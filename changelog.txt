@@ -1,0 +1,10 @@
+0.1.1a
++Some GUI fixes:
+ - points creation: text fields will be reset on creation menu reopen.
+ - points editing: text fields will contain current values (e.g. "name" will contain current point name) on editing menu open.
+ - points editing: buttons states will be reset on editing menu reopen.
+ - "refresh" button will also reset searh result.
+ - changed disabled state color for "creation" button, it will not merge with the background if button inactive.
+
+0.1.0a
++Initial release

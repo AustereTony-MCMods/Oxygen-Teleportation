@@ -1,5 +1,15 @@
+0.1.2a
++Added sort buttons for GUI.
++Fixes:
+ - Fixed camps preview images download from server, images will be downloaded and saved properly.
+ - Fixed locations preview images download from server, images will be downloaded and saved properly.
++GUI fixes:
+ - Fixed long descriptions display.
+ - Fixed text display in text fields.
+ - GUI menus design optimizations.
+
 0.1.1a
-+Some GUI fixes:
++GUI fixes:
  - points creation: text fields will be reset on creation menu reopen.
  - points editing: text fields will contain current values (e.g. "name" will contain current point name) on editing menu open.
  - points editing: buttons states will be reset on editing menu reopen.

@@ -1,4 +1,4 @@
-package austeretony.teleportation.client.gui.menu;
+package austeretony.alternateui.screen.panel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import austeretony.alternateui.screen.button.GUIButton;
-import austeretony.alternateui.screen.panel.GUIButtonPanel;
 import austeretony.alternateui.screen.text.GUITextField;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

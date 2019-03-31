@@ -19,7 +19,7 @@ public class EditCampGUICallback extends AbstractGUICallback {
 
     private final CampsGUISection section;
 
-    private GUITextField nameField, descField;
+    private GUITextField nameField, descriptionField;
 
     private GUICheckBoxButton updateImageButton, updatePositionButton;
 
@@ -49,7 +49,21 @@ public class EditCampGUICallback extends AbstractGUICallback {
         this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 61, this.getHeight() - 11, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.cancelButton"), true, 0.8F));
         this.addElement(this.confirmButton = new GUIButton(21, this.getHeight() - 11, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.confirmButton"), true, 0.8F));
         this.addElement(this.nameField = new GUITextField(1, 19, 165, 16).setScale(0.8F).enableDynamicBackground());
-        this.addElement(this.descField = new GUITextField(1, 39, 165, 64).setScale(0.8F).enableDynamicBackground());
+        this.addElement(this.descriptionField = new GUITextField(1, 39, 165, 64).setScale(0.8F).enableDynamicBackground());
+    }
+
+    @Override
+    protected void onOpen() {
+        this.nameField.setText(this.section.currentPoint.getName());
+        this.descriptionField.setText(this.section.currentPoint.getDescription());
+    }
+
+    @Override
+    protected void onClose() {
+        this.nameField.reset();
+        this.descriptionField.reset();
+        this.updateImageButton.setToggled(false);
+        this.updatePositionButton.setToggled(false);
     }
 
     @Override
@@ -58,13 +72,10 @@ public class EditCampGUICallback extends AbstractGUICallback {
             this.close();
         else if (element == this.confirmButton) {
             this.section.resetPointInfo();
-            String 
-            prevName,
-            name = this.nameField.getTypedText().isEmpty() ? this.section.currentPoint.getName() : this.nameField.getTypedText(),
-                    desc = this.descField.getTypedText().isEmpty() ? this.section.currentPoint.getDescription() : this.descField.getTypedText();
-                    CampsManagerClient.instance().editCampPointSynced(this.section.currentPoint, name, desc, this.updateImageButton.isToggled(), this.updatePositionButton.isToggled());
-                    this.section.updatePoints();
-                    this.close();
+            CampsManagerClient.instance().editCampPointSynced(this.section.currentPoint, this.nameField.getTypedText(), this.descriptionField.getTypedText(), 
+                    this.updateImageButton.isToggled(), this.updatePositionButton.isToggled());
+            this.section.updatePoints();
+            this.close();
         }
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ChatAllowedCharacters;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -39,7 +40,7 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
      */
     public GUITextField(int xPosition, int yPosition, int width, int maxStringLength) {   	    	
         this.setPosition(xPosition, yPosition);
-        this.setSize(width, this.FONT_HEIGHT);
+        this.setSize(width, FONT_HEIGHT);
         this.maxStringLength = maxStringLength > 64 ? 64 : maxStringLength;        
         this.typedText = "";
         this.enableFull();
@@ -62,6 +63,10 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
         this.setCursorPositionEnd();
     }
 
+    public void reset() {
+        this.setText("");
+    }
+
     private String getSelectedText() {  	
         int i = this.cursorPosition < this.selectionEnd ? this.cursorPosition : this.selectionEnd;
         int j = this.cursorPosition < this.selectionEnd ? this.selectionEnd : this.cursorPosition;       
@@ -76,8 +81,7 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
                 j = this.cursorPosition < this.selectionEnd ? this.selectionEnd : this.cursorPosition,
                         k = this.maxStringLength - this.typedText.length() - (i - this.selectionEnd),
                         l;
-        boolean flag = false;
-        if (this.typedText.length() > 0)
+        if (!this.typedText.isEmpty())
             s1 = s1 + this.typedText.substring(0, i);
         if (k < s2.length()) {       	
             s1 = s1 + s2.substring(0, k);         
@@ -86,7 +90,7 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
             s1 = s1 + s2;            
             l = s2.length();
         }
-        if (this.typedText.length() > 0 && j < this.typedText.length())
+        if (!this.typedText.isEmpty() && j < this.typedText.length())
             s1 = s1 + this.typedText.substring(j);
         this.typedText = s1;       
         this.moveCursorBy(i - this.selectionEnd + l);
@@ -182,21 +186,9 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
     }
 
     private void setCursorPosition(int index) {
-
         this.cursorPosition = index;
-
-        int j = this.typedText.length();
-
-        if (this.cursorPosition < 0) {
-
-            this.cursorPosition = 0;
-        }
-
-        if (this.cursorPosition > j) {
-
-            this.cursorPosition = j;
-        }
-
+        int i = this.typedText.length();
+        this.cursorPosition = MathHelper.clamp(this.cursorPosition, 0, i);
         this.setSelectionPos(this.cursorPosition);
     }
 
@@ -397,67 +389,35 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
     //TODO mouseClicked()
     @Override
     public boolean mouseClicked(int mouseX, int mouseY) {
-
         boolean flag = false;
-
         if (this.isDoubleClickRequired()) {
-
             if (this.isClickedLately()) {
-
                 flag = true;
-
                 this.setLastClickTime(0L);
-            }
-
-            else {
-
+            } else
                 this.setLastClickTime(Minecraft.getSystemTime());
-            }
-        }
-
-        else {
-
+        } else
             flag = true;
-        }
-
         if (flag) {
-
             if (this.isEnabled()) {
-
                 this.setDragged(this.isHovered());	            
-
-                if (!this.isHovered() && this.shouldResetOnMisclick()) {
-
-                    this.setText("");
-                }	   	       
-
+                if (!this.isHovered() && this.shouldResetOnMisclick())
+                    this.setText("");   	       
                 if (this.isDragged() && this.isHovered()) {
-
                     int l = mouseX - this.getX();
-
-                    if (this.isDynamicBackgroundEnabled()) {
-
-                        l -= 4;
-                    }
-
+                    if (this.isDynamicBackgroundEnabled())
+                        l -= 4;                  
                     String s = this.mc.fontRenderer.trimStringToWidth(this.typedText.substring(this.lineScrollOffset), this.getWidth());
-
-                    this.setCursorPosition(this.mc.fontRenderer.trimStringToWidth(s, l).length() + this.lineScrollOffset);
-                }
-
-                this.screen.handleElementClick(this.screen.getWorkspace().getCurrentSection(), this);
-
-                this.screen.getWorkspace().getCurrentSection().handleElementClick(this.screen.getWorkspace().getCurrentSection(), this);
-
-                if (this.screen.getWorkspace().getCurrentSection().hasCurrentCallback()) {
-
-                    this.screen.getWorkspace().getCurrentSection().getCurrentCallback().handleElementClick(this.screen.getWorkspace().getCurrentSection(), this);
-                }
-
-                return true;
+                    this.setCursorPosition(this.mc.fontRenderer.trimStringToWidth(s, l).length() + this.lineScrollOffset);                  
+                    this.screen.handleElementClick(this.screen.getWorkspace().getCurrentSection(), this);
+                    this.screen.getWorkspace().getCurrentSection().handleElementClick(this.screen.getWorkspace().getCurrentSection(), this);
+                    if (this.screen.getWorkspace().getCurrentSection().hasCurrentCallback())
+                        this.screen.getWorkspace().getCurrentSection().getCurrentCallback().handleElementClick(this.screen.getWorkspace().getCurrentSection(), this);
+                    return true;
+                } else
+                    return false;
             }
         }
-
         return false;
     }
 
@@ -468,9 +428,9 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
             GlStateManager.translate(this.getX(), this.getY(), 0.0F);            
             GlStateManager.scale(this.getScale(), this.getScale(), 0.0F);                          
             if (this.isDynamicBackgroundEnabled()) {
-                this.drawRect(ZERO, - 1, ZERO + getWidth(), this.getHeight() + 1, this.getEnabledBackgroundColor());
+                this.drawRect(ZERO, - 1, this.getWidth(), this.getHeight() + 1, this.getEnabledBackgroundColor());
                 if (this.isDragged())
-                    this.drawRect(ZERO, - 1, ZERO + this.getWidth(), this.getHeight() + 1, this.getHoveredBackgroundColor());
+                    this.drawRect(ZERO, - 1, this.getWidth(), this.getHeight() + 1, this.getHoveredBackgroundColor());
             }
             int 
             i = this.isEnabled() ? this.getEnabledTextColor() : this.getDisabledTextColor(),
@@ -489,7 +449,7 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
 
                 j1 = this.mc.fontRenderer.drawString(s1, l, i1 + 1, i, this.isTextShadowEnabled());
             }
-            if (this.hasDisplayText() && !this.isDragged() && this.getTypedText().length() == 0)
+            if (this.hasDisplayText() && !this.isDragged() && this.getTypedText().isEmpty())
                 this.mc.fontRenderer.drawString(this.getDisplayText(), l, i1 + 1, this.getEnabledTextColor(), this.isTextShadowEnabled());
             boolean flag2 = this.cursorPosition < this.typedText.length() || this.typedText.length() >= this.getMaxStringLength();
             int k1 = j1;
@@ -579,28 +539,25 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
     }
 
     private void setSelectionPos(int index) {   	
-        int j = this.typedText.length();
-        if (index > j)
-            index = j;
+        int i = this.typedText.length();
+        if (index > i)
+            index = i;
         if (index < 0)
             index = 0;
         this.selectionEnd = index;
-        if (this.mc.fontRenderer != null) {       	
-            if (this.lineScrollOffset > j)
-                this.lineScrollOffset = j;
-            int k = this.getWidth();           
-            String s = this.mc.fontRenderer.trimStringToWidth(this.typedText.substring(this.lineScrollOffset), k);           
-            int l = s.length() + this.lineScrollOffset;
+        if (this.mc.fontRenderer != null) {
+            if (this.lineScrollOffset > i)
+                this.lineScrollOffset = i;
+            int j = this.getWidth();
+            String s = this.mc.fontRenderer.trimStringToWidth(this.typedText.substring(this.lineScrollOffset), j);
+            int k = s.length() + this.lineScrollOffset;
             if (index == this.lineScrollOffset)
-                this.lineScrollOffset -= this.mc.fontRenderer.trimStringToWidth(this.typedText, k, true).length();
-            if (index > l)
-                this.lineScrollOffset += index - l;
+                this.lineScrollOffset -= this.mc.fontRenderer.trimStringToWidth(this.typedText, j, true).length();
+            if (index > k)
+                this.lineScrollOffset += index - k;
             else if (index <= this.lineScrollOffset)
                 this.lineScrollOffset -= this.lineScrollOffset - index;
-            if (this.lineScrollOffset < 0)
-                this.lineScrollOffset = 0;
-            if (this.lineScrollOffset > j)
-                this.lineScrollOffset = j;
+            this.lineScrollOffset = MathHelper.clamp(this.lineScrollOffset, 0, i);
         }
     }
 

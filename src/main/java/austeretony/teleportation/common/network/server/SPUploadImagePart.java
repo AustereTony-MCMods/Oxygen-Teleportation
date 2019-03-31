@@ -8,7 +8,9 @@ import net.minecraft.network.PacketBuffer;
 
 public class SPUploadImagePart extends ProxyPacket {
 
-    private int operation, index, partsAmount;
+    private ImageTransferingServerBuffer.EnumImageTransfer operation;
+
+    private int index, partsAmount;
 
     private long pointId;
 
@@ -17,7 +19,7 @@ public class SPUploadImagePart extends ProxyPacket {
     public SPUploadImagePart() {}
 
     public SPUploadImagePart(ImageTransferingServerBuffer.EnumImageTransfer operation, long pointId, int index, int[] part, int partsAmount) {
-        this.operation = operation.ordinal();
+        this.operation = operation;
         this.pointId = pointId;
         this.index = index;
         this.part = part;
@@ -26,7 +28,7 @@ public class SPUploadImagePart extends ProxyPacket {
 
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeByte(this.operation);
+        buffer.writeByte(this.operation.ordinal());
         buffer.writeLong(this.pointId);
         buffer.writeByte(this.index);
         buffer.writeByte(this.partsAmount);
@@ -37,7 +39,7 @@ public class SPUploadImagePart extends ProxyPacket {
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
-        ImageTransferingServerBuffer.EnumImageTransfer operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[buffer.readByte()];
+        this.operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[buffer.readByte()];
         this.pointId = buffer.readLong();
         this.index = buffer.readByte();
         this.partsAmount = buffer.readByte();

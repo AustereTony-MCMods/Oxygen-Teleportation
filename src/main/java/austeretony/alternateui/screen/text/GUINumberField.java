@@ -39,7 +39,7 @@ public class GUINumberField extends GUISimpleElement<GUINumberField> {
      */
     public GUINumberField(int xPosition, int yPosition, int width, int maxNumber) {
         this.setPosition(xPosition, yPosition);
-        this.setSize(this.width(String.valueOf(maxNumber)), this.FONT_HEIGHT);        
+        this.setSize(this.width(String.valueOf(maxNumber)), FONT_HEIGHT);        
         this.maxNumber = maxNumber;
         this.typedNumber = "";
         this.enableFull();		
@@ -63,6 +63,10 @@ public class GUINumberField extends GUISimpleElement<GUINumberField> {
         else
             this.typedNumber = empty ? "" : String.valueOf(value);
         this.setCursorPositionEnd();
+    }
+
+    public void reset() {
+        this.setText("");
     }
 
     private String getSelectedText() {

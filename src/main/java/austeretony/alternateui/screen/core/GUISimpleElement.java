@@ -273,7 +273,7 @@ public class GUISimpleElement<T extends GUIBaseElement> extends GUIBaseElement<T
      */
     public T setDisplayText(String displayText, boolean enableShadow) {	
         this.setDisplayText(displayText);
-        this.isTextShadowEnabled = true;
+        this.isTextShadowEnabled = enableShadow;
         return (T) this;
     }
 

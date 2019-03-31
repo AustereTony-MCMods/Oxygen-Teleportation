@@ -56,7 +56,7 @@ public class ImageTransferingClientBuffer {
             LocationsLoaderClient.saveLocationPreviewImageDelegated(this.pointId, image);
         CampsManagerClient.instance().getPreviewImages().put(this.pointId, image);
         CampsManagerClient.instance().getImageTransfers().remove(this.pointId);
-        TeleportationMain.LOGGER.info("Image {} saved.", this.pointId);
+        TeleportationMain.LOGGER.info("Image {}.png saved.", this.pointId);
     }
 
     public enum EnumImageTransfer {

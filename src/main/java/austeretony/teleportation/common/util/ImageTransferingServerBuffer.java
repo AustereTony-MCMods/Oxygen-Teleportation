@@ -57,7 +57,7 @@ public class ImageTransferingServerBuffer {
         else
             LocationsLoaderServer.saveAndLoadBytesLocationPreviewDelegated(this.pointId, BufferedImageUtils.convertIntArraysListToBufferedImage(orderedParts));
         CampsManagerServer.instance().getImageTransfers().remove(this.pointId);
-        TeleportationMain.LOGGER.info("Image {} saved.", this.pointId);
+        TeleportationMain.LOGGER.info("Image {}.png saved.", this.pointId);
     }
 
     public enum EnumImageTransfer {

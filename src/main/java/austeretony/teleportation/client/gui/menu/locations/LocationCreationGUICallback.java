@@ -20,7 +20,7 @@ public class LocationCreationGUICallback extends AbstractGUICallback {
 
     private final LocationsGUISection section;
 
-    private GUITextField nameField, descField;
+    private GUITextField nameField, descriptionField;
 
     private GUIButton confirmButton, cancelButton;
 
@@ -40,7 +40,13 @@ public class LocationCreationGUICallback extends AbstractGUICallback {
         this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 61, this.getHeight() - 11, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.cancelButton"), true, 0.8F));
         this.addElement(this.confirmButton = new GUIButton(21, this.getHeight() - 11, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.confirmButton"), true, 0.8F));
         this.addElement(this.nameField = new GUITextField(1, 19, 165, 16).setScale(0.8F).enableDynamicBackground());
-        this.addElement(this.descField = new GUITextField(1, 39, 165, 64).setScale(0.8F).enableDynamicBackground());
+        this.addElement(this.descriptionField = new GUITextField(1, 39, 165, 64).setScale(0.8F).enableDynamicBackground());
+    }
+
+    @Override
+    protected void onClose() {
+        this.nameField.reset();
+        this.descriptionField.reset();
     }
 
     @Override
@@ -53,12 +59,12 @@ public class LocationCreationGUICallback extends AbstractGUICallback {
             name = this.nameField.getTypedText().isEmpty() 
             ? I18n.format("teleportation.menu.locationGenericName") + " #" + String.valueOf(LocationsManagerClient.instance().getWorldProfile().getLocationsAmount() + 1) 
             : this.nameField.getTypedText(),
-            desc = this.descField.getTypedText();
+            description = this.descriptionField.getTypedText();
             WorldPoint worldPoint = new WorldPoint(
                     OxygenHelperClient.getPlayerUUID(),
                     this.mc.player.getName(), 
                     name, 
-                    desc,
+                    description,
                     this.mc.player.dimension,
                     (float) this.mc.player.posX, 
                     (float) this.mc.player.posY, 

@@ -7,32 +7,34 @@ import net.minecraft.network.PacketBuffer;
 
 public class CPStartImageDownload extends ProxyPacket {
 
-    private int operation, partsAmount;
+    private ImageTransferingClientBuffer.EnumImageTransfer operation;
+
+    private int partsAmount;
 
     private long pointId;
 
     public CPStartImageDownload() {}
 
     public CPStartImageDownload(ImageTransferingClientBuffer.EnumImageTransfer operation, long pointId, int partsAmount) {
-        this.operation = operation.ordinal();
+        this.operation = operation;
         this.pointId = pointId;
         this.partsAmount = partsAmount;
     }
 
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeByte(this.operation);
+        buffer.writeByte(this.operation.ordinal());
         buffer.writeLong(this.pointId);
         buffer.writeInt(this.partsAmount);
     }
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
-        this.operation = buffer.readByte();
+        this.operation = ImageTransferingClientBuffer.EnumImageTransfer.values()[buffer.readByte()];
         this.pointId = buffer.readLong();
         if (!ImageTransferingClientBuffer.exist(this.pointId))
             ImageTransferingClientBuffer.create(
-                    ImageTransferingClientBuffer.EnumImageTransfer.values()[this.operation], 
+                    this.operation, 
                     this.pointId, 
                     buffer.readInt());
     }

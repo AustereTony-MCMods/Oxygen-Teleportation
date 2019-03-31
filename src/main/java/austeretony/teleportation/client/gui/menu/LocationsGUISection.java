@@ -12,6 +12,7 @@ import austeretony.alternateui.screen.callback.AbstractGUICallback;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.image.GUIImageLabel;
+import austeretony.alternateui.screen.panel.SearchableGUIButtonPanel;
 import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.alternateui.util.EnumGUIAlignment;
@@ -95,15 +96,14 @@ public class LocationsGUISection extends AbstractGUISection {
         this.pointsListPanel.setButtonsOffset(1);
         this.pointsListPanel.setTextScale(0.8F);
         this.addElement(this.pointsListPanel);
-        this.addElement(this.searchField = new GUITextField(0, 18, 98, 16).setScale(0.8F).enableDynamicBackground().disableFull());
+        this.addElement(this.searchField = new GUITextField(0, 18, 98, 16).setScale(0.8F).enableDynamicBackground().setDisplayText("...", false, 0.8F).disableFull());
         this.pointsListPanel.initSearchField(this.searchField);
         GUIScroller panelScroller = new GUIScroller(TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue(), 10);
         this.pointsListPanel.initScroller(panelScroller);
         GUISlider panelSlider = new GUISlider(82, 27, 3, 109);
         panelScroller.initSlider(panelSlider);
 
-        this.addElement(this.createButton = new GUIButton(22, 140,  40, 10).enableDynamicBackground(0xFF404040, 0xFF101010, 0xFF606060)
-                .setDisplayText(I18n.format("teleportation.menu.createButton"), true, 0.8F));     
+        this.addElement(this.createButton = new GUIButton(22, 140,  40, 10).enableDynamicBackground(0xFF404040, 0xFF202020, 0xFF606060).setDisplayText(I18n.format("teleportation.menu.createButton"), true, 0.8F));     
         this.lockCreateButton();     
         this.createCallback = new LocationCreationGUICallback(this.screen, this, 140, 64).enableDefaultBackground();
 
@@ -170,6 +170,7 @@ public class LocationsGUISection extends AbstractGUISection {
         else if (element == this.searchButton)
             this.searchField.enableFull();
         else if (element == this.refreshButton) {
+            this.searchField.reset();
             this.updatePoints();
             this.resetPointInfo();
         } else if (element == this.moveButton) {

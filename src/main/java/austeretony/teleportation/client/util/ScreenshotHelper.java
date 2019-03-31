@@ -17,10 +17,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ScreenshotHelper {
 
-    private static IntBuffer pixelBuffer;
-
-    private static int[] pixelValues;
-
     public static BufferedImage createScreenshot() {
         return resize(prepareImage(ClientReference.getMinecraft().displayWidth, ClientReference.getMinecraft().displayHeight, 
                 ClientReference.getMinecraft().getFramebuffer()), TeleportationConfig.IMAGE_WIDTH.getIntValue(), TeleportationConfig.IMAGE_HEIGHT.getIntValue());
@@ -32,6 +28,8 @@ public class ScreenshotHelper {
             height = frameBuffer.framebufferTextureHeight;
         }
         int i = width * height;
+        IntBuffer pixelBuffer = null;
+        int[] pixelValues = null;
         if (pixelBuffer == null || pixelBuffer.capacity() < i) {
             pixelBuffer = BufferUtils.createIntBuffer(i);
             pixelValues = new int[i];

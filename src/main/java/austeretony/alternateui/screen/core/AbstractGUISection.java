@@ -187,8 +187,9 @@ public abstract class AbstractGUISection extends GUIAdvancedElement<AbstractGUIS
         return this.currentCallback;
     }
 
-    public void openCallback(AbstractGUICallback callback) {		
-        this.currentCallback = callback;		
+    public void openCallback(AbstractGUICallback callback) {	
+        this.hoveredElement.setHovered(false);
+        this.currentCallback = callback;	
         this.hasCurrentCallback = true;
     }
 

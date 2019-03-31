@@ -227,7 +227,7 @@ public class CampsManagerClient {
         this.replaceImage(oldPointId, worldPoint.getId());
     }
 
-    //TODO editCampPointSynced() //It should be flexible enough to sum changes and apply them in any combination at same time
+    //TODO editCampPointSynced()
     public void editCampPointSynced(WorldPoint worldPoint, String newName, String newDescription, boolean updateImage, boolean updatePosition) {
         long 
         oldPointId = worldPoint.getId(),

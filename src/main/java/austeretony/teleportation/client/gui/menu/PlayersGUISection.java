@@ -13,6 +13,7 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.alternateui.screen.list.GUIDropDownElement;
 import austeretony.alternateui.screen.list.GUIDropDownList;
+import austeretony.alternateui.screen.panel.SearchableGUIButtonPanel;
 import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.alternateui.util.EnumGUIAlignment;
@@ -120,7 +121,7 @@ public class PlayersGUISection extends AbstractGUISection {
         this.playersListPanel.setButtonsOffset(1);
         this.playersListPanel.setTextScale(0.8F);
         this.addElement(this.playersListPanel);
-        this.addElement(this.searchField = new GUITextField(87, 18, 98, 16).setScale(0.8F).enableDynamicBackground().disableFull());
+        this.addElement(this.searchField = new GUITextField(87, 18, 98, 16).setScale(0.8F).enableDynamicBackground().setDisplayText("...", false, 0.8F).disableFull());
         this.playersListPanel.initSearchField(this.searchField);
         GUIScroller panelScroller = new GUIScroller(this.playerList.size() > 10 ? this.playerList.size() : 10, 10);
         this.playersListPanel.initScroller(panelScroller);
@@ -129,7 +130,7 @@ public class PlayersGUISection extends AbstractGUISection {
 
         this.addElement(this.targetUsernameLabel = new GUITextLabel(3, 104));  
         this.addElement(this.targetDimensionLabel = new GUITextLabel(3, 114).setTextScale(0.7F));    
-        this.addElement(this.moveButton = new GUIButton(22, 140,  40, 10).enableDynamicBackground(0xFF404040, 0xFF101010, 0xFF606060).setTextScale(0.8F).disableFull());
+        this.addElement(this.moveButton = new GUIButton(22, 140,  40, 10).enableDynamicBackground(0xFF404040, 0xFF202020, 0xFF606060).setTextScale(0.8F).disableFull());
 
         this.updatePlayers();
 
@@ -191,6 +192,7 @@ public class PlayersGUISection extends AbstractGUISection {
         else if (element == this.searchButton)
             this.searchField.enableFull();
         else if (element == this.refreshButton) {
+            this.searchField.reset();
             this.updatePlayers();
             this.resetPlayerInfo();
         } else if (element == this.moveButton) {

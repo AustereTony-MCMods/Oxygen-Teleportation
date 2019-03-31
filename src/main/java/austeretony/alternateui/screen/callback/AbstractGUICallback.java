@@ -54,7 +54,7 @@ public abstract class AbstractGUICallback extends GUIAdvancedElement<AbstractGUI
     /**
      * Вызывается непосредственно перед открытием.
      */
-    private void onOpen() {}
+    protected void onOpen() {}
 
     /**
      * Закрытие всплывающего окна.
@@ -69,7 +69,7 @@ public abstract class AbstractGUICallback extends GUIAdvancedElement<AbstractGUI
     /**
      * Вызывается непосредственно перед закрытием.
      */
-    private void onClose() {}
+    protected void onClose() {}
 
     @Override
     public void mouseOver(int mouseX, int mouseY) {  	

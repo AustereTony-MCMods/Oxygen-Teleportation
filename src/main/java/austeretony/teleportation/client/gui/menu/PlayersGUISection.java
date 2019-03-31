@@ -1,6 +1,10 @@
 package austeretony.teleportation.client.gui.menu;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -42,7 +46,7 @@ public class PlayersGUISection extends AbstractGUISection {
 
     private GUITextLabel playersAmountLabel, targetUsernameLabel, targetDimensionLabel, cooldownLabel;
 
-    private GUIButton campsPageButton, locationsPageButton, playersPageButton, searchButton, refreshButton, moveButton;
+    private GUIButton campsPageButton, locationsPageButton, playersPageButton, searchButton, refreshButton, moveButton, sortUpButton, sortDownButton;
 
     private PlayerGUIButton currentButton;
 
@@ -87,7 +91,7 @@ public class PlayersGUISection extends AbstractGUISection {
                 this.playerList.add(playerData);
         }
 
-        this.addElement(new GUIImageLabel(- 2, - 2, this.getWidth() + 4, this.getHeight() + 4).enableStaticBackground(0xC8202020));//main background
+        this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(0xC8202020));//main background
         this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 15).enableStaticBackground(0xFF101010));//title background
         this.addElement(new GUIImageLabel(0, 17, 85, 65).enableStaticBackground(0xFF101010));//client profile background
         this.addElement(new GUIImageLabel(87, 17, 85, 9).enableStaticBackground(0xFF101010));//players list search background
@@ -111,7 +115,9 @@ public class PlayersGUISection extends AbstractGUISection {
         if (!TeleportationConfig.ENABLE_LOCATIONS.getBooleanValue())
             this.locationsPageButton.disable();
 
-        this.addElement(this.searchButton = new GUIButton(89, 18, 7, 7).setTexture(MenuGUIScreen.SEARCH_ICONS, 7, 7).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.search"), 0.8F));  
+        this.addElement(this.searchButton = new GUIButton(94, 18, 7, 7).setTexture(MenuGUIScreen.SEARCH_ICONS, 7, 7).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.search"), 0.8F));  
+        this.addElement(this.sortDownButton = new GUIButton(89, 22, 3, 3).setTexture(MenuGUIScreen.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.sort"), 0.8F)); 
+        this.addElement(this.sortUpButton = new GUIButton(89, 18, 3, 3).setTexture(MenuGUIScreen.SORT_UP_ICONS, 3, 3).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.sort"), 0.8F)); 
         this.addElement(this.refreshButton = new GUIButton(0, 17, 10, 10).setTexture(MenuGUIScreen.REFRESH_ICONS, 10, 10).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.refresh"), 0.8F));
         this.addElement(this.playersAmountLabel = new GUITextLabel(0, 18).setTextScale(0.7F).setDisplayText(String.valueOf(this.playerList.size()) + 
                 " / " + String.valueOf(OxygenHelperClient.getMaxPlayers())));   
@@ -133,6 +139,7 @@ public class PlayersGUISection extends AbstractGUISection {
         this.addElement(this.moveButton = new GUIButton(22, 140,  40, 10).enableDynamicBackground(0xFF404040, 0xFF202020, 0xFF606060).setTextScale(0.8F).disableFull());
 
         this.updatePlayers();
+        this.sortDownButton.toggle(); 
 
         this.addElement(new GUITextLabel(3, 36).setDisplayText(clientData.getUsername()));  
         this.addElement(new GUITextLabel(3, 46).setDisplayText(EnumDimensions.getLocalizedNameFromId(clientData.getDimension())).setTextScale(0.7F));   
@@ -176,6 +183,33 @@ public class PlayersGUISection extends AbstractGUISection {
         }
     }
 
+    private void sortPlayers(int mode) {
+        List<OxygenPlayerData> players = new ArrayList<OxygenPlayerData>(this.playerList);
+        Collections.sort(players, new Comparator<OxygenPlayerData>() {
+
+            @Override
+            public int compare(OxygenPlayerData player1, OxygenPlayerData player2) {
+                if (mode == 0)
+                    return player1.getUsername().compareTo(player2.getUsername());
+                else
+                    return player2.getUsername().compareTo(player1.getUsername());
+            }
+        });
+        this.playersListPanel.reset();
+        this.mappedPlayers.clear();
+        PlayerGUIButton button;
+        for (OxygenPlayerData playerData : players) {
+            button = new PlayerGUIButton(
+                    playerData.getUsername(), 
+                    EnumDimensions.getLocalizedNameFromId(playerData.getDimension()), 
+                    PlayersManagerClient.getPlayerJumpProfile(playerData.getUUID()).getLocalizedName());
+            button.enableDynamicBackground(0xFF151515, 0xFF101010, 0xFF303030);
+            button.setTextDynamicColor(0xFFB2B2B2, 0xFF8C8C8C, 0xFFD1D1D1);
+            this.playersListPanel.addButton(button);
+            this.mappedPlayers.put(button, playerData);
+        }
+    }
+
     @Override
     public boolean mouseClicked(int mouseX, int mouseY) {
         if (this.searchField.isEnabled() && !this.searchField.isHovered())
@@ -191,7 +225,19 @@ public class PlayersGUISection extends AbstractGUISection {
             this.screen.locationsSection.open();
         else if (element == this.searchButton)
             this.searchField.enableFull();
-        else if (element == this.refreshButton) {
+        else if (element == this.sortDownButton) {
+            if (!this.sortDownButton.isToggled()) {
+                this.sortPlayers(1);
+                this.sortUpButton.setToggled(false);
+                this.sortDownButton.toggle(); 
+            }
+        } else if (element == this.sortUpButton) {
+            if (!this.sortUpButton.isToggled()) {
+                this.sortPlayers(0);
+                this.sortDownButton.setToggled(false);
+                this.sortUpButton.toggle();
+            }
+        } else if (element == this.refreshButton) {
             this.searchField.reset();
             this.updatePlayers();
             this.resetPlayerInfo();

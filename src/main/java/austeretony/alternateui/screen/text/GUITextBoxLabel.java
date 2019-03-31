@@ -62,7 +62,7 @@ public class GUITextBoxLabel extends GUISimpleElement<GUITextBoxLabel> {
     public GUITextBoxLabel setDisplayText(String displayText) {  	
         this.lines.clear();   	
         StringBuilder stringBuilder = new StringBuilder();    	
-        String[] words = displayText.split(" ");    	
+        String[] words = displayText.split("[ ]");    	
         if (words.length > 0) {   		
             for (int i = 0; i < words.length; i++) {  		
                 if (this.width(stringBuilder.toString() + words[i]) < this.getWidth())	    			

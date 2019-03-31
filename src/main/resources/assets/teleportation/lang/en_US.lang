@@ -52,6 +52,7 @@ teleportation.menu.tooltip.favorite=Make Favorite
 teleportation.menu.tooltip.lock=Lock
 teleportation.menu.tooltip.edit=Edit
 teleportation.menu.tooltip.remove=Remove
+teleportation.menu.tooltip.sort=Sort
 
 teleportation.jumpProfile.free=Free
 teleportation.jumpProfile.request=Request

@@ -1,6 +1,8 @@
 package austeretony.teleportation.client.gui.menu;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import austeretony.alternateui.screen.image.GUIImageLabel;
@@ -16,9 +18,11 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
 
     private final Map<Long, ResourceLocation> cache = new HashMap<Long, ResourceLocation>();
 
-    private String name, owner, creationDate, position, dimension, description, noImage;
+    private String name, owner, creationDate, position, dimension, noImage;
 
     private boolean enableFavMark, hasImage;
+
+    private final List<String> description = new ArrayList<String>();
 
     public PreviewGUIImageLabel(int xPosition, int yPosition) {
         super(xPosition, yPosition);
@@ -71,7 +75,10 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
             GlStateManager.pushMatrix();           
             GlStateManager.translate(0.0F, 0.0F, 0.0F);           
             GlStateManager.scale(0.9F, 0.9F, 0.0F);  
-            this.mc.fontRenderer.drawString(this.description, 16, 60, 0xFFD1D1D1, true);
+            //this.mc.fontRenderer.drawString(this.description, 16, 60, 0xFFD1D1D1, true);
+            if (!this.description.isEmpty())                      
+                for (String line : this.description)                  
+                    this.mc.fontRenderer.drawString(line, 16, 60 + 10 * this.description.indexOf(line), 0xFFD1D1D1, true); 
             GlStateManager.popMatrix();
             GlStateManager.popMatrix();
         }
@@ -87,8 +94,29 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
         this.creationDate = worldPoint.getCreationDate();
         this.position = String.valueOf((int) worldPoint.getXPos()) + ", " + String.valueOf((int) worldPoint.getYPos()) + ", " + String.valueOf((int) worldPoint.getZPos());
         this.dimension = EnumDimensions.getLocalizedNameFromId(worldPoint.getDimensionId());
-        this.description = worldPoint.getDescription();
+        this.processDescription(worldPoint.getDescription());
         this.setVisible(true);
+    }
+
+    private void processDescription(String description) {     
+        this.description.clear();     
+        StringBuilder stringBuilder = new StringBuilder();      
+        String[] words = description.split("[ ]");        
+        if (words.length > 0) {                 
+            for (int i = 0; i < words.length; i++) {            
+                if (this.width(stringBuilder.toString() + words[i]) < 220)                          
+                    stringBuilder.append(words[i]).append(" ");
+                else {                          
+                    if (this.description.size() * 10 <= 20)                                      
+                        this.description.add(stringBuilder.toString());                       
+                    stringBuilder = new StringBuilder();                                
+                    stringBuilder.append(words[i]).append(" ");
+                }                       
+                if (i == words.length - 1)                              
+                    if (this.description.size() * 10 <= 20)                            
+                        this.description.add(stringBuilder.toString());
+            }
+        }       
     }
 
     public void hide() {

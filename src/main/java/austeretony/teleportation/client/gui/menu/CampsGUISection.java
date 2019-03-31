@@ -1,9 +1,11 @@
 package austeretony.teleportation.client.gui.menu;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import austeretony.alternateui.screen.browsing.GUIScroller;
 import austeretony.alternateui.screen.button.GUIButton;
@@ -41,7 +43,7 @@ public class CampsGUISection extends AbstractGUISection {
     private GUITextLabel pointsAmountLabel, cooldownLabel;
 
     private GUIButton campsPageButton, locationsPageButton, playersPageButton, downloadButton, searchButton, refreshButton, createButton, moveButton, setFavoriteButton,
-    lockPointButton, editPointButton, removePointButton;
+    lockPointButton, editPointButton, removePointButton, sortUpButton, sortDownButton;
 
     private SearchableGUIButtonPanel pointsListPanel;
 
@@ -71,7 +73,7 @@ public class CampsGUISection extends AbstractGUISection {
     protected void init() {	
         int maxCamps = PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue());
 
-        this.addElement(new GUIImageLabel(- 2, - 2, this.getWidth() + 4, this.getHeight() + 4).enableStaticBackground(0xC8202020));//main background
+        this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(0xC8202020));//main background
         this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 15).enableStaticBackground(0xFF101010));//title background
         this.addElement(new GUIImageLabel(0, 17, 85, 9).enableStaticBackground(0xFF101010));//search background
         this.addElement(new GUIImageLabel(0, 27, 81, 109).enableStaticBackground(0xFF101010));//list background
@@ -87,7 +89,9 @@ public class CampsGUISection extends AbstractGUISection {
         if (!TeleportationConfig.ENABLE_PLAYERS.getBooleanValue())
             this.playersPageButton.disable();
 
-        this.addElement(this.searchButton = new GUIButton(4, 18, 7, 7).setTexture(MenuGUIScreen.SEARCH_ICONS, 7, 7).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.search"), 0.8F));	
+        this.addElement(this.searchButton = new GUIButton(7, 18, 7, 7).setTexture(MenuGUIScreen.SEARCH_ICONS, 7, 7).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.search"), 0.8F));	
+        this.addElement(this.sortDownButton = new GUIButton(2, 22, 3, 3).setTexture(MenuGUIScreen.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.sort"), 0.8F)); 
+        this.addElement(this.sortUpButton = new GUIButton(2, 18, 3, 3).setTexture(MenuGUIScreen.SORT_UP_ICONS, 3, 3).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.sort"), 0.8F)); 
         this.addElement(this.refreshButton = new GUIButton(0, 17, 10, 10).setTexture(MenuGUIScreen.REFRESH_ICONS, 10, 10).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.refresh"), 0.8F));
         this.addElement(this.downloadButton = new GUIButton(this.width(I18n.format("teleportation.menu.campsTitle")) + 3, 4,  8, 8).setTexture(MenuGUIScreen.DOWNLOAD_ICONS, 8, 8).initSimpleTooltip(I18n.format("teleportation.menu.tooltip.download"), 0.8F));
         this.addElement(this.pointsAmountLabel = new GUITextLabel(0, 18).setTextScale(0.7F));	
@@ -107,13 +111,14 @@ public class CampsGUISection extends AbstractGUISection {
 
         this.addElement(this.createButton = new GUIButton(22, 140,  40, 10).enableDynamicBackground(0xFF404040, 0xFF202020, 0xFF606060).setDisplayText(I18n.format("teleportation.menu.createButton"), true, 0.8F));     
         this.lockCreateButton();     
-        this.createCallback = new CampCreationGUICallback(this.screen, this, 140, 64).enableDefaultBackground();
+        this.createCallback = new CampCreationGUICallback(this.screen, this, 140, 66).enableDefaultBackground();
 
-        this.editPointCallback = new EditCampGUICallback(this.screen, this, 140, 90).enableDefaultBackground();
+        this.editPointCallback = new EditCampGUICallback(this.screen, this, 140, 94).enableDefaultBackground();
         this.removePointCallback = new CampRemoveGUICallback(this.screen, this, 140, 40).enableDefaultBackground();
 
         this.initSpecials(); 
         this.updatePoints();
+        this.sortDownButton.toggle(); 
     }
 
     private void initSpecials() {
@@ -135,11 +140,25 @@ public class CampsGUISection extends AbstractGUISection {
                 " / " + String.valueOf(PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue())));	
         this.pointsAmountLabel.setX(83 - (int) ((float) this.width(this.pointsAmountLabel.getDisplayText()) * 0.7F));
         this.refreshButton.setX(this.pointsAmountLabel.getX() - 11);
+        this.sortPoints(1);
+    }
+
+    private void sortPoints(int mode) {
+        List<WorldPoint> points = new ArrayList<WorldPoint>(CampsManagerClient.instance().getPlayerProfile().getCamps().values());
+        Collections.sort(points, new Comparator<WorldPoint>() {
+
+            @Override
+            public int compare(WorldPoint point1, WorldPoint point2) {
+                if (mode == 0)
+                    return (int) (point1.getId() - point2.getId());
+                else
+                    return (int) (point2.getId() - point1.getId());
+            }
+        });
         this.pointsListPanel.reset();
         this.mappedPoints.clear();
-        Set<WorldPoint> orderedPoints = new TreeSet<WorldPoint>(CampsManagerClient.instance().getPlayerProfile().getCamps().values());
         CampGUIButton button;
-        for (WorldPoint worldPoint : orderedPoints) {
+        for (WorldPoint worldPoint : points) {
             button = new CampGUIButton();
             button.enableDynamicBackground(0xFF151515, 0xFF101010, 0xFF303030);
             button.setTextDynamicColor(0xFFB2B2B2, 0xFF8C8C8C, 0xFFD1D1D1);
@@ -176,7 +195,19 @@ public class CampsGUISection extends AbstractGUISection {
             this.createCallback.open();
         else if (element == this.searchButton)
             this.searchField.enableFull();
-        else if (element == this.refreshButton) {
+        else if (element == this.sortDownButton) {
+            if (!this.sortDownButton.isToggled()) {
+                this.sortPoints(1);
+                this.sortUpButton.setToggled(false);
+                this.sortDownButton.toggle(); 
+            }
+        } else if (element == this.sortUpButton) {
+            if (!this.sortUpButton.isToggled()) {
+                this.sortPoints(0);
+                this.sortDownButton.setToggled(false);
+                this.sortUpButton.toggle();
+            }
+        } else if (element == this.refreshButton) {
             this.searchField.reset();
             this.updatePoints();
             this.resetPointInfo();

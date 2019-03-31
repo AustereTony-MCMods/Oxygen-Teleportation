@@ -441,12 +441,11 @@ public class GUITextField extends GUISimpleElement<GUITextField> {
             boolean 
             flag = j >= 0 && j <= s.length(),
             flag1 = this.isDragged() && this.cursorCounter / 6 % 2 == 0 && flag;
-            int l = this.isDynamicBackgroundEnabled() ? 4 : ZERO, i1 = this.isDynamicBackgroundEnabled() ? (this.getHeight() - FONT_HEIGHT) / 2 : ZERO, j1 = l;
+            int l = this.isDynamicBackgroundEnabled() ? 2 : ZERO, i1 = this.isDynamicBackgroundEnabled() ? (this.getHeight() - FONT_HEIGHT) / 2 : ZERO, j1 = l;
             if (k > s.length())
                 k = s.length();
             if (s.length() > 0) {
                 String s1 = flag ? s.substring(0, j) : s;
-
                 j1 = this.mc.fontRenderer.drawString(s1, l, i1 + 1, i, this.isTextShadowEnabled());
             }
             if (this.hasDisplayText() && !this.isDragged() && this.getTypedText().isEmpty())

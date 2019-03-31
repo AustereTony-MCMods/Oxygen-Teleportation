@@ -12,7 +12,7 @@ import austeretony.oxygen.common.util.PacketBufferUtils;
 import austeretony.oxygen.common.util.StreamUtils;
 import net.minecraft.network.PacketBuffer;
 
-public class WorldPoint implements Comparable<WorldPoint> {
+public class WorldPoint {
 
     private static final DateFormat 
     ID_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmmssSSS"),
@@ -201,10 +201,5 @@ public class WorldPoint implements Comparable<WorldPoint> {
 
         CAMP,
         LOCATION
-    }
-
-    @Override
-    public int compareTo(WorldPoint other) {
-        return (int) (other.id - this.id);
     }
 }

@@ -113,10 +113,10 @@ public class LocationsManagerServer {
     public void downloadLocationPreviewToClient(EntityPlayerMP playerMP, long pointId) {
         if (this.getLocationPreviewBytes().containsKey(pointId)) {
             List<byte[]> imageParts = this.getLocationPreviewBytes().get(pointId).getParts();
-            TeleportationMain.network().sendTo(new CPStartImageDownload(ImageTransferingClientBuffer.EnumImageTransfer.DOWNLOAD_CAMP, pointId, imageParts.size()), playerMP);  
+            TeleportationMain.network().sendTo(new CPStartImageDownload(ImageTransferingClientBuffer.EnumImageTransfer.DOWNLOAD_LOCATION, pointId, imageParts.size()), playerMP);  
             int index = 0;
             for (byte[] part : imageParts) {
-                TeleportationMain.network().sendTo(new CPDownloadImagePart(ImageTransferingClientBuffer.EnumImageTransfer.DOWNLOAD_CAMP, pointId, index, part, imageParts.size()), playerMP);
+                TeleportationMain.network().sendTo(new CPDownloadImagePart(ImageTransferingClientBuffer.EnumImageTransfer.DOWNLOAD_LOCATION, pointId, index, part, imageParts.size()), playerMP);
                 index++;
             }
         } else 

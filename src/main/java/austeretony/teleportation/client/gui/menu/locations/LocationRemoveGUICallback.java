@@ -27,12 +27,13 @@ public class LocationRemoveGUICallback extends AbstractGUICallback {
 
     @Override
     protected void init() {
-        this.addElement(new GUIImageLabel(- 2, - 2, this.getWidth() + 4, this.getHeight() + 4).enableStaticBackground(0xFF202020));//main background 1st layer
-        this.addElement(new GUIImageLabel(0, 0, this.getWidth(), this.getHeight()).enableStaticBackground(0xFF101010));//main background 2nd layer
-        this.addElement(new GUITextLabel(1, 1).setDisplayText(I18n.format("teleportation.menu.removeLocationCallback"), true));
-        this.addElement(new GUITextLabel(1, 12).setDisplayText(I18n.format("teleportation.menu.removeCallback.request", this.section.currentPoint.getName()), true, 0.8F));     
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 61, this.getHeight() - 11, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.cancelButton"), true, 0.8F));
-        this.addElement(this.confirmButton = new GUIButton(21, this.getHeight() - 11, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.confirmButton"), true, 0.8F));
+        this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(0xFF202020));//main background 1st layer
+        this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 11).enableStaticBackground(0xFF101010));//main background 2nd layer
+        this.addElement(new GUIImageLabel(0, 12, this.getWidth(), this.getHeight() - 12).enableStaticBackground(0xFF101010));//main background 2nd layer
+        this.addElement(new GUITextLabel(2, 2).setDisplayText(I18n.format("teleportation.menu.removeLocationCallback"), true));
+        this.addElement(new GUITextLabel(2, 14).setDisplayText(I18n.format("teleportation.menu.removeCallback.request", this.section.currentPoint.getName()), true, 0.8F));     
+        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 61, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.cancelButton"), true, 0.8F));
+        this.addElement(this.confirmButton = new GUIButton(21, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.confirmButton"), true, 0.8F));
     }
 
     @Override

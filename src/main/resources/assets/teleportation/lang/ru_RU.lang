@@ -52,6 +52,7 @@ teleportation.menu.tooltip.favorite=Сделать Избранным
 teleportation.menu.tooltip.lock=Заблокировать
 teleportation.menu.tooltip.edit=Редактировать
 teleportation.menu.tooltip.remove=Удалить
+teleportation.menu.tooltip.sort=Сортировать
 
 teleportation.jumpProfile.free=Открытый
 teleportation.jumpProfile.request=Запрос

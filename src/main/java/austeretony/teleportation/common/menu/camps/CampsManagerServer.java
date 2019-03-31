@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.api.OxygenTask;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
@@ -160,7 +159,7 @@ public class CampsManagerServer {
     }
 
     public void downloadCampPreviewToClientDelegated(EntityPlayerMP playerMP, long pointId, BufferedImage bufferedImage) {
-        OxygenHelperClient.addRoutineTaskClient(new OxygenTask() {
+        OxygenHelperServer.addRoutineTaskServer(new OxygenTask() {
 
             @Override
             public void execute() {

@@ -1,3 +1,9 @@
+0.2.0a
++Improvements for performance.
++Improvements for GUI design.
++Added privileges for teleportation behavior management. To use teleportations in operators mode
+you will need promote yourself to operators group (oxygen privileged group).
+
 0.1.2a
 +Added sort buttons for GUI.
 +Fixes:

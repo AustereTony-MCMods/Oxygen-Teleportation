@@ -1,7 +1,7 @@
 package austeretony.teleportation.common.network.server;
 
 import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.teleportation.common.menu.camps.CampsManagerServer;
+import austeretony.teleportation.common.TeleportationManagerServer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
@@ -22,6 +22,6 @@ public class SPSetFavoriteCamp extends ProxyPacket {
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
-        CampsManagerServer.instance().setFavoriteCamp(getEntityPlayerMP(netHandler), buffer.readLong());
+        TeleportationManagerServer.instance().getCampsManager().setFavoriteCamp(getEntityPlayerMP(netHandler), buffer.readLong());
     }
 }

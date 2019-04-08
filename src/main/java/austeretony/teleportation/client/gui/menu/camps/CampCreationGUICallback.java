@@ -7,10 +7,11 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
+import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.common.api.OxygenHelperClient;
+import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.client.gui.menu.CampsGUISection;
 import austeretony.teleportation.client.gui.menu.MenuGUIScreen;
-import austeretony.teleportation.common.menu.camps.CampsManagerClient;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.client.resources.I18n;
 
@@ -32,16 +33,17 @@ public class CampCreationGUICallback extends AbstractGUICallback {
 
     @Override
     protected void init() {
-        this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(0xFF202020));//main background 1st layer
-        this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 11).enableStaticBackground(0xFF101010));//main background 2nd layer
-        this.addElement(new GUIImageLabel(0, 12, this.getWidth(), this.getHeight() - 12).enableStaticBackground(0xFF101010));//main background 2nd layer
+        this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(GUISettings.instance().getBaseGUIBackgroundColor()));//main background 1st layer
+        this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 11).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
+        this.addElement(new GUIImageLabel(0, 12, this.getWidth(), this.getHeight() - 12).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
         this.addElement(new GUITextLabel(2, 2).setDisplayText(I18n.format("teleportation.menu.campCreationCallback"), true));   
-        this.addElement(new GUITextLabel(2, 14).setScale(0.7F).setDisplayText(I18n.format("teleportation.menu.spec.name")));    
-        this.addElement(new GUITextLabel(2, 34).setScale(0.7F).setDisplayText(I18n.format("teleportation.menu.spec.desc")));    
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 61, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.cancelButton"), true, 0.8F));
-        this.addElement(this.confirmButton = new GUIButton(21, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.confirmButton"), true, 0.8F));
-        this.addElement(this.nameField = new GUITextField(2, 21, 162, 16).setScale(0.8F).enableDynamicBackground());
-        this.addElement(this.descriptionField = new GUITextField(2, 41, 162, 64).setScale(0.8F).enableDynamicBackground());
+        this.addElement(new GUITextLabel(2, 17).setScale(0.7F).setDisplayText(I18n.format("teleportation.menu.spec.name")));    
+        this.addElement(new GUITextLabel(2, 37).setScale(0.7F).setDisplayText(I18n.format("teleportation.menu.spec.desc")));    
+        this.addElement(this.nameField = new GUITextField(2, 25, 162, 16).setScale(0.8F).enableDynamicBackground());
+        this.addElement(this.descriptionField = new GUITextField(2, 45, 162, 64).setScale(0.8F).enableDynamicBackground());
+
+        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.confirmButton"), true, 0.8F));
+        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.cancelButton"), true, 0.8F));
     }
 
     @Override
@@ -58,7 +60,7 @@ public class CampCreationGUICallback extends AbstractGUICallback {
             this.section.resetPointInfo();
             String 
             name = this.nameField.getTypedText().isEmpty() 
-            ? I18n.format("teleportation.menu.campGenericName") + " #" + String.valueOf(CampsManagerClient.instance().getPlayerProfile().getCampsAmount() + 1) 
+            ? I18n.format("teleportation.menu.campGenericName") + " #" + String.valueOf(TeleportationManagerClient.instance().getPlayerProfile().getCampsAmount() + 1) 
             : this.nameField.getTypedText(),
             description = this.descriptionField.getTypedText();
             WorldPoint worldPoint = new WorldPoint(
@@ -73,7 +75,7 @@ public class CampCreationGUICallback extends AbstractGUICallback {
                     this.mc.player.rotationYawHead, 
                     this.mc.player.rotationPitch);
             worldPoint.createId();
-            CampsManagerClient.instance().setCampPointSynced(worldPoint);
+            TeleportationManagerClient.instance().getCampsManager().setCampPointSynced(worldPoint);
             this.section.updatePoints();
             this.section.lockCreateButton();     
             this.close();

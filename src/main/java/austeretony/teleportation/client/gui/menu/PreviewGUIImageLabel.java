@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import austeretony.alternateui.screen.image.GUIImageLabel;
-import austeretony.teleportation.common.menu.camps.CampsManagerClient;
+import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.common.world.EnumDimensions;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.client.renderer.GlStateManager;
@@ -16,11 +16,11 @@ import net.minecraft.util.ResourceLocation;
 
 public class PreviewGUIImageLabel extends GUIImageLabel {
 
-    private final Map<Long, ResourceLocation> cache = new HashMap<Long, ResourceLocation>();
-
     private String name, owner, creationDate, position, dimension, noImage;
 
-    private boolean enableFavMark, hasImage;
+    private boolean favoriteIconEnabled, sharedIconEnabled, hasImage;
+
+    private final Map<Long, ResourceLocation> cache = new HashMap<Long, ResourceLocation>();
 
     private final List<String> description = new ArrayList<String>();
 
@@ -52,11 +52,18 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
             this.drawGradientRect(ZERO, ZERO, 240, 70, 0x00000000, 0xC8000000);
             GlStateManager.disableBlend(); 
             this.drawRect(0, 121, 240, 135, 0xB4101010);
-            if (this.enableFavMark) {
-                GlStateManager.color(1.0F, 1.0F, 1.0F);
+            if (this.sharedIconEnabled) {
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                GlStateManager.enableBlend(); 
+                this.mc.getTextureManager().bindTexture(MenuGUIScreen.SHARED_ICON);                         
+                this.drawCustomSizedTexturedRect(8 + (int) ((float) this.width(this.name) * 1.3F), 3, 10, 0, 10, 10, 30, 10);           
+                GlStateManager.disableBlend(); 
+            }
+            if (this.favoriteIconEnabled) {
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.enableBlend(); 
                 this.mc.getTextureManager().bindTexture(MenuGUIScreen.FAVORITE_ICONS);                         
-                this.drawCustomSizedTexturedRect(8 + (int) ((float) this.width(this.name) * 1.3F), 3, 10, 0, 10, 10, 30, 10);       	
+                this.drawCustomSizedTexturedRect((this.sharedIconEnabled ? 16 : 8) + (int) ((float) this.width(this.name) * 1.3F), 3, 10, 0, 10, 10, 30, 10);       	
                 GlStateManager.disableBlend(); 
             }
             GlStateManager.pushMatrix();           
@@ -75,7 +82,6 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
             GlStateManager.pushMatrix();           
             GlStateManager.translate(0.0F, 0.0F, 0.0F);           
             GlStateManager.scale(0.9F, 0.9F, 0.0F);  
-            //this.mc.fontRenderer.drawString(this.description, 16, 60, 0xFFD1D1D1, true);
             if (!this.description.isEmpty())                      
                 for (String line : this.description)                  
                     this.mc.fontRenderer.drawString(line, 16, 60 + 10 * this.description.indexOf(line), 0xFFD1D1D1, true); 
@@ -88,7 +94,8 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
         ResourceLocation imageLocation = this.getPreviewImage(worldPoint.getId(), forceLoad);
         if (imageLocation != null)
             this.setTexture(imageLocation, 240, 135);
-        this.enableFavMark = worldPoint.getId() == CampsManagerClient.instance().getPlayerProfile().getFavoriteCampId();
+        this.favoriteIconEnabled = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerProfile().getFavoriteCampId();
+        this.sharedIconEnabled = TeleportationManagerClient.instance().getPlayerProfile().haveInvitedPlayers(worldPoint.getId());
         this.name = worldPoint.getName();
         this.owner = I18n.format("teleportation.menu.info.owner") + " " + worldPoint.ownerName;
         this.creationDate = worldPoint.getCreationDate();
@@ -126,10 +133,10 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
     private ResourceLocation getPreviewImage(long pointId, boolean forceLoad) {
         this.hasImage = true;
         if (!this.cache.containsKey(pointId) || forceLoad) {
-            if (CampsManagerClient.instance().getPreviewImages().get(pointId) != null) {
+            if (TeleportationManagerClient.instance().getImagesManager().getPreviewImages().get(pointId) != null) {
                 ResourceLocation textureLocation = this.mc.getTextureManager().getDynamicTextureLocation(
                         "preview_" + String.valueOf(pointId),
-                        new DynamicTexture(CampsManagerClient.instance().getPreviewImages().get(pointId)));
+                        new DynamicTexture(TeleportationManagerClient.instance().getImagesManager().getPreviewImages().get(pointId)));
                 this.cache.put(pointId, textureLocation);
                 this.hasImage = true;
                 return textureLocation;		

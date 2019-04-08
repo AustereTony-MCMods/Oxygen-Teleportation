@@ -24,9 +24,11 @@ public class MenuGUIScreen extends AbstractGUIScreen {
     FAVORITE_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/favorite_icons.png"),
     EDIT_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/edit_icons.png"),
     REMOVE_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/remove_icons.png"),
+    INVITE_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/invite_icons.png"),
     LOCK_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/lock_icons.png"),
     SORT_DOWN_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/sort_down_icons.png"),
-    SORT_UP_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/sort_up_icons.png");
+    SORT_UP_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/sort_up_icons.png"),
+    SHARED_ICON = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/shared_icon.png");
 
     protected AbstractGUISection campsSection, locationsSection, playersSection;
 

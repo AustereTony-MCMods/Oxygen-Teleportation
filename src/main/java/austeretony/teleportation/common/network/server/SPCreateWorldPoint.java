@@ -2,8 +2,7 @@ package austeretony.teleportation.common.network.server;
 
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.oxygen.common.util.PacketBufferUtils;
-import austeretony.teleportation.common.menu.camps.CampsManagerServer;
-import austeretony.teleportation.common.menu.locations.LocationsManagerServer;
+import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
@@ -38,10 +37,10 @@ public class SPCreateWorldPoint extends ProxyPacket {
         this.type = WorldPoint.EnumWorldPoints.values()[buffer.readByte()];
         switch (type) {
         case CAMP:            
-            CampsManagerServer.instance().createCamp(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), PacketBufferUtils.readString(buffer));
+            TeleportationManagerServer.instance().getCampsManager().createCamp(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), PacketBufferUtils.readString(buffer));
             break;
         case LOCATION:
-            LocationsManagerServer.instance().createLocation(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), PacketBufferUtils.readString(buffer));
+            TeleportationManagerServer.instance().getLocationsManager().createLocation(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), PacketBufferUtils.readString(buffer));
             break;
         }
     }

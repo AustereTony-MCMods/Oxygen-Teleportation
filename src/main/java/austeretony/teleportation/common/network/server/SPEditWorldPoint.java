@@ -2,8 +2,7 @@ package austeretony.teleportation.common.network.server;
 
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.oxygen.common.util.PacketBufferUtils;
-import austeretony.teleportation.common.menu.camps.CampsManagerServer;
-import austeretony.teleportation.common.menu.locations.LocationsManagerServer;
+import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
@@ -53,11 +52,11 @@ public class SPEditWorldPoint extends ProxyPacket {
         this.updatePosition = buffer.readBoolean();
         switch (this.type) {
         case CAMP:            
-            CampsManagerServer.instance().editCamp(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), 
+            TeleportationManagerServer.instance().getCampsManager().editCamp(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), 
                     PacketBufferUtils.readString(buffer), this.updateName, this.updateDescription, this.updateImage, this.updatePosition);
             break;
         case LOCATION:
-            LocationsManagerServer.instance().editLocation(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), 
+            TeleportationManagerServer.instance().getLocationsManager().editLocation(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), 
                     PacketBufferUtils.readString(buffer), this.updateName, this.updateDescription, this.updateImage, this.updatePosition);
             break;
         }

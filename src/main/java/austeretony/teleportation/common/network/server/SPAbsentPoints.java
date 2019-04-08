@@ -2,12 +2,12 @@ package austeretony.teleportation.common.network.server;
 
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.oxygen.common.reference.CommonReference;
+import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.main.TeleportationMain;
-import austeretony.teleportation.common.menu.camps.CampsLoaderServer;
-import austeretony.teleportation.common.menu.camps.CampsManagerServer;
-import austeretony.teleportation.common.menu.locations.LocationsManagerServer;
 import austeretony.teleportation.common.network.client.CPCommand;
-import austeretony.teleportation.common.network.client.CPSyncPoints;
+import austeretony.teleportation.common.network.client.CPSyncInvitedPlayers;
+import austeretony.teleportation.common.network.client.CPSyncWorldPoints;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
@@ -47,22 +47,24 @@ public class SPAbsentPoints extends ProxyPacket {
         EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
         this.absentCamps = new long[buffer.readInt()];
         int i = 0;
-        for (; i < this.absentCamps.length; i++)
-            this.absentCamps[i] = buffer.readLong(); 
         if (this.absentCamps.length > 0) {
-            TeleportationMain.network().sendTo(new CPSyncPoints(WorldPoint.EnumWorldPoints.CAMP, this.absentCamps), playerMP);
-            CampsLoaderServer.loadAndSendCampPreviewImagesDelegated(playerMP, this.absentCamps);
+            for (; i < this.absentCamps.length; i++)
+                this.absentCamps[i] = buffer.readLong(); 
+            TeleportationMain.network().sendTo(new CPSyncWorldPoints(WorldPoint.EnumWorldPoints.CAMP, this.absentCamps), playerMP);
+            TeleportationManagerServer.instance().getImagesLoader().loadAndSendCampPreviewImagesDelegated(playerMP, this.absentCamps);
+            if (!TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP)).getSharedCamps().isEmpty())
+                TeleportationMain.network().sendTo(new CPSyncInvitedPlayers(), playerMP);
         }
         this.absentLocations = new long[buffer.readInt()];
-        i = 0;
-        for (; i < this.absentLocations.length; i++)
-            this.absentLocations[i] = buffer.readLong(); 
         if (this.absentLocations.length > 0) {
-            TeleportationMain.network().sendTo(new CPSyncPoints(WorldPoint.EnumWorldPoints.LOCATION, this.absentLocations), playerMP);
-            LocationsManagerServer.instance().downloadLocationPreviewsToClientDelegated(playerMP, this.absentLocations);
+            i = 0;
+            for (; i < this.absentLocations.length; i++)
+                this.absentLocations[i] = buffer.readLong(); 
+            TeleportationMain.network().sendTo(new CPSyncWorldPoints(WorldPoint.EnumWorldPoints.LOCATION, this.absentLocations), playerMP);
+            TeleportationManagerServer.instance().getImagesManager().downloadLocationPreviewsToClientDelegated(playerMP, this.absentLocations);
         }
         OxygenHelperServer.syncPlayersData(playerMP, TeleportationMain.JUMP_PROFILE_DATA_ID);
         TeleportationMain.network().sendTo(new CPCommand(CPCommand.EnumCommand.OPEN_MENU), playerMP);
-        CampsManagerServer.instance().getPlayerProfile(OxygenHelperServer.uuid(playerMP)).setSyncing(false);
+        TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP)).setSyncing(false);
     }
 }

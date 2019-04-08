@@ -9,8 +9,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.util.StreamUtils;
+import austeretony.teleportation.common.CooldownInfo;
+import austeretony.teleportation.common.camps.InvitedPlayers;
+import austeretony.teleportation.common.camps.SharedCamps;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.menu.camps.CampsList;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
@@ -18,24 +20,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class PlayerProfile {
 
-    public final UUID playerUUID;
+    public UUID playerUUID;
 
-    //Belong to this player
     private final Map<Long, WorldPoint> ownedCamps = new ConcurrentHashMap<Long, WorldPoint>();
 
-    //TODO Part of the invitation mechanic - WIP
-    //Shared WITH this player
     private final Map<Long, UUID> otherCamps = new ConcurrentHashMap<Long, UUID>();
 
-    //TODO Part of the invitation mechanic - WIP
-    //Shared BY this player
-    private final Map<UUID, CampsList> sharedCamps = new ConcurrentHashMap<UUID, CampsList>();
+    private final Map<UUID, SharedCamps> sharedCamps = new ConcurrentHashMap<UUID, SharedCamps>();
+
+    private final Map<Long, InvitedPlayers> invitedPlayers = new ConcurrentHashMap<Long, InvitedPlayers>();
 
     private long favoriteCampId;
 
     private EnumJumpProfile jumpProfile;
 
-    private volatile boolean syncing;
+    private boolean syncing;
 
     private final CooldownInfo cooldownInfo = new CooldownInfo();
 
@@ -68,7 +67,7 @@ public class PlayerProfile {
     }
 
     public boolean campExist(long pointId) {
-        return this.ownedCamps.containsKey(pointId) || this.otherCamps.containsKey(pointId);
+        return this.ownedCamps.containsKey(pointId);
     }
 
     public WorldPoint getCamp(long pointId) {
@@ -83,9 +82,12 @@ public class PlayerProfile {
         this.ownedCamps.remove(pointId);
         if (this.favoriteCampId == pointId)
             this.favoriteCampId = 0;
-        for (CampsList list : this.sharedCamps.values())
-            if (list.getCamps().contains(pointId))
-                list.getCamps().remove(pointId);
+        //TODO mind shared camps
+        if (this.invitedPlayers.containsKey(pointId)) {
+            InvitedPlayers invitedPlayers = this.invitedPlayers.get(pointId);
+            for (UUID playerUUID : invitedPlayers.getPlayers())
+                this.uninviteFromCamp(pointId, playerUUID);
+        }
     }
 
     public boolean isFavoriteCampExist() {
@@ -104,6 +106,10 @@ public class PlayerProfile {
         return this.otherCamps;
     }
 
+    public boolean isOtherCamp(long pointId) {
+        return this.otherCamps.containsKey(pointId);
+    }
+
     public int getOtherCampsAmount() {
         return this.otherCamps.size();
     }
@@ -112,35 +118,62 @@ public class PlayerProfile {
         return this.otherCamps.keySet();
     }
 
-    public UUID getOtherCampOwner(long id) {
-        return this.otherCamps.get(id);
+    public UUID getOtherCampOwner(long pointId) {
+        return this.otherCamps.get(pointId);
     }
 
-    public void addOtherCamp(Long id, UUID ownerUUID) {
-        this.otherCamps.put(id, ownerUUID);
+    public void addOtherCamp(long pointId, UUID ownerUUID) {
+        this.otherCamps.put(pointId, ownerUUID);
     }
 
-    public void removeOtherCamp(Long id) {
-        this.otherCamps.remove(id);
+    public void removeOtherCamp(long pointId) {
+        this.otherCamps.remove(pointId);
     }
 
-    public Map<UUID, CampsList> getSharedCamps() {
+    public boolean haveInvitedPlayers(long pointId) {
+        return this.invitedPlayers.containsKey(pointId);
+    }
+
+    public int getInvitedPlayersAmount(long pointId) {
+        return this.invitedPlayers.get(pointId).getPlayers().size();
+    }
+
+    public Map<UUID, SharedCamps> getSharedCamps() {
         return this.sharedCamps;
     }
 
-    public void shareCamp(long id, UUID playerUUID) {
+    public Map<Long, InvitedPlayers> getInvitedPlayers() {
+        return this.invitedPlayers;
+    }
+
+    public void inviteToCamp(long pointId, UUID playerUUID, String username) {
         if (this.sharedCamps.containsKey(playerUUID))
-            this.sharedCamps.get(playerUUID).getCamps().add(id);
+            this.sharedCamps.get(playerUUID).getCamps().add(pointId);
         else {
-            CampsList list = new CampsList();
-            list.getCamps().add(id);
-            this.sharedCamps.put(playerUUID, list);
+            SharedCamps sharedCamps = new SharedCamps(playerUUID, username);
+            sharedCamps.getCamps().add(pointId);
+            this.sharedCamps.put(playerUUID, sharedCamps);
+        }        
+        if (this.invitedPlayers.containsKey(pointId))
+            this.invitedPlayers.get(pointId).getPlayers().add(playerUUID);
+        else {
+            InvitedPlayers invitedPlayers = new InvitedPlayers();
+            invitedPlayers.getPlayers().add(playerUUID);
+            this.invitedPlayers.put(pointId, invitedPlayers);
         }
     }
 
-    public void unshareCamp(long id, UUID playerUUID) {
-        if (this.sharedCamps.containsKey(playerUUID))
-            this.sharedCamps.get(playerUUID).getCamps().remove(id);
+    public void uninviteFromCamp(long pointId, UUID playerUUID) {
+        if (this.sharedCamps.containsKey(playerUUID)) {
+            this.sharedCamps.get(playerUUID).getCamps().remove(pointId);
+            if (this.sharedCamps.get(playerUUID).getCamps().isEmpty())
+                this.sharedCamps.remove(playerUUID);
+        }
+        if (this.invitedPlayers.containsKey(pointId)) {
+            this.invitedPlayers.get(pointId).getPlayers().remove(playerUUID);
+            if (this.invitedPlayers.get(pointId).getPlayers().isEmpty())
+                this.invitedPlayers.remove(pointId);
+        }
     }
 
     public EnumJumpProfile getJumpProfile() {
@@ -170,29 +203,37 @@ public class PlayerProfile {
             StreamUtils.write(entry.getValue().getLeastSignificantBits(), bos);
         }
         StreamUtils.write(this.sharedCamps.size(), bos);
-        for (Map.Entry<UUID, CampsList> entry : this.sharedCamps.entrySet()) {
-            StreamUtils.write(entry.getKey().getMostSignificantBits(), bos);
-            StreamUtils.write(entry.getKey().getLeastSignificantBits(), bos);
-            entry.getValue().write(bos);
-        }
+        for (SharedCamps sharedCamps : this.sharedCamps.values())
+            sharedCamps.write(bos);
         this.cooldownInfo.write(bos);
     }
 
-    public static PlayerProfile read(BufferedInputStream bis) throws IOException {
-        PlayerProfile playerProfile = new PlayerProfile(new UUID(StreamUtils.readLong(bis), StreamUtils.readLong(bis)));
-        playerProfile.setFavoriteCampId(StreamUtils.readLong(bis));
-        playerProfile.setJumpProfile(EnumJumpProfile.values()[StreamUtils.readByte(bis)]);
+    public void read(BufferedInputStream bis) throws IOException {
+        this.playerUUID = new UUID(StreamUtils.readLong(bis), StreamUtils.readLong(bis));
+        this.setFavoriteCampId(StreamUtils.readLong(bis));
+        this.setJumpProfile(EnumJumpProfile.values()[StreamUtils.readByte(bis)]);
         int camps = StreamUtils.readInt(bis);
         for (int i = 0; i < camps; i++)
-            playerProfile.addCamp(WorldPoint.read(bis));  
+            this.addCamp(WorldPoint.read(bis));  
         int otherCamps = StreamUtils.readInt(bis);
         for (int i = 0; i < otherCamps; i++)
-            playerProfile.addOtherCamp(StreamUtils.readLong(bis), new UUID(StreamUtils.readLong(bis), StreamUtils.readLong(bis)));
+            this.addOtherCamp(StreamUtils.readLong(bis), new UUID(StreamUtils.readLong(bis), StreamUtils.readLong(bis)));
         int sharedrCamps = StreamUtils.readInt(bis);
-        for (int i = 0; i < sharedrCamps; i++)
-            playerProfile.getSharedCamps().put(new UUID(StreamUtils.readLong(bis), StreamUtils.readLong(bis)), CampsList.read(bis));
-        playerProfile.cooldownInfo.read(bis);
-        return playerProfile;       
+        SharedCamps sharedCamps;
+        for (int i = 0; i < sharedrCamps; i++) {
+            sharedCamps = SharedCamps.read(bis);
+            this.getSharedCamps().put(sharedCamps.playerUUID, sharedCamps);
+            for (long id : sharedCamps.getCamps()) {
+                if (this.invitedPlayers.containsKey(id))
+                    this.invitedPlayers.get(id).getPlayers().add(sharedCamps.playerUUID);
+                else {
+                    InvitedPlayers invitedPlayers = new InvitedPlayers();
+                    invitedPlayers.getPlayers().add(sharedCamps.playerUUID);
+                    this.invitedPlayers.put(id, invitedPlayers);
+                }
+            }
+        }
+        this.cooldownInfo.read(bis);     
     }
 
     public enum EnumJumpProfile {

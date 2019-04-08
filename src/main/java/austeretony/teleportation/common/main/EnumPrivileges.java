@@ -1,13 +1,18 @@
 package austeretony.teleportation.common.main;
 
+import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
+
 public enum EnumPrivileges {
 
     PROCESS_TELEPORTATION_ON_MOVE(":processTeleportationOnMove"),
+    ENABLE_MOVE_TO_LOCKED_LOCATIONS(":enableMoveToLockedLocations"),
     ENABLE_CROSS_DIM_TELEPORTATION(":enableCrossDimTeleportation"),
+    ENABLE_TELEPORTATION_TO_ANY_PLAYER(":enableTeleportationToAnyPlayer"),
     CAMPS_MAX_AMOUNT(":campsMaxAmount"),
     CAMP_TELEPORTATION_DELAY(":campTeleportDelay"),
     CAMP_TELEPORTATION_COOLDOWN(":campTeleportCooldown"),
     LOCATIONS_CREATION(":locationsCreation"),
+    LOCATIONS_EDITING(":locationsEditing"),
     LOCATION_TELEPORTATION_DELAY(":locationTeleportDelay"),
     LOCATION_TELEPORTATION_COOLDOWN(":locationTeleportCooldown"),
     PLAYER_TELEPORTATION_DELAY(":playerTeleportDelay"),
@@ -17,6 +22,7 @@ public enum EnumPrivileges {
 
     EnumPrivileges(String name) {
         this.name = name;
+        PrivilegeProviderServer.registerPrivilege(TeleportationMain.MODID + name, TeleportationMain.NAME);
     }
 
     @Override

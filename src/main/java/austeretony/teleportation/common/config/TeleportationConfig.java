@@ -4,6 +4,7 @@ import java.util.Queue;
 
 import austeretony.oxygen.common.api.config.AbstractConfigHolder;
 import austeretony.oxygen.common.api.config.ConfigValue;
+import austeretony.oxygen.common.reference.CommonReference;
 import austeretony.teleportation.common.main.TeleportationMain;
 
 public class TeleportationConfig extends AbstractConfigHolder {
@@ -16,11 +17,13 @@ public class TeleportationConfig extends AbstractConfigHolder {
     ENABLE_FAVORITE_CAMP = new ConfigValue(ConfigValue.EnumValueType.BOOLEAN, "main", "enable_favorite_camp"),
     DEFAULT_JUMP_PROFILE = new ConfigValue(ConfigValue.EnumValueType.INT, "main", "default_jump_profile"),
     JUMP_REQUEST_EXPIRE_TIME = new ConfigValue(ConfigValue.EnumValueType.INT, "main", "jump_request_expire_seconds"),
+    INVITATION_REQUEST_EXPIRE_TIME = new ConfigValue(ConfigValue.EnumValueType.INT, "main", "invitation_request_expire_time_seconds"),
 
     ENABLE_CAMPS = new ConfigValue(ConfigValue.EnumValueType.BOOLEAN, "camps", "enable_camps"),
     CAMPS_MAX_AMOUNT = new ConfigValue(ConfigValue.EnumValueType.INT, "camps", "max_amount"),
     CAMPS_TELEPORT_DELAY = new ConfigValue(ConfigValue.EnumValueType.INT, "camps", "teleport_delay_seconds"),
     CAMPS_TELEPORT_COOLDOWN = new ConfigValue(ConfigValue.EnumValueType.INT, "camps", "cooldown_seconds"),
+    MAX_INVITED_PLAYERS_PER_CAMP = new ConfigValue(ConfigValue.EnumValueType.INT, "camps", "max_invited_players_per_camp"),
 
     ENABLE_LOCATIONS = new ConfigValue(ConfigValue.EnumValueType.BOOLEAN, "locations", "enable_locations"),
     LOCATIONS_MAX_AMOUNT = new ConfigValue(ConfigValue.EnumValueType.INT, "locations", "max_amount"),
@@ -37,6 +40,16 @@ public class TeleportationConfig extends AbstractConfigHolder {
     }
 
     @Override
+    public String getExternalPath() {
+        return CommonReference.getGameFolder() + "/config/oxygen/teleportation/teleportation.json";
+    }
+
+    @Override
+    public String getInternalPath() {
+        return "assets/teleportation/teleportation.json";
+    }
+
+    @Override
     public void getValues(Queue<ConfigValue> values) {
         values.add(IMAGE_WIDTH);
         values.add(IMAGE_HEIGHT);
@@ -45,11 +58,13 @@ public class TeleportationConfig extends AbstractConfigHolder {
         values.add(ENABLE_FAVORITE_CAMP);
         values.add(DEFAULT_JUMP_PROFILE);
         values.add(JUMP_REQUEST_EXPIRE_TIME);
+        values.add(INVITATION_REQUEST_EXPIRE_TIME);
 
         values.add(ENABLE_CAMPS);
         values.add(CAMPS_MAX_AMOUNT);
         values.add(CAMPS_TELEPORT_DELAY);
         values.add(CAMPS_TELEPORT_COOLDOWN);
+        values.add(MAX_INVITED_PLAYERS_PER_CAMP);
 
         values.add(ENABLE_LOCATIONS);
         values.add(LOCATIONS_MAX_AMOUNT);

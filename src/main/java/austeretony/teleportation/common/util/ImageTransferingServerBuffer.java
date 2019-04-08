@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.main.TeleportationMain;
-import austeretony.teleportation.common.menu.camps.CampsLoaderServer;
-import austeretony.teleportation.common.menu.camps.CampsManagerServer;
-import austeretony.teleportation.common.menu.locations.LocationsLoaderServer;
 
 public class ImageTransferingServerBuffer {
 
@@ -31,15 +29,15 @@ public class ImageTransferingServerBuffer {
     }
 
     public static void create(EnumImageTransfer operation, UUID playerUUID, long pointId, int partsAmount) {
-        CampsManagerServer.instance().getImageTransfers().put(pointId, new ImageTransferingServerBuffer(operation, playerUUID, pointId, partsAmount));
+        TeleportationManagerServer.instance().getImagesManager().getImageTransfers().put(pointId, new ImageTransferingServerBuffer(operation, playerUUID, pointId, partsAmount));
     }
 
     public static boolean exist(long pointId) {
-        return CampsManagerServer.instance().getImageTransfers().containsKey(pointId);
+        return TeleportationManagerServer.instance().getImagesManager().getImageTransfers().containsKey(pointId);
     }
 
     public static ImageTransferingServerBuffer get(long pointId) {
-        return CampsManagerServer.instance().getImageTransfers().get(pointId);
+        return TeleportationManagerServer.instance().getImagesManager().getImageTransfers().get(pointId);
     }
 
     public void addPart(int index, int[] imagePart) {
@@ -53,10 +51,10 @@ public class ImageTransferingServerBuffer {
         for (int i = 0; i < this.partsAmount; i++)
             orderedParts.add(this.imageParts.get(i));
         if (this.operation == EnumImageTransfer.UPLOAD_CAMP)
-            CampsLoaderServer.saveCampPreviewImageDelegated(this.playerUUID, this.pointId, BufferedImageUtils.convertIntArraysListToBufferedImage(orderedParts));
+            TeleportationManagerServer.instance().getImagesLoader().saveCampPreviewImageDelegated(this.playerUUID, this.pointId, BufferedImageUtils.convertIntArraysListToBufferedImage(orderedParts));
         else
-            LocationsLoaderServer.saveAndLoadBytesLocationPreviewDelegated(this.pointId, BufferedImageUtils.convertIntArraysListToBufferedImage(orderedParts));
-        CampsManagerServer.instance().getImageTransfers().remove(this.pointId);
+            TeleportationManagerServer.instance().getImagesLoader().saveAndLoadBytesLocationPreviewDelegated(this.pointId, BufferedImageUtils.convertIntArraysListToBufferedImage(orderedParts));
+        TeleportationManagerServer.instance().getImagesManager().getImageTransfers().remove(this.pointId);
         TeleportationMain.LOGGER.info("Image {}.png saved.", this.pointId);
     }
 

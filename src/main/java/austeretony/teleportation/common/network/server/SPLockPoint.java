@@ -1,8 +1,7 @@
 package austeretony.teleportation.common.network.server;
 
 import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.teleportation.common.menu.camps.CampsManagerServer;
-import austeretony.teleportation.common.menu.locations.LocationsManagerServer;
+import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
@@ -35,10 +34,10 @@ public class SPLockPoint extends ProxyPacket {
         this.type = WorldPoint.EnumWorldPoints.values()[buffer.readByte()];
         switch (this.type) {
         case CAMP:           
-            CampsManagerServer.instance().lockCamp(getEntityPlayerMP(netHandler), buffer.readLong(), buffer.readBoolean());
+            TeleportationManagerServer.instance().getCampsManager().lockCamp(getEntityPlayerMP(netHandler), buffer.readLong(), buffer.readBoolean());
             break;
         case LOCATION:
-            LocationsManagerServer.instance().lockLocation(getEntityPlayerMP(netHandler), buffer.readLong(), buffer.readBoolean());
+            TeleportationManagerServer.instance().getLocationsManager().lockLocation(getEntityPlayerMP(netHandler), buffer.readLong(), buffer.readBoolean());
             break;
         }
     }

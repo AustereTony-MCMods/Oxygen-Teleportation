@@ -1,8 +1,8 @@
 package austeretony.teleportation.common.network.server;
 
 import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.main.PlayerProfile;
-import austeretony.teleportation.common.menu.players.PlayersManagerServer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
@@ -23,6 +23,6 @@ public class SPChangeJumpProfile extends ProxyPacket {
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
-        PlayersManagerServer.instance().changeJumpProfile(getEntityPlayerMP(netHandler), PlayerProfile.EnumJumpProfile.values()[buffer.readByte()]);
+        TeleportationManagerServer.instance().getPlayersManager().changeJumpProfile(getEntityPlayerMP(netHandler), PlayerProfile.EnumJumpProfile.values()[buffer.readByte()]);
     }
 }

@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.util.PacketBufferUtils;
 import austeretony.oxygen.common.util.StreamUtils;
 import net.minecraft.network.PacketBuffer;
@@ -15,7 +16,6 @@ import net.minecraft.network.PacketBuffer;
 public class WorldPoint {
 
     private static final DateFormat 
-    ID_DATE_FORMAT = new SimpleDateFormat("yyMMddHHmmssSSS"),
     CREATED_DATE_FORMAT = new SimpleDateFormat("d MM yyyy");
 
     private long id;
@@ -55,7 +55,7 @@ public class WorldPoint {
     }
 
     public void createId() {
-        this.id = Long.valueOf(ID_DATE_FORMAT.format(new Date()));
+        this.id = Long.parseLong(OxygenMain.SIMPLE_ID_DATE_FORMAT.format(new Date()));
     }
 
     public String getName() {		

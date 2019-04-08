@@ -1,7 +1,7 @@
 package austeretony.teleportation.common.network.server;
 
-import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.oxygen.common.reference.CommonReference;
 import austeretony.teleportation.common.util.ImageTransferingServerBuffer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
@@ -36,7 +36,7 @@ public class SPStartImageUpload extends ProxyPacket {
         if (!ImageTransferingServerBuffer.exist(this.pointId))
             ImageTransferingServerBuffer.create(
                     this.operation, 
-                    OxygenHelperServer.uuid(getEntityPlayerMP(netHandler)), 
+                    CommonReference.uuid(getEntityPlayerMP(netHandler)), 
                     this.pointId, 
                     buffer.readInt());
     }

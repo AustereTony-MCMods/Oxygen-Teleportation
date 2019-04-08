@@ -6,10 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.common.main.TeleportationMain;
-import austeretony.teleportation.common.menu.camps.CampsLoaderClient;
-import austeretony.teleportation.common.menu.camps.CampsManagerClient;
-import austeretony.teleportation.common.menu.locations.LocationsLoaderClient;
 
 public class ImageTransferingClientBuffer {
 
@@ -28,15 +26,15 @@ public class ImageTransferingClientBuffer {
     }
 
     public static void create(EnumImageTransfer operation, long pointId, int partsAmount) {
-        CampsManagerClient.instance().getImageTransfers().put(pointId, new ImageTransferingClientBuffer(operation, pointId, partsAmount));
+        TeleportationManagerClient.instance().getImagesManager().getImageTransfers().put(pointId, new ImageTransferingClientBuffer(operation, pointId, partsAmount));
     }
 
     public static boolean exist(long pointId) {
-        return CampsManagerClient.instance().getImageTransfers().containsKey(pointId);
+        return TeleportationManagerClient.instance().getImagesManager().getImageTransfers().containsKey(pointId);
     }
 
     public static ImageTransferingClientBuffer get(long pointId) {
-        return CampsManagerClient.instance().getImageTransfers().get(pointId);
+        return TeleportationManagerClient.instance().getImagesManager().getImageTransfers().get(pointId);
     }
 
     public void addPart(int index, byte[] imagePart) {
@@ -51,11 +49,11 @@ public class ImageTransferingClientBuffer {
             orderedParts.add(this.imageParts.get(i));
         BufferedImage image = BufferedImageUtils.convertByteArraysListToBufferedImage(orderedParts);
         if (this.operation == EnumImageTransfer.DOWNLOAD_CAMP)
-            CampsLoaderClient.saveCampPreviewImageDelegated(this.pointId, image);
+            TeleportationManagerClient.instance().getImagesLoader().saveCampPreviewImageDelegated(this.pointId, image);
         else
-            LocationsLoaderClient.saveLocationPreviewImageDelegated(this.pointId, image);
-        CampsManagerClient.instance().getPreviewImages().put(this.pointId, image);
-        CampsManagerClient.instance().getImageTransfers().remove(this.pointId);
+            TeleportationManagerClient.instance().getImagesLoader().saveLocationPreviewImageDelegated(this.pointId, image);
+        TeleportationManagerClient.instance().getImagesManager().cacheImage(this.pointId, image);
+        TeleportationManagerClient.instance().getImagesManager().getImageTransfers().remove(this.pointId);
         TeleportationMain.LOGGER.info("Image {}.png saved.", this.pointId);
     }
 

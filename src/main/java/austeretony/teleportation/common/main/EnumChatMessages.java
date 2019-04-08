@@ -30,7 +30,15 @@ public enum EnumChatMessages {
     JUMP_REQUEST_TARGET_OFFLINE,
     JUMP_REQUEST_VISITOR_OFFLINE,
     TELEPORTATION_ABORTED,
-    CROSS_DIM_TELEPORTSTION_DISABLED;
+    CROSS_DIM_TELEPORTSTION_DISABLED,
+    INVITATION_REQUEST_SENT,
+    INVITATION_REQUEST_RESET,
+    INVITATION_REQUEST_ACCEPTED_OWNER,
+    INVITATION_REQUEST_REJECTED_OWNER,
+    INVITATION_REQUEST_ACCEPTED,
+    INVITATION_REQUEST_REJECTED,
+    UNINVITED,
+    CAMP_LEFT;
 
     @SideOnly(Side.CLIENT)
     public void show(String... args) {
@@ -106,6 +114,30 @@ public enum EnumChatMessages {
             break;
         case CROSS_DIM_TELEPORTSTION_DISABLED:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.crossDimTeleportationDisabled"));
+            break;
+        case INVITATION_REQUEST_SENT:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitatioinRequestSent", args[0], args[1]));
+            break;
+        case INVITATION_REQUEST_RESET:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitatioinRequestReset"));
+            break;
+        case INVITATION_REQUEST_ACCEPTED:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitationRequestAccepted", args[0], args[1]));
+            break;
+        case INVITATION_REQUEST_REJECTED:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitationRequestRejected", args[0], args[1]));
+            break;
+        case INVITATION_REQUEST_ACCEPTED_OWNER:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitationRequestAcceptedOwner", args[0], args[1]));
+            break;
+        case INVITATION_REQUEST_REJECTED_OWNER:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitationRequestRejectedOwner", args[0], args[1]));
+            break;
+        case UNINVITED:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.playerUninvited"));
+            break;
+        case CAMP_LEFT:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.campLeft", args[0]));
             break;
         }
     }

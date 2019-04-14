@@ -1,3 +1,13 @@
+0.3.0a
++Increased points names maximum length (from 16 to 20 symbols).
++Increased points descriptions maximum length (from 64 to 80 symbols).
++Changes for GUI:
+ - Replaced points management buttons with context menu (open with right mouse click on element).
+ - Fixed some GUI interaction problems.
+ - Improved text scale.
+ - Ability to change activity status via 'Players' section.
+ - Activity status display for players list in 'Players' section.
+
 0.2.0a
 +Improvements for performance.
 +Improvements for GUI design.

@@ -1,8 +1,9 @@
 package austeretony.teleportation.common.network.server;
 
 import austeretony.oxygen.common.api.OxygenHelperServer;
+import austeretony.oxygen.common.core.api.CommonReference;
+import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.oxygen.common.reference.CommonReference;
 import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.network.client.CPCommand;
@@ -13,15 +14,15 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
-public class SPAbsentPoints extends ProxyPacket {
+public class SPSendAbsentPointsIds extends ProxyPacket {
 
     private long[] absentCamps, absentLocations;
 
     private int campsSize, locationsSize;
 
-    public SPAbsentPoints() {}
+    public SPSendAbsentPointsIds() {}
 
-    public SPAbsentPoints(int campsSize, long[] absentCamps, int locationsSize, long[] absentLocations) {
+    public SPSendAbsentPointsIds(int campsSize, long[] absentCamps, int locationsSize, long[] absentLocations) {
         this.campsSize = campsSize;
         this.absentCamps = absentCamps;
         this.locationsSize = locationsSize;
@@ -30,14 +31,14 @@ public class SPAbsentPoints extends ProxyPacket {
 
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeInt(this.campsSize);
+        buffer.writeShort(this.campsSize);
         for (long id : this.absentCamps) {
-            if (id == 0) break;
+            if (id == 0L) break;
             buffer.writeLong(id);
         }
-        buffer.writeInt(this.locationsSize);
+        buffer.writeShort(this.locationsSize);
         for (long id : this.absentLocations) {
-            if (id == 0) break;
+            if (id == 0L) break;
             buffer.writeLong(id);
         }
     }
@@ -45,17 +46,17 @@ public class SPAbsentPoints extends ProxyPacket {
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
         EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
-        this.absentCamps = new long[buffer.readInt()];
+        this.absentCamps = new long[buffer.readShort()];
         int i = 0;
         if (this.absentCamps.length > 0) {
             for (; i < this.absentCamps.length; i++)
                 this.absentCamps[i] = buffer.readLong(); 
             TeleportationMain.network().sendTo(new CPSyncWorldPoints(WorldPoint.EnumWorldPoints.CAMP, this.absentCamps), playerMP);
             TeleportationManagerServer.instance().getImagesLoader().loadAndSendCampPreviewImagesDelegated(playerMP, this.absentCamps);
-            if (!TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP)).getSharedCamps().isEmpty())
+            if (TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP)).getSharedCampsAmount() > 0)
                 TeleportationMain.network().sendTo(new CPSyncInvitedPlayers(), playerMP);
         }
-        this.absentLocations = new long[buffer.readInt()];
+        this.absentLocations = new long[buffer.readShort()];
         if (this.absentLocations.length > 0) {
             i = 0;
             for (; i < this.absentLocations.length; i++)
@@ -63,7 +64,7 @@ public class SPAbsentPoints extends ProxyPacket {
             TeleportationMain.network().sendTo(new CPSyncWorldPoints(WorldPoint.EnumWorldPoints.LOCATION, this.absentLocations), playerMP);
             TeleportationManagerServer.instance().getImagesManager().downloadLocationPreviewsToClientDelegated(playerMP, this.absentLocations);
         }
-        OxygenHelperServer.syncPlayersData(playerMP, TeleportationMain.JUMP_PROFILE_DATA_ID);
+        OxygenHelperServer.syncSharedPlayersData(playerMP, OxygenMain.STATUS_DATA_ID, TeleportationMain.JUMP_PROFILE_DATA_ID);
         TeleportationMain.network().sendTo(new CPCommand(CPCommand.EnumCommand.OPEN_MENU), playerMP);
         TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP)).setSyncing(false);
     }

@@ -1,6 +1,6 @@
 package austeretony.teleportation.common.main;
 
-import austeretony.oxygen.client.reference.ClientReference;
+import austeretony.oxygen.common.core.api.ClientReference;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -22,17 +22,15 @@ public enum EnumChatMessages {
     MOVED_TO_PLAYER,
     JUMP_PROFILE_CHANGED,
     JUMP_REQUEST_SENT,
-    JUMP_REQUEST_RESET,
-    JUMP_REQUEST_ACCEPTED,
-    JUMP_REQUEST_REJECTED,
-    JUMP_REQUEST_ACCEPTED_VISITOR,
-    JUMP_REQUEST_REJECTED_VISITOR,
+    JUMP_REQUEST_ACCEPTED_TARGET,
+    JUMP_REQUEST_REJECTED_TARGET,
+    JUMP_REQUEST_ACCEPTED_SENDER,
+    JUMP_REQUEST_REJECTED_SENDER,
     JUMP_REQUEST_TARGET_OFFLINE,
     JUMP_REQUEST_VISITOR_OFFLINE,
     TELEPORTATION_ABORTED,
     CROSS_DIM_TELEPORTSTION_DISABLED,
     INVITATION_REQUEST_SENT,
-    INVITATION_REQUEST_RESET,
     INVITATION_REQUEST_ACCEPTED_OWNER,
     INVITATION_REQUEST_REJECTED_OWNER,
     INVITATION_REQUEST_ACCEPTED,
@@ -88,20 +86,17 @@ public enum EnumChatMessages {
         case JUMP_REQUEST_SENT:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestSent", args[0]));
             break;
-        case JUMP_REQUEST_RESET:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestReset"));
+        case JUMP_REQUEST_ACCEPTED_TARGET:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestAccepted"));
             break;
-        case JUMP_REQUEST_ACCEPTED:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestAccepted", args[0]));
+        case JUMP_REQUEST_REJECTED_TARGET:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestRejected"));
             break;
-        case JUMP_REQUEST_REJECTED:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestRejected", args[0]));
+        case JUMP_REQUEST_ACCEPTED_SENDER:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestAcceptedVisitor"));
             break;
-        case JUMP_REQUEST_ACCEPTED_VISITOR:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestAcceptedVisitor", args[0]));
-            break;
-        case JUMP_REQUEST_REJECTED_VISITOR:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestRejectedVisitor", args[0]));
+        case JUMP_REQUEST_REJECTED_SENDER:
+            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestRejectedVisitor"));
             break;
         case JUMP_REQUEST_TARGET_OFFLINE:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestTargetOffline"));
@@ -117,9 +112,6 @@ public enum EnumChatMessages {
             break;
         case INVITATION_REQUEST_SENT:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitatioinRequestSent", args[0], args[1]));
-            break;
-        case INVITATION_REQUEST_RESET:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitatioinRequestReset"));
             break;
         case INVITATION_REQUEST_ACCEPTED:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitationRequestAccepted", args[0], args[1]));

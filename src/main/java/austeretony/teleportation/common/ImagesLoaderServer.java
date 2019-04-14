@@ -15,11 +15,11 @@ import org.apache.commons.lang3.Validate;
 
 import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperServer;
-import austeretony.oxygen.common.reference.CommonReference;
+import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.locations.SplittedByteArray;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.util.BufferedImageUtils;
+import austeretony.teleportation.common.util.SplittedByteArray;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ImagesLoaderServer {
@@ -31,7 +31,7 @@ public class ImagesLoaderServer {
     }
 
     public void loadAndSendCampPreviewImagesDelegated(EntityPlayerMP playerMP, long[] campIds) {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -72,7 +72,7 @@ public class ImagesLoaderServer {
     }
 
     public void saveCampPreviewImageDelegated(UUID playerUUID, long pointId, BufferedImage image) {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -100,7 +100,7 @@ public class ImagesLoaderServer {
     }
 
     public void removeCampPreviewImageDelegated(UUID playerUUID, long pointId) {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -123,7 +123,7 @@ public class ImagesLoaderServer {
     }
 
     public void renameCampPreviewImageDelegated(UUID playerUUID, long oldPointId, long newPointId) {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -179,7 +179,7 @@ public class ImagesLoaderServer {
     }
 
     public void saveAndLoadBytesLocationPreviewDelegated(long pointId, BufferedImage image) {        
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -236,7 +236,7 @@ public class ImagesLoaderServer {
     }
 
     public void removeLocationPreviewImageDelegated(long pointId) {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -259,7 +259,7 @@ public class ImagesLoaderServer {
     }
 
     public void renameLocationPreviewImageDelegated(long oldPointId, long newPointId) {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {

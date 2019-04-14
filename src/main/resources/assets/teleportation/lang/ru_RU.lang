@@ -1,68 +1,51 @@
 key.oxygen.accept=Принять
 key.oxygen.reject=Отклонить
 key.teleportation.openMenu=Открыть Меню
-key.teleportation.moveToCamp=Переместиться к Избранному Лагерю
+key.teleportation.moveToCamp=Избранный Лагерь
 
-teleportation.menu.campsTitle=Лагеря
-teleportation.menu.locationsTitle=Локации
-teleportation.menu.playersTitle=Игроки
+teleportation.gui.menu.campsTitle=Лагеря
+teleportation.gui.menu.locationsTitle=Локации
+teleportation.gui.menu.playersTitle=Игроки
 
-teleportation.menu.players.client=Клиент
-teleportation.menu.players.target=Цель
-teleportation.menu.players.username=Ник
-teleportation.menu.players.dimension=Измерение
-teleportation.menu.players.profile=Профиль
+teleportation.gui.menu.makeFvorite=Сдел. Избранным
+teleportation.gui.menu.lock=Заблокировать
+teleportation.gui.menu.unlock=Разблокировать
+teleportation.gui.menu.invite=Пригласить
+teleportation.gui.menu.edit=Редактировать
+teleportation.gui.menu.remove=Удалить
+teleportation.gui.menu.leave=Покинуть
 
-teleportation.menu.campsDownloadCallback=Загрузка Лагерей
-teleportation.menu.campsDownloadCallback.request=Загрузить с сервера?
-teleportation.menu.campCreationCallback=Создание Лагеря
-teleportation.menu.invitationsCallback=Приглашения
-teleportation.menu.invitationsCallback.list=Приглашённые игроки:
-teleportation.menu.removeCampCallback=Удаление Лагеря
-teleportation.menu.removeCallback.request=Позиция %s будет удалёна.
-teleportation.menu.leaveCampCallback=Покинуть Лагерь
-teleportation.menu.leaveCallback.request=Покинуть позицию %s?
-teleportation.menu.editCampCallback=Редактирование Лагеря
-teleportation.menu.locationsDownloadCallback=Загрузка Локаций
-teleportation.menu.locationCreationCallback=Создание Локации
-teleportation.menu.removeLocationCallback=Удаление Локации
-teleportation.menu.editLocationCallback=Редактирование Локации
+teleportation.gui.menu.players.profile=Профиль
 
-teleportation.menu.spec.name=Название
-teleportation.menu.spec.username=Ник
-teleportation.menu.spec.desc=Описание
-teleportation.menu.spec.updateImage=Обновить изображение
-teleportation.menu.spec.updatePosition=Обновить позицию
-teleportation.menu.spec.playerFound=Игрок найден
-teleportation.menu.spec.playerNotFound=Игрок не найден
+teleportation.gui.menu.campCreationCallback=Создание Лагеря
+teleportation.gui.menu.invitationsCallback=Приглашения
+teleportation.gui.menu.invitationsCallback.list=Приглашённые игроки:
+teleportation.gui.menu.removeCampCallback=Удаление Лагеря
+teleportation.gui.menu.removeCallback.request=Позиция %s будет удалёна.
+teleportation.gui.menu.leaveCampCallback=Покинуть Лагерь
+teleportation.gui.menu.leaveCallback.request=Покинуть позицию %s?
+teleportation.gui.menu.editCampCallback=Редактирование Лагеря
+teleportation.gui.menu.locationCreationCallback=Создание Локации
+teleportation.gui.menu.removeLocationCallback=Удаление Локации
+teleportation.gui.menu.editLocationCallback=Редактирование Локации
 
-teleportation.menu.createButton=Создать
-teleportation.menu.moveButton=Посетить
-teleportation.menu.requestButton=Запрос
-teleportation.menu.cancelButton=Отмена
-teleportation.menu.confirmButton=Принять
+teleportation.gui.menu.updateImage=Обновить изображение
+teleportation.gui.menu.updatePosition=Обновить позицию
 
-teleportation.menu.campGenericName=Лагерь
-teleportation.menu.locationGenericName=Локация
+teleportation.gui.menu.createButton=Создать
+teleportation.gui.menu.moveButton=Посетить
+teleportation.gui.menu.requestButton=Запрос
 
-teleportation.menu.noImage=НЕТ ИЗОБРАЖЕНИЯ
+teleportation.gui.menu.campGenericName=Лагерь
+teleportation.gui.menu.locationGenericName=Локация
 
-teleportation.menu.info.owner=Владелец:
+teleportation.gui.menu.noImage=НЕТ ИЗОБРАЖЕНИЯ
 
-teleportation.menu.tooltip.camps=Лагеря
-teleportation.menu.tooltip.locations=Локации
-teleportation.menu.tooltip.players=Игроки
-teleportation.menu.tooltip.download=Загрузить
-teleportation.menu.tooltip.search=Поиск
-teleportation.menu.tooltip.refresh=Обновить
-teleportation.menu.tooltip.favorite=Сделать Избранным
-teleportation.menu.tooltip.lock=Заблокировать
-teleportation.menu.tooltip.unlock=Разблокировать
-teleportation.menu.tooltip.invite=Приглашения
-teleportation.menu.tooltip.edit=Редактировать
-teleportation.menu.tooltip.remove=Удалить
-teleportation.menu.tooltip.leave=Покинуть
-teleportation.menu.tooltip.sort=Сортировать
+teleportation.gui.menu.info.owner=Владелец:
+
+teleportation.gui.menu.tooltip.camps=Лагеря
+teleportation.gui.menu.tooltip.locations=Локации
+teleportation.gui.menu.tooltip.players=Игроки
 
 teleportation.jumpProfile.free=Открытый
 teleportation.jumpProfile.request=Запрос
@@ -82,12 +65,12 @@ teleportation.message.movedToCamp=Перемещение к лагерю %s.
 teleportation.message.movedToLocation=Перемещение к локации %s.
 teleportation.message.movedToPlayer=Перемещение к игроку %s.
 teleportation.message.jumpProfileChanged=Профиль изменен на %s.
-teleportation.message.jumpRequestSent=Запрос на перемещение отправлен игроку %s.
+teleportation.message.jumpRequestSent=Запрос на перемещение отправлен.
 teleportation.message.jumpRequestReset=Запрос на перемещение сброшен.
-teleportation.message.jumpRequestAccepted=Вы приняли запрос на перемещение от игрока %s.
-teleportation.message.jumpRequestRejected=Вы отклонили запрос на перемещение от игрока %s.
-teleportation.message.jumpRequestAcceptedVisitor=Ваш запрос на перемещение принят игроком %s.
-teleportation.message.jumpRequestRejectedVisitor=Ваш запрос на перемещение отклонён игроком %s.
+teleportation.message.jumpRequestAccepted=Вы приняли запрос на перемещение.
+teleportation.message.jumpRequestRejected=Вы отклонили запрос на перемещение.
+teleportation.message.jumpRequestAcceptedVisitor=Ваш запрос на перемещение принят.
+teleportation.message.jumpRequestRejectedVisitor=Ваш запрос на перемещение отклонён.
 teleportation.message.jumpRequestTargetOffline=Игрок не в сети.
 teleportation.message.jumpRequestVisitorOffline=Игрок не в сети.
 teleportation.message.teleportationAborted=Перемещение отменено.

@@ -14,10 +14,7 @@ import austeretony.teleportation.common.network.server.SPUploadImagePart;
 import austeretony.teleportation.common.util.BufferedImageUtils;
 import austeretony.teleportation.common.util.ImageTransferingClientBuffer;
 import austeretony.teleportation.common.util.ImageTransferingServerBuffer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class ImagesManagerClient {
 
     private final TeleportationManagerClient manager;
@@ -68,7 +65,7 @@ public class ImagesManagerClient {
     }
 
     public void uploadCampPreviewToServerDelegated(long pointId) {
-        OxygenHelperClient.addRoutineTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addRoutineTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -88,7 +85,7 @@ public class ImagesManagerClient {
     }
 
     public void uploadLocationPreviewToServerDelegated(long pointId) {
-        OxygenHelperClient.addRoutineTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addRoutineTask(new IOxygenTask() {
 
             @Override
             public void execute() {

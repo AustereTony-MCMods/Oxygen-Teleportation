@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import austeretony.alternateui.screen.image.GUIImageLabel;
+import austeretony.oxygen.client.gui.settings.GUISettings;
+import austeretony.oxygen.common.api.EnumDimensions;
 import austeretony.teleportation.client.TeleportationManagerClient;
-import austeretony.teleportation.common.world.EnumDimensions;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -27,7 +28,7 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
     public PreviewGUIImageLabel(int xPosition, int yPosition) {
         super(xPosition, yPosition);
         this.disableFull();
-        this.noImage = I18n.format("teleportation.menu.noImage");
+        this.noImage = I18n.format("teleportation.gui.menu.noImage");
     }
 
     @Override
@@ -46,7 +47,7 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
                 GlStateManager.pushMatrix();           
                 GlStateManager.translate(0.0F, 0.0F, 0.0F);           
                 GlStateManager.scale(1.3F, 1.3F, 0.0F);  
-                this.mc.fontRenderer.drawString(this.noImage, 240 / 2 - (int) ((float) this.width(this.noImage) * 1.3F) + 5, 48, 0xFFD1D1D1);
+                this.mc.fontRenderer.drawString(this.noImage, 240 / 2 - this.width(this.noImage, 1.3F) + 5, 48, GUISettings.instance().getEnabledTextColor());
                 GlStateManager.popMatrix();
             }
             this.drawGradientRect(ZERO, ZERO, 240, 70, 0x00000000, 0xC8000000);
@@ -55,36 +56,36 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
             if (this.sharedIconEnabled) {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.enableBlend(); 
-                this.mc.getTextureManager().bindTexture(MenuGUIScreen.SHARED_ICON);                         
-                this.drawCustomSizedTexturedRect(8 + (int) ((float) this.width(this.name) * 1.3F), 3, 10, 0, 10, 10, 30, 10);           
+                this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.SHARED_ICON);                         
+                this.drawCustomSizedTexturedRect(10 + this.width(this.name, 1.2F), 6, 10, 0, 10, 10, 30, 10);           
                 GlStateManager.disableBlend(); 
             }
             if (this.favoriteIconEnabled) {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.enableBlend(); 
-                this.mc.getTextureManager().bindTexture(MenuGUIScreen.FAVORITE_ICONS);                         
-                this.drawCustomSizedTexturedRect((this.sharedIconEnabled ? 16 : 8) + (int) ((float) this.width(this.name) * 1.3F), 3, 10, 0, 10, 10, 30, 10);       	
+                this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.FAVORITE_ICONS);                         
+                this.drawCustomSizedTexturedRect((this.sharedIconEnabled ? 20 : 10) + this.width(this.name, 1.2F), 6, 10, 0, 10, 10, 30, 10);       	
                 GlStateManager.disableBlend(); 
             }
             GlStateManager.pushMatrix();           
             GlStateManager.translate(0.0F, 0.0F, 0.0F);           
-            GlStateManager.scale(1.3F, 1.3F, 0.0F);  
-            this.mc.fontRenderer.drawString(this.name, 4, 3, 0xFFD1D1D1, true);
+            GlStateManager.scale(1.2F, 1.2F, 0.0F);  
+            this.mc.fontRenderer.drawString(this.name, 5, 6, GUISettings.instance().getEnabledTextColor(), true);
             GlStateManager.popMatrix();
             GlStateManager.pushMatrix();           
             GlStateManager.translate(0.0F, 0.0F, 0.0F);           
             GlStateManager.scale(0.7F, 0.7F, 0.0F);  
-            this.mc.fontRenderer.drawString(this.owner, 8, 24, 0xFFD1D1D1, true);
-            this.mc.fontRenderer.drawString(this.creationDate, 8, 38, 0xFFD1D1D1, true);
-            this.mc.fontRenderer.drawString(this.position, 8, 50, 0xFFD1D1D1, true);
-            this.mc.fontRenderer.drawString(this.dimension, 8, 62, 0xFFD1D1D1, true);
+            this.mc.fontRenderer.drawString(this.owner, 8, 28, GUISettings.instance().getEnabledTextColor(), true);
+            this.mc.fontRenderer.drawString(this.creationDate, 8, 42, GUISettings.instance().getEnabledTextColor(), true);
+            this.mc.fontRenderer.drawString(this.position, 8, 54, GUISettings.instance().getEnabledTextColor(), true);
+            this.mc.fontRenderer.drawString(this.dimension, 8, 66, GUISettings.instance().getEnabledTextColor(), true);
             GlStateManager.popMatrix();
             GlStateManager.pushMatrix();           
             GlStateManager.translate(0.0F, 0.0F, 0.0F);           
-            GlStateManager.scale(0.9F, 0.9F, 0.0F);  
+            GlStateManager.scale(0.8F, 0.8F, 0.0F);  
             if (!this.description.isEmpty())                      
                 for (String line : this.description)                  
-                    this.mc.fontRenderer.drawString(line, 16, 60 + 10 * this.description.indexOf(line), 0xFFD1D1D1, true); 
+                    this.mc.fontRenderer.drawString(line, 20, 74 + 10 * this.description.indexOf(line), GUISettings.instance().getEnabledTextColor(), true); 
             GlStateManager.popMatrix();
             GlStateManager.popMatrix();
         }
@@ -94,10 +95,10 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
         ResourceLocation imageLocation = this.getPreviewImage(worldPoint.getId(), forceLoad);
         if (imageLocation != null)
             this.setTexture(imageLocation, 240, 135);
-        this.favoriteIconEnabled = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerProfile().getFavoriteCampId();
-        this.sharedIconEnabled = TeleportationManagerClient.instance().getPlayerProfile().haveInvitedPlayers(worldPoint.getId());
+        this.favoriteIconEnabled = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerData().getFavoriteCampId();
+        this.sharedIconEnabled = TeleportationManagerClient.instance().getPlayerData().haveInvitedPlayers(worldPoint.getId());
         this.name = worldPoint.getName();
-        this.owner = I18n.format("teleportation.menu.info.owner") + " " + worldPoint.ownerName;
+        this.owner = I18n.format("teleportation.gui.menu.info.owner") + " " + worldPoint.ownerName;
         this.creationDate = worldPoint.getCreationDate();
         this.position = String.valueOf((int) worldPoint.getXPos()) + ", " + String.valueOf((int) worldPoint.getYPos()) + ", " + String.valueOf((int) worldPoint.getZPos());
         this.dimension = EnumDimensions.getLocalizedNameFromId(worldPoint.getDimensionId());

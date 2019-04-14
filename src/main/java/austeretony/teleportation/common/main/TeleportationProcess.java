@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.api.process.AbstractTemporaryProcess;
+import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
-import austeretony.oxygen.common.reference.CommonReference;
 import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import austeretony.teleportation.common.network.client.CPSyncCooldown;
@@ -104,7 +104,7 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
             OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.MOVED_TO_CAMP.ordinal(), point.getName());
             break;
         case LOCATION:
-            point = TeleportationManagerServer.instance().getWorldProfile().getLocation(this.pointId);
+            point = TeleportationManagerServer.instance().getWorldData().getLocation(this.pointId);
             this.move(point.getDimensionId(), point.getXPos(), point.getYPos(), point.getZPos(), point.getYaw(), point.getPitch());
             if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.LOCATIONS_TELEPORT_COOLDOWN.getIntValue()) > 0) {

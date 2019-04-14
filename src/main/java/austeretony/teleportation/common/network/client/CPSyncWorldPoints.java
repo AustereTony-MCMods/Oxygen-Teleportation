@@ -2,11 +2,11 @@ package austeretony.teleportation.common.network.client;
 
 import java.util.UUID;
 
+import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.oxygen.common.reference.CommonReference;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.common.TeleportationManagerServer;
-import austeretony.teleportation.common.main.PlayerProfile;
+import austeretony.teleportation.common.main.TeleportationPlayerData;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
@@ -33,7 +33,7 @@ public class CPSyncWorldPoints extends ProxyPacket {
         switch (this.type) {
         case CAMP:
             UUID otherUUID;
-            PlayerProfile ownerProfile = TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP));
+            TeleportationPlayerData ownerProfile = TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP));
             for (long id : this.points) {
                 if (ownerProfile.getOtherCampIds().contains(id)) {
                     otherUUID = ownerProfile.getOtherCampOwner(id);
@@ -49,7 +49,7 @@ public class CPSyncWorldPoints extends ProxyPacket {
             break;
         case LOCATION:
             for (long id : this.points)
-                TeleportationManagerServer.instance().getWorldProfile().getLocation(id).write(buffer);
+                TeleportationManagerServer.instance().getWorldData().getLocation(id).write(buffer);
             break;
         }
     }
@@ -63,7 +63,7 @@ public class CPSyncWorldPoints extends ProxyPacket {
         switch (this.type) {
         case CAMP:
             for (i = 0; i < amount; i++)
-                TeleportationManagerClient.instance().getPlayerProfile().addCamp(WorldPoint.read(buffer));
+                TeleportationManagerClient.instance().getPlayerData().addCamp(WorldPoint.read(buffer));
             TeleportationManagerClient.instance().getCampsLoader().savePlayerDataDelegated();
             break;
         case LOCATION:

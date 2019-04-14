@@ -22,7 +22,7 @@ public class LocationsLoaderServer {
     }
 
     public void loadLocationsDataDelegated() {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -37,7 +37,7 @@ public class LocationsLoaderServer {
         Path path = Paths.get(folder);
         if (Files.exists(path)) {
             try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(folder))) {    
-                this.manager.getWorldProfile().read(bis);
+                this.manager.getWorldData().read(bis);
                 TeleportationMain.LOGGER.info("World server data loaded.");
             } catch (IOException exception) {
                 TeleportationMain.LOGGER.error("World server data loading failed.");
@@ -47,7 +47,7 @@ public class LocationsLoaderServer {
     }
 
     public void saveLocationsDataDelegated() {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -67,7 +67,7 @@ public class LocationsLoaderServer {
             }
         }
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(folder))) {   
-            this.manager.getWorldProfile().write(bos);
+            this.manager.getWorldData().write(bos);
         } catch (IOException exception) {
             TeleportationMain.LOGGER.error("Locations server data saving failed.");
             exception.printStackTrace();

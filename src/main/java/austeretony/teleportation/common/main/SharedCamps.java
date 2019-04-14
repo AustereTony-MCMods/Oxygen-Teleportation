@@ -1,4 +1,4 @@
-package austeretony.teleportation.common.camps;
+package austeretony.teleportation.common.main;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -29,8 +29,7 @@ public class SharedCamps {
     }
 
     public void write(BufferedOutputStream bos) throws IOException {
-        StreamUtils.write(this.playerUUID.getMostSignificantBits(), bos);
-        StreamUtils.write(this.playerUUID.getLeastSignificantBits(), bos);
+        StreamUtils.write(this.playerUUID, bos);
         StreamUtils.write(this.username, bos);
         StreamUtils.write((byte) this.camps.size(), bos);
         for (long id : this.camps)
@@ -39,7 +38,7 @@ public class SharedCamps {
 
     public static SharedCamps read(BufferedInputStream bis) throws IOException {
         SharedCamps sharedCamps = new SharedCamps(
-                new UUID(StreamUtils.readLong(bis), StreamUtils.readLong(bis)), 
+                StreamUtils.readUUID(bis), 
                 StreamUtils.readString(bis));
         int size = StreamUtils.readByte(bis);
         for (int i = 0; i < size; i++)
@@ -48,8 +47,7 @@ public class SharedCamps {
     }
 
     public void write(PacketBuffer buffer) {
-        buffer.writeLong(this.playerUUID.getMostSignificantBits());
-        buffer.writeLong(this.playerUUID.getLeastSignificantBits());
+        PacketBufferUtils.writeUUID(this.playerUUID, buffer);
         PacketBufferUtils.writeString(this.username, buffer);
         buffer.writeByte(this.camps.size());
         for (long id : this.camps)
@@ -58,7 +56,7 @@ public class SharedCamps {
 
     public static SharedCamps read(PacketBuffer buffer) {
         SharedCamps sharedCamps = new SharedCamps(
-                new UUID(buffer.readLong(), buffer.readLong()), 
+                PacketBufferUtils.readUUID(buffer), 
                 PacketBufferUtils.readString(buffer));
         int size = buffer.readByte();
         for (int i = 0; i < size; i++)

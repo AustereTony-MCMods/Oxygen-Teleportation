@@ -1,15 +1,13 @@
-package austeretony.teleportation.common.camps;
+package austeretony.teleportation.common.main;
 
 import java.util.UUID;
 
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.api.notification.AbstractNotification;
+import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.notification.EnumNotifications;
-import austeretony.oxygen.common.reference.CommonReference;
 import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.main.EnumChatMessages;
-import austeretony.teleportation.common.main.TeleportationMain;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class InvitationRequest extends AbstractNotification {
@@ -58,7 +56,6 @@ public class InvitationRequest extends AbstractNotification {
 
     @Override
     public void accepted(EntityPlayer player) {
-        //TODO Debug
         TeleportationManagerServer.instance().getPlayerProfile(this.ownerUUID).inviteToCamp(this.pointId, this.targetUUID, CommonReference.username(player));
         TeleportationManagerServer.instance().getPlayerProfile(this.targetUUID).addOtherCamp(this.pointId, this.ownerUUID);
         TeleportationManagerServer.instance().getCampsLoader().savePlayerDataDelegated(this.ownerUUID);
@@ -66,7 +63,7 @@ public class InvitationRequest extends AbstractNotification {
         OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.INVITATION_REQUEST_ACCEPTED.ordinal(), this.ownerUsername, this.campName);
         if (OxygenHelperServer.isOnline(this.ownerUUID))
             OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.ownerUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.INVITATION_REQUEST_ACCEPTED_OWNER.ordinal(), this.campName, CommonReference.username(player));
-        TeleportationManagerServer.instance().getCampsManager().resetInviting(this.ownerUUID);
+        OxygenHelperServer.setRequesting(this.ownerUUID, false);
     }
 
     @Override
@@ -74,11 +71,11 @@ public class InvitationRequest extends AbstractNotification {
         OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.INVITATION_REQUEST_REJECTED.ordinal(), this.ownerUsername, this.campName);
         if (OxygenHelperServer.isOnline(this.ownerUUID))
             OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.ownerUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.INVITATION_REQUEST_REJECTED_OWNER.ordinal(), this.campName, CommonReference.username(player));
-        TeleportationManagerServer.instance().getCampsManager().resetInviting(this.ownerUUID);
+        OxygenHelperServer.setRequesting(this.ownerUUID, false);
     }
 
     @Override
     public void expired() {
-        TeleportationManagerServer.instance().getCampsManager().resetInviting(this.ownerUUID);
+        OxygenHelperServer.setRequesting(this.ownerUUID, false);
     }
 }

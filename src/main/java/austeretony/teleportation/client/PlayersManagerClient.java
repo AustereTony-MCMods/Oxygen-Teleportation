@@ -5,7 +5,7 @@ import java.util.UUID;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderClient;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import austeretony.teleportation.common.main.EnumPrivileges;
-import austeretony.teleportation.common.main.PlayerProfile;
+import austeretony.teleportation.common.main.TeleportationPlayerData;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.network.server.SPChangeJumpProfile;
 import austeretony.teleportation.common.network.server.SPMoveToPlayer;
@@ -18,7 +18,7 @@ public class PlayersManagerClient {
         this.manager = manager;
     }
 
-    public void changeJumpProfileSynced(PlayerProfile.EnumJumpProfile profile) {
+    public void changeJumpProfileSynced(TeleportationPlayerData.EnumJumpProfile profile) {
         TeleportationMain.network().sendToServer(new SPChangeJumpProfile(profile));
     }
 

@@ -12,10 +12,7 @@ import java.nio.file.Paths;
 import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.teleportation.common.main.TeleportationMain;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class LocationsLoaderClient {
 
     private final TeleportationManagerClient manager;
@@ -25,7 +22,7 @@ public class LocationsLoaderClient {
     }
 
     public void loadLocationsDataDelegated() {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -50,7 +47,7 @@ public class LocationsLoaderClient {
     }
 
     public void saveLocationsDataDelegated() {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {

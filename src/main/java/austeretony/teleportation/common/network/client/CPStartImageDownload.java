@@ -25,7 +25,7 @@ public class CPStartImageDownload extends ProxyPacket {
     public void write(PacketBuffer buffer, INetHandler netHandler) {
         buffer.writeByte(this.operation.ordinal());
         buffer.writeLong(this.pointId);
-        buffer.writeInt(this.partsAmount);
+        buffer.writeShort(this.partsAmount);
     }
 
     @Override
@@ -36,6 +36,6 @@ public class CPStartImageDownload extends ProxyPacket {
             ImageTransferingClientBuffer.create(
                     this.operation, 
                     this.pointId, 
-                    buffer.readInt());
+                    buffer.readShort());
     }
 }

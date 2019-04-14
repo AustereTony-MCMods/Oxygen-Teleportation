@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class WorldPointGUIButton extends GUIButton {
 
     public final WorldPoint worldPoint;
@@ -29,11 +28,11 @@ public class WorldPointGUIButton extends GUIButton {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableBlend(); 
         if (this.shared) {
-            this.mc.getTextureManager().bindTexture(MenuGUIScreen.SHARED_ICON);                        
+            this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.SHARED_ICON);                        
             this.drawCustomSizedTexturedRect(this.getWidth() - 8, 1, 8, 0, 8, 8, 24, 8);      
         }
         if (this.favorite) {
-            this.mc.getTextureManager().bindTexture(MenuGUIScreen.FAVORITE_ICONS);                        
+            this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.FAVORITE_ICONS);                        
             this.drawCustomSizedTexturedRect(this.getWidth() - (this.shared ? 16 : 8), 1, 8, 0, 8, 8, 24, 8);      
         }
         GlStateManager.disableBlend(); 

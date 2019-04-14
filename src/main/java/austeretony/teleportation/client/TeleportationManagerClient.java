@@ -1,24 +1,21 @@
 package austeretony.teleportation.client;
 
-import austeretony.oxygen.client.reference.ClientReference;
 import austeretony.oxygen.common.api.OxygenHelperClient;
-import austeretony.teleportation.client.gui.menu.MenuGUIScreen;
-import austeretony.teleportation.common.main.PlayerProfile;
+import austeretony.oxygen.common.core.api.ClientReference;
+import austeretony.teleportation.client.gui.menu.TeleportationMenuGUIScreen;
 import austeretony.teleportation.common.main.TeleportationMain;
-import austeretony.teleportation.common.main.WorldProfile;
+import austeretony.teleportation.common.main.TeleportationPlayerData;
+import austeretony.teleportation.common.main.TeleportationWorldData;
 import austeretony.teleportation.common.network.server.SPRequest;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class TeleportationManagerClient {
 
     private static TeleportationManagerClient instance;
 
     //Data
-    private final PlayerProfile playerProfile;
+    private final TeleportationPlayerData playerData;
 
-    private final WorldProfile worldProfile;
+    private final TeleportationWorldData worldData;
 
     //Camps
     private final CampsManagerClient campsManager;
@@ -41,8 +38,8 @@ public class TeleportationManagerClient {
     private long time, delay;
 
     private TeleportationManagerClient() {
-        this.playerProfile = new PlayerProfile(OxygenHelperClient.getPlayerUUID());
-        this.worldProfile = new WorldProfile();
+        this.playerData = new TeleportationPlayerData(OxygenHelperClient.getPlayerUUID());
+        this.worldData = new TeleportationWorldData();
         this.campsManager = new CampsManagerClient(this);
         this.campsLoader = new CampsLoaderClient(this);
         this.locationsManager = new LocationsManagerClient(this);
@@ -60,12 +57,12 @@ public class TeleportationManagerClient {
         return instance;
     }
 
-    public PlayerProfile getPlayerProfile() {
-        return this.playerProfile;
+    public TeleportationPlayerData getPlayerData() {
+        return this.playerData;
     }
 
-    public WorldProfile getWorldProfile() {
-        return this.worldProfile;
+    public TeleportationWorldData getWorldProfile() {
+        return this.worldData;
     }
 
     public CampsManagerClient getCampsManager() {
@@ -125,7 +122,7 @@ public class TeleportationManagerClient {
     public void openMenu() {
         this.getImagesManager().preparePreviewImage();
         ClientReference.getMinecraft().gameSettings.hideGUI = false;
-        ClientReference.displayGuiScreen(new MenuGUIScreen());
+        ClientReference.displayGuiScreen(new TeleportationMenuGUIScreen());
         this.campsLoader.savePlayerDataDelegated();
         this.imagesLoader.removeUnusedCampPreviewImagesDelegated();
         this.imagesLoader.removeUnusedLocationPreviewImagesDelegated();

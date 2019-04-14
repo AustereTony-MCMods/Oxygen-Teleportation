@@ -16,10 +16,7 @@ import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import austeretony.teleportation.common.main.TeleportationMain;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class ImagesLoaderClient {
 
     private final TeleportationManagerClient manager;
@@ -62,7 +59,7 @@ public class ImagesLoaderClient {
     }
 
     public void saveLatestCampPreviewImageDelegated(long pointId) {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -72,7 +69,7 @@ public class ImagesLoaderClient {
     }
 
     public void saveCampPreviewImageDelegated(long pointId, BufferedImage image) {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -100,7 +97,7 @@ public class ImagesLoaderClient {
     }
 
     public void removeUnusedCampPreviewImagesDelegated() {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -122,7 +119,7 @@ public class ImagesLoaderClient {
             Path path;
             for (String fileName : files) {
                 path = Paths.get(folder + "/" + fileName);
-                if (!this.manager.getPlayerProfile().campExist(Long.parseLong(fileName.substring(0, 15)))) {
+                if (!this.manager.getPlayerData().campExist(Long.parseLong(fileName.substring(0, 15)))) {
                     try {
                         Files.delete(path);
                     } catch (IOException exception) {
@@ -149,7 +146,7 @@ public class ImagesLoaderClient {
     }
 
     public void renameCampPreviewImageDelegated(long oldPointId, long newPointId) {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -206,7 +203,7 @@ public class ImagesLoaderClient {
     }
 
     public void saveLatestLocationPreviewImageDelegated(long pointId) {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -216,7 +213,7 @@ public class ImagesLoaderClient {
     }
 
     public void saveLocationPreviewImageDelegated(long pointId, BufferedImage image) {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -244,7 +241,7 @@ public class ImagesLoaderClient {
     }
 
     public void removeUnusedLocationPreviewImagesDelegated() {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -280,7 +277,7 @@ public class ImagesLoaderClient {
     }
 
     public void removeLocationPreviewImageDelegated(long pointId) {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -303,7 +300,7 @@ public class ImagesLoaderClient {
     }
 
     public void renameLocationPreviewImageDelegated(long oldPointId, long newPointId) {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {

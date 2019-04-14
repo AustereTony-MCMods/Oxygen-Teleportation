@@ -1,7 +1,7 @@
 package austeretony.teleportation.common.network.server;
 
+import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.oxygen.common.reference.CommonReference;
 import austeretony.teleportation.common.util.ImageTransferingServerBuffer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
@@ -26,7 +26,7 @@ public class SPStartImageUpload extends ProxyPacket {
     public void write(PacketBuffer buffer, INetHandler netHandler) {
         buffer.writeByte(this.operation.ordinal());
         buffer.writeLong(this.pointId);
-        buffer.writeInt(this.partsAmount);
+        buffer.writeShort(this.partsAmount);
     }
 
     @Override
@@ -38,6 +38,6 @@ public class SPStartImageUpload extends ProxyPacket {
                     this.operation, 
                     CommonReference.uuid(getEntityPlayerMP(netHandler)), 
                     this.pointId, 
-                    buffer.readInt());
+                    buffer.readShort());
     }
 }

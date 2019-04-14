@@ -15,8 +15,11 @@ import net.minecraft.network.PacketBuffer;
 
 public class WorldPoint {
 
-    private static final DateFormat 
-    CREATED_DATE_FORMAT = new SimpleDateFormat("d MM yyyy");
+    public static final int 
+    MAX_POINT_NAME_LENGTH = 20,
+    MAX_POINT_DESCRIPTION_LENGTH = 80;
+
+    public static final DateFormat CREATED_DATE_FORMAT = new SimpleDateFormat("d MM yyyy");
 
     private long id;
 
@@ -28,17 +31,16 @@ public class WorldPoint {
 
     private float yaw, pitch, xPos, yPos, zPos;
 
-    private int dimId;
+    private int dimension;
 
     private boolean locked;
 
-    public WorldPoint(UUID ownerUUID, String ownerName, String name, String description, int dimensionId, float xPos, float yPos, float zPos, float yaw, float pitch) {	
+    public WorldPoint(UUID ownerUUID, String ownerName, String name, String description, int dimension, float xPos, float yPos, float zPos, float yaw, float pitch) {	
         this.ownerUUID = ownerUUID;
-        this.ownerName = ownerName.length() > 16 ? ownerName.substring(0, 16) : ownerName;	
-        this.dateCreated = CREATED_DATE_FORMAT.format(new Date());
-        this.name = name.length() > 16 ? name.substring(0, 16) : name;		
-        this.desc = description.length() > 64 ? description.substring(0, 64) : description;
-        this.dimId = dimensionId;
+        this.ownerName = ownerName;	
+        this.name = name.length() > MAX_POINT_NAME_LENGTH ? name.substring(0, MAX_POINT_NAME_LENGTH) : name;		
+        this.desc = description.length() > MAX_POINT_DESCRIPTION_LENGTH ? description.substring(0, MAX_POINT_DESCRIPTION_LENGTH) : description;
+        this.dimension = dimension;
         this.xPos = xPos;
         this.yPos = yPos;
         this.zPos = zPos;
@@ -82,6 +84,10 @@ public class WorldPoint {
         this.dateCreated = date;
     }
 
+    public void createDate() {
+        this.dateCreated = CREATED_DATE_FORMAT.format(new Date());    
+    }
+
     public float getYaw() {		
         return this.yaw;
     }
@@ -103,7 +109,7 @@ public class WorldPoint {
     }
 
     public int getDimensionId() {		
-        return this.dimId;
+        return this.dimension;
     }
 
     public void setPosition(float yaw, float pitch, float x, float y, float z, int dimension) {
@@ -112,7 +118,7 @@ public class WorldPoint {
         this.xPos = x;
         this.yPos = y;
         this.zPos = z;
-        this.dimId = dimension;
+        this.dimension = dimension;
     }
 
     public boolean isOwner(UUID playerUUID) {
@@ -128,8 +134,7 @@ public class WorldPoint {
     }
 
     public void write(BufferedOutputStream bos) throws IOException {
-        StreamUtils.write(this.ownerUUID.getMostSignificantBits(), bos);
-        StreamUtils.write(this.ownerUUID.getLeastSignificantBits(), bos);
+        StreamUtils.write(this.ownerUUID, bos);
         StreamUtils.write(this.ownerName, bos);
         StreamUtils.write(this.getName(), bos);
         StreamUtils.write(this.getDescription(), bos);
@@ -146,7 +151,7 @@ public class WorldPoint {
 
     public static WorldPoint read(BufferedInputStream bis) throws IOException {
         WorldPoint worldPoint = new WorldPoint(
-                new UUID(StreamUtils.readLong(bis), StreamUtils.readLong(bis)),
+                StreamUtils.readUUID(bis),
                 StreamUtils.readString(bis),
                 StreamUtils.readString(bis),
                 StreamUtils.readString(bis),
@@ -163,8 +168,7 @@ public class WorldPoint {
     }
 
     public void write(PacketBuffer buffer) {
-        buffer.writeLong(this.ownerUUID.getMostSignificantBits());
-        buffer.writeLong(this.ownerUUID.getLeastSignificantBits());
+        PacketBufferUtils.writeUUID(this.ownerUUID, buffer);
         PacketBufferUtils.writeString(this.ownerName, buffer);
         PacketBufferUtils.writeString(this.getName(), buffer);
         PacketBufferUtils.writeString(this.getDescription(), buffer);
@@ -181,7 +185,7 @@ public class WorldPoint {
 
     public static WorldPoint read(PacketBuffer buffer) {
         WorldPoint worldPoint = new WorldPoint(
-                new UUID(buffer.readLong(), buffer.readLong()),
+                PacketBufferUtils.readUUID(buffer),
                 PacketBufferUtils.readString(buffer),
                 PacketBufferUtils.readString(buffer),
                 PacketBufferUtils.readString(buffer),

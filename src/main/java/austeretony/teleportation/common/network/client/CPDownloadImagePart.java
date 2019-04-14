@@ -29,22 +29,20 @@ public class CPDownloadImagePart extends ProxyPacket {
     public void write(PacketBuffer buffer, INetHandler netHandler) {
         buffer.writeByte(this.operation.ordinal());
         buffer.writeLong(this.pointId);
-        buffer.writeByte(this.index);
-        buffer.writeByte(this.partsAmount);
-        buffer.writeInt(this.part.length);
-        for (int i = 0; i < this.part.length; i++)
-            buffer.writeByte(this.part[i]);
+        buffer.writeShort(this.index);
+        buffer.writeShort(this.partsAmount);
+        buffer.writeShort(this.part.length);
+        buffer.writeBytes(this.part);
     }
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
         this.operation = ImageTransferingClientBuffer.EnumImageTransfer.values()[buffer.readByte()];
         this.pointId = buffer.readLong();
-        this.index = buffer.readByte();
-        this.partsAmount = buffer.readByte();
-        byte[] recieved = new byte[buffer.readInt()];
-        for (int i = 0; i < recieved.length; i++) 
-            recieved[i] = buffer.readByte();
+        this.index = buffer.readShort();
+        this.partsAmount = buffer.readShort();
+        byte[] recieved = new byte[buffer.readShort()];
+        buffer.readBytes(recieved);
         if (ImageTransferingClientBuffer.exist(this.pointId))
             ImageTransferingClientBuffer.get(this.pointId).addPart(this.index, recieved);
         else {

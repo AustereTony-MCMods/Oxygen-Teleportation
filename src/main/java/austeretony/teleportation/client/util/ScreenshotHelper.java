@@ -7,14 +7,11 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import austeretony.oxygen.client.reference.ClientReference;
+import austeretony.oxygen.common.core.api.ClientReference;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.shader.Framebuffer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class ScreenshotHelper {
 
     public static BufferedImage createScreenshot() {

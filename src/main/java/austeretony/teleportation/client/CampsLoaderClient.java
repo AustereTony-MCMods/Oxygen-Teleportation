@@ -11,12 +11,8 @@ import java.nio.file.Paths;
 
 import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperClient;
-import austeretony.teleportation.common.main.PlayerProfile;
 import austeretony.teleportation.common.main.TeleportationMain;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class CampsLoaderClient {
 
     private final TeleportationManagerClient manager;
@@ -26,7 +22,7 @@ public class CampsLoaderClient {
     }
 
     public void loadCampsDataDelegated() {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -41,7 +37,7 @@ public class CampsLoaderClient {
         Path path = Paths.get(folder);
         if (Files.exists(path)) {
             try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(folder))) {    
-                this.manager.getPlayerProfile().read(bis);
+                this.manager.getPlayerData().read(bis);
                 TeleportationMain.LOGGER.info("Player client data loaded.");
             } catch (IOException exception) {
                 TeleportationMain.LOGGER.error("Player client data loading failed.");
@@ -51,7 +47,7 @@ public class CampsLoaderClient {
     }
 
     public void savePlayerDataDelegated() {
-        OxygenHelperClient.addIOTaskClient(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -71,7 +67,7 @@ public class CampsLoaderClient {
             }
         }
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(folder))) {   
-            this.manager.getPlayerProfile().write(bos);
+            this.manager.getPlayerData().write(bos);
         } catch (IOException exception) {
             TeleportationMain.LOGGER.error("Player client data saving failed.");
             exception.printStackTrace();

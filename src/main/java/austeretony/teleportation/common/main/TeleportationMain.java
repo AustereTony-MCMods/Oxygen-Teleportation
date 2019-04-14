@@ -7,21 +7,23 @@ import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.api.network.OxygenNetwork;
+import austeretony.oxygen.common.core.api.CommonReference;
+import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.privilege.api.Privilege;
 import austeretony.oxygen.common.privilege.api.PrivilegedGroup;
-import austeretony.oxygen.common.reference.CommonReference;
-import austeretony.teleportation.client.handler.KeyHandler;
+import austeretony.teleportation.client.handler.TeleportationKeyHandler;
+import austeretony.teleportation.client.listener.TeleportationListenerClient;
 import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.events.TeleportationEvents;
+import austeretony.teleportation.common.listener.TeleportationListenerServer;
 import austeretony.teleportation.common.network.client.CPCommand;
 import austeretony.teleportation.common.network.client.CPDownloadImagePart;
 import austeretony.teleportation.common.network.client.CPStartImageDownload;
 import austeretony.teleportation.common.network.client.CPSyncCooldown;
 import austeretony.teleportation.common.network.client.CPSyncInvitedPlayers;
-import austeretony.teleportation.common.network.client.CPSyncValidWorldPointIds;
+import austeretony.teleportation.common.network.client.CPSyncValidWorldPointsIds;
 import austeretony.teleportation.common.network.client.CPSyncWorldPoints;
-import austeretony.teleportation.common.network.server.SPAbsentPoints;
+import austeretony.teleportation.common.network.server.SPSendAbsentPointsIds;
 import austeretony.teleportation.common.network.server.SPChangeJumpProfile;
 import austeretony.teleportation.common.network.server.SPCreateWorldPoint;
 import austeretony.teleportation.common.network.server.SPEditWorldPoint;
@@ -46,7 +48,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = TeleportationMain.MODID, 
         name = TeleportationMain.NAME, 
         version = TeleportationMain.VERSION,
-        dependencies = "required-after:oxygen@[0.2.0,);",//TODO always check required core version before build
+        dependencies = "required-after:oxygen@[0.3.0,);",//TODO always check required core version before build
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = TeleportationMain.VERSIONS_FORGE_URL)
 public class TeleportationMain {
@@ -54,14 +56,16 @@ public class TeleportationMain {
     public static final String 
     MODID = "teleportation",
     NAME = "Teleportation",
-    VERSION = "0.2.0",
+    VERSION = "0.3.0",
     VERSION_CUSTOM = VERSION + ":alpha:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Teleportation/info/mod_versions_forge.json";
 
     public static final int 
     TELEPORTATION_MOD_INDEX = 1,
-    JUMP_PROFILE_DATA_ID = 1;
+    JUMP_PROFILE_DATA_ID = 10,
+    TELEPORTATION_REQUEST_ID = 10,
+    INVITATION_TO_CAMP_ID = 11;
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
 
@@ -74,15 +78,21 @@ public class TeleportationMain {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         this.initNetwork();
+
+        TeleportationListenerServer listenerServer = new TeleportationListenerServer();
+        OxygenHelperServer.registerPlayerLogInListener(listenerServer);
+        OxygenHelperServer.registerPlayerLogOutListener(listenerServer);
+
         if (event.getSide() == Side.CLIENT) {
-            CommonReference.registerEvent(new KeyHandler());
-            OxygenHelperClient.registerClientInitListener(new ClientInitListener());
-            OxygenHelperClient.registerChatMessageInfoListener(new ChatMessagesListener());
-            //icons for notifications
-            OxygenHelperClient.registerNotificationIcon(0, new ResourceLocation(MODID, "textures/gui/notifications/teleportation_request_icon.png"));
-            OxygenHelperClient.registerNotificationIcon(1, new ResourceLocation(MODID, "textures/gui/notifications/invitation_request_icon.png"));
+            CommonReference.registerEvent(new TeleportationKeyHandler());
+
+            TeleportationListenerClient listenerClient = new TeleportationListenerClient();
+            OxygenHelperClient.registerClientInitListener(listenerClient);
+            OxygenHelperClient.registerChatMessageInfoListener(listenerClient);
+
+            OxygenHelperClient.registerNotificationIcon(TELEPORTATION_REQUEST_ID, new ResourceLocation(MODID, "textures/gui/notifications/teleportation_request_icon.png"));
+            OxygenHelperClient.registerNotificationIcon(INVITATION_TO_CAMP_ID, new ResourceLocation(OxygenMain.MODID, "textures/gui/invitation_request_icon.png"));
         }
-        CommonReference.registerEvent(new TeleportationEvents());
     }
 
     @EventHandler
@@ -92,12 +102,13 @@ public class TeleportationMain {
         this.addPrivilegesDelegated();
     }
 
+    //TODO Need better solution (queue or something).
     private void addPrivilegesDelegated() {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
-                if (!PrivilegedGroup.OPERATORS_GROUP.hasPrivilege(EnumPrivileges.LOCATIONS_CREATION.toString()))
+                if (!PrivilegedGroup.OPERATORS_GROUP.hasPrivilege(EnumPrivileges.LOCATIONS_MANAGEMENT.toString()))
                     PrivilegedGroup.OPERATORS_GROUP.addPrivileges(true, 
                             new Privilege(EnumPrivileges.PROCESS_TELEPORTATION_ON_MOVE.toString()),
                             new Privilege(EnumPrivileges.ENABLE_MOVE_TO_LOCKED_LOCATIONS.toString()),
@@ -107,8 +118,7 @@ public class TeleportationMain {
                             new Privilege(EnumPrivileges.CAMP_TELEPORTATION_DELAY.toString(), 0),
                             new Privilege(EnumPrivileges.CAMP_TELEPORTATION_COOLDOWN.toString(), 0),
 
-                            new Privilege(EnumPrivileges.LOCATIONS_CREATION.toString()),
-                            new Privilege(EnumPrivileges.LOCATIONS_EDITING.toString()),
+                            new Privilege(EnumPrivileges.LOCATIONS_MANAGEMENT.toString()),
                             new Privilege(EnumPrivileges.LOCATION_TELEPORTATION_DELAY.toString(), 0),
                             new Privilege(EnumPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), 0),
 
@@ -122,7 +132,7 @@ public class TeleportationMain {
         network = OxygenHelperServer.createNetworkHandler("oxygen:" + MODID);
 
         network.registerPacket(CPCommand.class);
-        network.registerPacket(CPSyncValidWorldPointIds.class);
+        network.registerPacket(CPSyncValidWorldPointsIds.class);
         network.registerPacket(CPSyncWorldPoints.class);
         network.registerPacket(CPStartImageDownload.class);
         network.registerPacket(CPDownloadImagePart.class);
@@ -130,7 +140,7 @@ public class TeleportationMain {
         network.registerPacket(CPSyncInvitedPlayers.class);
 
         network.registerPacket(SPRequest.class);
-        network.registerPacket(SPAbsentPoints.class);
+        network.registerPacket(SPSendAbsentPointsIds.class);
         network.registerPacket(SPCreateWorldPoint.class);
         network.registerPacket(SPRemoveWorldPoint.class);
         network.registerPacket(SPEditWorldPoint.class);

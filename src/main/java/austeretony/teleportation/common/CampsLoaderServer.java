@@ -23,12 +23,12 @@ public class CampsLoaderServer {
     }
 
     public void loadPlayerDataDelegated(UUID playerUUID) {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
                 loadPlayerData(playerUUID);
-                manager.appendAdditionalPlayerData(playerUUID);
+                manager.appendSharedPlayerData(playerUUID);
             }     
         });
     }
@@ -48,7 +48,7 @@ public class CampsLoaderServer {
     }
 
     public void savePlayerDataDelegated(UUID playerUUID) {
-        OxygenHelperServer.addIOTaskServer(new IOxygenTask() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {

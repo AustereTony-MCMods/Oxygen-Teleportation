@@ -1,4 +1,4 @@
-package austeretony.teleportation.common.camps;
+package austeretony.teleportation.common.main;
 
 import java.util.Set;
 import java.util.UUID;

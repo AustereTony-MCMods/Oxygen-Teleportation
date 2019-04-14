@@ -3,6 +3,7 @@ package austeretony.teleportation.common.network.server;
 import java.util.UUID;
 
 import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.oxygen.common.util.PacketBufferUtils;
 import austeretony.teleportation.common.TeleportationManagerServer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
@@ -27,8 +28,7 @@ public class SPManageInvitation extends ProxyPacket {
     public void write(PacketBuffer buffer, INetHandler netHandler) {
         buffer.writeByte(this.operation.ordinal());
         buffer.writeLong(this.pointId);
-        buffer.writeLong(this.playerUUID.getMostSignificantBits());
-        buffer.writeLong(this.playerUUID.getLeastSignificantBits());
+        PacketBufferUtils.writeUUID(this.playerUUID, buffer);
     }
 
     @Override
@@ -36,10 +36,10 @@ public class SPManageInvitation extends ProxyPacket {
         this.operation = EnumOperation.values()[buffer.readByte()];
         switch (this.operation) {
         case INVITE:
-            TeleportationManagerServer.instance().getCampsManager().invitePlayer(getEntityPlayerMP(netHandler), buffer.readLong(), new UUID(buffer.readLong(), buffer.readLong()));
+            TeleportationManagerServer.instance().getCampsManager().invitePlayer(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readUUID(buffer));
             break;
         case UNINVITE:
-            TeleportationManagerServer.instance().getCampsManager().uninvitePlayer(getEntityPlayerMP(netHandler), buffer.readLong(), new UUID(buffer.readLong(), buffer.readLong()));
+            TeleportationManagerServer.instance().getCampsManager().uninvitePlayer(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readUUID(buffer));
             break;
         }
     }

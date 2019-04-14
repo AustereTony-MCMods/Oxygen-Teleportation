@@ -3,6 +3,7 @@ package austeretony.teleportation.common.main;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,12 +11,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import austeretony.oxygen.common.util.StreamUtils;
 import austeretony.teleportation.common.world.WorldPoint;
 
-public class WorldProfile {
+public class TeleportationWorldData {
 
     private final Map<Long, WorldPoint> locations = new ConcurrentHashMap<Long, WorldPoint>();
 
-    public Map<Long, WorldPoint> getLocations() {
-        return this.locations;
+    public Collection<WorldPoint> getLocations() {
+        return this.locations.values();
     }
 
     public int getLocationsAmount() {
@@ -47,13 +48,13 @@ public class WorldProfile {
     }
 
     public void write(BufferedOutputStream bos) throws IOException {
-        StreamUtils.write(this.getLocationsAmount(), bos);
-        for (WorldPoint worldPoint : this.getLocations().values())
+        StreamUtils.write((short) this.getLocationsAmount(), bos);
+        for (WorldPoint worldPoint : this.getLocations())
             worldPoint.write(bos);
     }
 
     public void read(BufferedInputStream bis) throws IOException {
-        int locations = StreamUtils.readInt(bis);
+        int locations = StreamUtils.readShort(bis);
         for (int i = 0; i < locations; i++)
             this.addLocation(WorldPoint.read(bis));    
     }

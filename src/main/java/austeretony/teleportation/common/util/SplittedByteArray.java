@@ -1,4 +1,4 @@
-package austeretony.teleportation.common.locations;
+package austeretony.teleportation.common.util;
 
 import java.util.List;
 

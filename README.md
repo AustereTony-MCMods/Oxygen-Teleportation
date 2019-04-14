@@ -1,2 +1,2 @@
 # Oxygen-Teleportation
-Handy teleportation interface.
+POIs creation and teleportation interface.

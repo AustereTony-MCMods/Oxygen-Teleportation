@@ -1,6 +1,7 @@
 package austeretony.teleportation.client;
 
-import austeretony.oxygen.client.reference.ClientReference;
+import austeretony.oxygen.common.api.OxygenHelperClient;
+import austeretony.oxygen.common.core.api.ClientReference;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderClient;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import austeretony.teleportation.common.main.EnumPrivileges;
@@ -12,10 +13,7 @@ import austeretony.teleportation.common.network.server.SPMoveToPoint;
 import austeretony.teleportation.common.network.server.SPRemoveWorldPoint;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
 public class LocationsManagerClient {
 
     private final TeleportationManagerClient manager;
@@ -36,8 +34,21 @@ public class LocationsManagerClient {
         }
     }
 
-    public void setLocationPointSynced(WorldPoint worldPoint) {
+    public void createLocationPointSynced(String name, String description) {
         if (this.canCreateLocation() && this.manager.getWorldProfile().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue()) {
+            WorldPoint worldPoint = new WorldPoint(
+                    OxygenHelperClient.getPlayerUUID(),
+                    ClientReference.getClientPlayer().getName(), 
+                    name, 
+                    description,
+                    ClientReference.getClientPlayer().dimension,
+                    (float) ClientReference.getClientPlayer().posX, 
+                    (float) ClientReference.getClientPlayer().posY, 
+                    (float) ClientReference.getClientPlayer().posZ,
+                    ClientReference.getClientPlayer().rotationYawHead, 
+                    ClientReference.getClientPlayer().rotationPitch);
+            worldPoint.createId();
+            worldPoint.createDate();
             this.manager.getWorldProfile().addLocation(worldPoint);
             TeleportationMain.network().sendToServer(new SPCreateWorldPoint(WorldPoint.EnumWorldPoints.LOCATION, worldPoint));
             this.manager.getImagesManager().cacheLatestImage(worldPoint.getId());
@@ -109,6 +120,6 @@ public class LocationsManagerClient {
     }
 
     private boolean canCreateLocation() {
-        return PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.LOCATIONS_CREATION.toString(), false);
+        return PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.LOCATIONS_CREATION.toString(), false) || PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.LOCATIONS_MANAGEMENT.toString(), false);
     }
 }

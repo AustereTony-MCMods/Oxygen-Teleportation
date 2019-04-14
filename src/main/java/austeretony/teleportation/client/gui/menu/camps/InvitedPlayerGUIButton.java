@@ -39,8 +39,8 @@ public class InvitedPlayerGUIButton extends GUIButton {
     }
 
     @Override
-    public boolean mouseClicked(int mouseX, int mouseY) {       
-        if (this.uninviteButton.mouseClicked(mouseX, mouseY)) {
+    public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {       
+        if (this.uninviteButton.mouseClicked(mouseX, mouseY, mouseButton)) {
             TeleportationManagerClient.instance().getCampsManager().uninvitePlayerSynced(this.pointId, this.playerUUID);
             this.uninviteButton.disable();
             this.disable();

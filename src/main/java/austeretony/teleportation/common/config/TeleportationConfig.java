@@ -4,7 +4,7 @@ import java.util.Queue;
 
 import austeretony.oxygen.common.api.config.AbstractConfigHolder;
 import austeretony.oxygen.common.api.config.ConfigValue;
-import austeretony.oxygen.common.reference.CommonReference;
+import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.teleportation.common.main.TeleportationMain;
 
 public class TeleportationConfig extends AbstractConfigHolder {
@@ -37,6 +37,11 @@ public class TeleportationConfig extends AbstractConfigHolder {
     @Override
     public String getModId() {
         return TeleportationMain.MODID;
+    }
+
+    @Override
+    public String getVersion() {
+        return TeleportationMain.VERSION_CUSTOM;
     }
 
     @Override

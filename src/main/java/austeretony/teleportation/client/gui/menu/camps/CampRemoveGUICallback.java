@@ -9,12 +9,12 @@ import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.client.gui.menu.CampsGUISection;
-import austeretony.teleportation.client.gui.menu.MenuGUIScreen;
+import austeretony.teleportation.client.gui.menu.TeleportationMenuGUIScreen;
 import net.minecraft.client.resources.I18n;
 
 public class CampRemoveGUICallback extends AbstractGUICallback {
 
-    private final MenuGUIScreen screen;
+    private final TeleportationMenuGUIScreen screen;
 
     private final CampsGUISection section;
 
@@ -22,7 +22,7 @@ public class CampRemoveGUICallback extends AbstractGUICallback {
 
     private GUIButton confirmButton, cancelButton;
 
-    public CampRemoveGUICallback(MenuGUIScreen screen, CampsGUISection section, int width, int height) {
+    public CampRemoveGUICallback(TeleportationMenuGUIScreen screen, CampsGUISection section, int width, int height) {
         super(screen, section, width, height);
         this.screen = screen;
         this.section = section;
@@ -33,16 +33,16 @@ public class CampRemoveGUICallback extends AbstractGUICallback {
         this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(GUISettings.instance().getBaseGUIBackgroundColor()));//main background 1st layer
         this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 11).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
         this.addElement(new GUIImageLabel(0, 12, this.getWidth(), this.getHeight() - 12).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
-        this.addElement(new GUITextLabel(2, 2).setDisplayText(I18n.format("teleportation.menu.removeCampCallback"), true));
+        this.addElement(new GUITextLabel(2, 2).setDisplayText(I18n.format("teleportation.gui.menu.removeCampCallback"), true, GUISettings.instance().getTitleScale()));
         this.addElement(this.requestLabel = new GUITextLabel(2, 16));     
 
-        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.confirmButton"), true, 0.8F));
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.menu.cancelButton"), true, 0.8F));
+        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
     }
 
     @Override
     protected void onOpen() {
-        this.requestLabel.setDisplayText(I18n.format("teleportation.menu.removeCallback.request", this.section.currentPoint.getName()), true, 0.8F);
+        this.requestLabel.setDisplayText(I18n.format("teleportation.gui.menu.removeCallback.request", this.section.getCurrentPoint().getName()), false, GUISettings.instance().getTextScale());
     }
 
     @Override
@@ -51,8 +51,8 @@ public class CampRemoveGUICallback extends AbstractGUICallback {
             this.close();
         else if (element == this.confirmButton) {
             this.section.resetPointInfo();
-            TeleportationManagerClient.instance().getCampsManager().removeCampPointSynced(this.section.currentPoint.getId());
-            this.section.updatePoints();
+            TeleportationManagerClient.instance().getCampsManager().removeCampPointSynced(this.section.getCurrentPoint().getId());
+            this.section.sortPoints(0);
             this.section.unlockCreateButton();
             this.close();
         }

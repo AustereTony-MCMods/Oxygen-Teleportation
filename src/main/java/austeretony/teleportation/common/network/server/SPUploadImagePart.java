@@ -1,7 +1,7 @@
 package austeretony.teleportation.common.network.server;
 
+import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.oxygen.common.reference.CommonReference;
 import austeretony.teleportation.common.util.ImageTransferingServerBuffer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
@@ -30,9 +30,9 @@ public class SPUploadImagePart extends ProxyPacket {
     public void write(PacketBuffer buffer, INetHandler netHandler) {
         buffer.writeByte(this.operation.ordinal());
         buffer.writeLong(this.pointId);
-        buffer.writeByte(this.index);
-        buffer.writeByte(this.partsAmount);
-        buffer.writeInt(this.part.length);
+        buffer.writeShort(this.index);
+        buffer.writeShort(this.partsAmount);
+        buffer.writeShort(this.part.length);
         for (int i = 0; i < this.part.length; i++)
             buffer.writeInt(this.part[i]);
     }
@@ -41,9 +41,9 @@ public class SPUploadImagePart extends ProxyPacket {
     public void read(PacketBuffer buffer, INetHandler netHandler) {
         this.operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[buffer.readByte()];
         this.pointId = buffer.readLong();
-        this.index = buffer.readByte();
-        this.partsAmount = buffer.readByte();
-        int[] recieved = new int[buffer.readInt()];
+        this.index = buffer.readShort();
+        this.partsAmount = buffer.readShort();
+        int[] recieved = new int[buffer.readShort()];
         for (int i = 0; i < recieved.length; i++) 
             recieved[i] = buffer.readInt();
         if (ImageTransferingServerBuffer.exist(this.pointId))

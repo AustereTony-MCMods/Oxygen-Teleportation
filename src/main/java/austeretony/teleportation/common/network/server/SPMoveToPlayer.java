@@ -3,6 +3,7 @@ package austeretony.teleportation.common.network.server;
 import java.util.UUID;
 
 import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.oxygen.common.util.PacketBufferUtils;
 import austeretony.teleportation.common.TeleportationManagerServer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
@@ -19,12 +20,11 @@ public class SPMoveToPlayer extends ProxyPacket {
 
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeLong(this.targetUUID.getMostSignificantBits());
-        buffer.writeLong(this.targetUUID.getLeastSignificantBits());
+        PacketBufferUtils.writeUUID(this.targetUUID, buffer);
     }
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
-        TeleportationManagerServer.instance().getPlayersManager().moveToPlayer(getEntityPlayerMP(netHandler), new UUID(buffer.readLong(), buffer.readLong()));
+        TeleportationManagerServer.instance().getPlayersManager().moveToPlayer(getEntityPlayerMP(netHandler), PacketBufferUtils.readUUID(buffer));
     }
 }

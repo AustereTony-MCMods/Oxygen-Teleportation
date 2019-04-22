@@ -60,17 +60,17 @@ public class InvitationRequest extends AbstractNotification {
         TeleportationManagerServer.instance().getPlayerProfile(this.targetUUID).addOtherCamp(this.pointId, this.ownerUUID);
         TeleportationManagerServer.instance().getCampsLoader().savePlayerDataDelegated(this.ownerUUID);
         TeleportationManagerServer.instance().getCampsLoader().savePlayerDataDelegated(this.targetUUID);
-        OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.INVITATION_REQUEST_ACCEPTED.ordinal(), this.ownerUsername, this.campName);
+        OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.INVITATION_REQUEST_ACCEPTED.ordinal(), this.ownerUsername, this.campName);
         if (OxygenHelperServer.isOnline(this.ownerUUID))
-            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.ownerUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.INVITATION_REQUEST_ACCEPTED_OWNER.ordinal(), this.campName, CommonReference.username(player));
+            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.ownerUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.INVITATION_REQUEST_ACCEPTED_OWNER.ordinal(), this.campName, CommonReference.username(player));
         OxygenHelperServer.setRequesting(this.ownerUUID, false);
     }
 
     @Override
     public void rejected(EntityPlayer player) {
-        OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.INVITATION_REQUEST_REJECTED.ordinal(), this.ownerUsername, this.campName);
+        OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.INVITATION_REQUEST_REJECTED.ordinal(), this.ownerUsername, this.campName);
         if (OxygenHelperServer.isOnline(this.ownerUUID))
-            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.ownerUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.INVITATION_REQUEST_REJECTED_OWNER.ordinal(), this.campName, CommonReference.username(player));
+            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.ownerUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.INVITATION_REQUEST_REJECTED_OWNER.ordinal(), this.campName, CommonReference.username(player));
         OxygenHelperServer.setRequesting(this.ownerUUID, false);
     }
 

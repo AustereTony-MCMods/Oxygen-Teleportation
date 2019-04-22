@@ -1,6 +1,5 @@
 package austeretony.teleportation.client;
 
-import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.oxygen.common.core.api.ClientReference;
 import austeretony.teleportation.client.gui.menu.TeleportationMenuGUIScreen;
 import austeretony.teleportation.common.main.TeleportationMain;
@@ -38,7 +37,7 @@ public class TeleportationManagerClient {
     private long time, delay;
 
     private TeleportationManagerClient() {
-        this.playerData = new TeleportationPlayerData(OxygenHelperClient.getPlayerUUID());
+        this.playerData = new TeleportationPlayerData();
         this.worldData = new TeleportationWorldData();
         this.campsManager = new CampsManagerClient(this);
         this.campsLoader = new CampsLoaderClient(this);
@@ -50,7 +49,8 @@ public class TeleportationManagerClient {
     }
 
     public static void create() {
-        instance = new TeleportationManagerClient();
+        if (instance == null) 
+            instance = new TeleportationManagerClient();
     }
 
     public static TeleportationManagerClient instance() {
@@ -123,8 +123,12 @@ public class TeleportationManagerClient {
         this.getImagesManager().preparePreviewImage();
         ClientReference.getMinecraft().gameSettings.hideGUI = false;
         ClientReference.displayGuiScreen(new TeleportationMenuGUIScreen());
-        this.campsLoader.savePlayerDataDelegated();
         this.imagesLoader.removeUnusedCampPreviewImagesDelegated();
         this.imagesLoader.removeUnusedLocationPreviewImagesDelegated();
+    }
+
+    public void reset() {
+        this.playerData.resetData();
+        this.worldData.resetData();
     }
 }

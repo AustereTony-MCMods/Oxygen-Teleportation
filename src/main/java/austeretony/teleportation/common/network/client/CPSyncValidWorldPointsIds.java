@@ -1,5 +1,6 @@
 package austeretony.teleportation.common.network.client;
 
+import austeretony.oxygen.common.api.OxygenGUIHelper;
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.teleportation.client.TeleportationManagerClient;
@@ -78,7 +79,8 @@ public class CPSyncValidWorldPointsIds extends ProxyPacket {
                 TeleportationManagerClient.instance().getWorldProfile().addLocation(worldPoint);
             }
         }
-
+        if (nscSize > 0 || indexNeedSync > 0)
+            OxygenGUIHelper.needSync(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
         TeleportationMain.network().sendToServer(new SPSendAbsentPointsIds(nscSize, needSyncCamps, indexNeedSync, needSyncLocations));
     }
 }

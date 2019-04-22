@@ -34,7 +34,7 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
         this.prevX = player.posX;
         this.prevY = player.posY;
         this.prevZ = player.posZ;
-        this.processOnMove = PrivilegeProviderServer.getPrivilegeValue(CommonReference.uuid(player), EnumPrivileges.PROCESS_TELEPORTATION_ON_MOVE.toString(), 
+        this.processOnMove = PrivilegeProviderServer.getPrivilegeValue(CommonReference.uuid(player), EnumTeleportationPrivileges.PROCESS_TELEPORTATION_ON_MOVE.toString(), 
                 TeleportationConfig.PROCESS_TELEPORTATION_ON_MOVE.getBooleanValue());
         this.counter = delay * 20;
     }
@@ -66,7 +66,7 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
         if (this.counter > 0) {
             if (!this.processOnMove) {
                 if (this.player.posX != this.prevX || this.player.posZ != this.prevZ) {
-                    OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.TELEPORTATION_ABORTED.ordinal());
+                    OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.TELEPORTATION_ABORTED.ordinal());
                     return true;
                 }
             }
@@ -96,31 +96,31 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
         case CAMP:
             point = TeleportationManagerServer.instance().getPlayerProfile(playerUUID).getCamp(this.pointId);
             this.move(point.getDimensionId(), point.getXPos(), point.getYPos(), point.getZPos(), point.getYaw(), point.getPitch());
-            if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.CAMP_TELEPORTATION_COOLDOWN.toString(), 
+            if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.CAMP_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.CAMPS_TELEPORT_COOLDOWN.getIntValue()) > 0) {
                 TeleportationManagerServer.instance().getPlayerProfile(playerUUID).getCooldownInfo().movedToCamp();
                 TeleportationMain.network().sendTo(new CPSyncCooldown(), this.player);
             }
-            OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.MOVED_TO_CAMP.ordinal(), point.getName());
+            OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.MOVED_TO_CAMP.ordinal(), point.getName());
             break;
         case LOCATION:
             point = TeleportationManagerServer.instance().getWorldData().getLocation(this.pointId);
             this.move(point.getDimensionId(), point.getXPos(), point.getYPos(), point.getZPos(), point.getYaw(), point.getPitch());
-            if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), 
+            if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.LOCATIONS_TELEPORT_COOLDOWN.getIntValue()) > 0) {
                 TeleportationManagerServer.instance().getPlayerProfile(playerUUID).getCooldownInfo().movedToLocation();
                 TeleportationMain.network().sendTo(new CPSyncCooldown(), this.player);
             }
-            OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.MOVED_TO_LOCATION.ordinal(), point.getName());
+            OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.MOVED_TO_LOCATION.ordinal(), point.getName());
             break;
         case JUMP:
             this.move(this.target.dimension, (float) this.target.posX, (float) this.target.posY, (float) this.target.posZ, this.target.rotationYawHead, this.target.rotationPitch);
-            if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.PLAYER_TELEPORTATION_COOLDOWN.toString(), 
+            if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.PLAYER_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.PLAYERS_TELEPORT_COOLDOWN.getIntValue()) > 0) {
                 TeleportationManagerServer.instance().getPlayerProfile(playerUUID).getCooldownInfo().jumped();
                 TeleportationMain.network().sendTo(new CPSyncCooldown(), this.player);
             }
-            OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.MOVED_TO_PLAYER.ordinal(), CommonReference.username(this.target));
+            OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.MOVED_TO_PLAYER.ordinal(), CommonReference.username(this.target));
             break;
         }        
         TeleportationManagerServer.instance().getCampsLoader().savePlayerData(playerUUID);

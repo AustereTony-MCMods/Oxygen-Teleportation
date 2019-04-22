@@ -5,7 +5,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public enum EnumChatMessages {
+public enum EnumTeleportationChatMessages {
 
     CAMP_CREATED,
     CAMP_REMOVED,
@@ -21,7 +21,6 @@ public enum EnumChatMessages {
     MOVED_TO_LOCATION,
     MOVED_TO_PLAYER,
     JUMP_PROFILE_CHANGED,
-    JUMP_REQUEST_SENT,
     JUMP_REQUEST_ACCEPTED_TARGET,
     JUMP_REQUEST_REJECTED_TARGET,
     JUMP_REQUEST_ACCEPTED_SENDER,
@@ -30,7 +29,6 @@ public enum EnumChatMessages {
     JUMP_REQUEST_VISITOR_OFFLINE,
     TELEPORTATION_ABORTED,
     CROSS_DIM_TELEPORTSTION_DISABLED,
-    INVITATION_REQUEST_SENT,
     INVITATION_REQUEST_ACCEPTED_OWNER,
     INVITATION_REQUEST_REJECTED_OWNER,
     INVITATION_REQUEST_ACCEPTED,
@@ -83,9 +81,6 @@ public enum EnumChatMessages {
         case JUMP_PROFILE_CHANGED:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpProfileChanged", args[0]));
             break;
-        case JUMP_REQUEST_SENT:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestSent", args[0]));
-            break;
         case JUMP_REQUEST_ACCEPTED_TARGET:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.jumpRequestAccepted"));
             break;
@@ -109,9 +104,6 @@ public enum EnumChatMessages {
             break;
         case CROSS_DIM_TELEPORTSTION_DISABLED:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.crossDimTeleportationDisabled"));
-            break;
-        case INVITATION_REQUEST_SENT:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitatioinRequestSent", args[0], args[1]));
             break;
         case INVITATION_REQUEST_ACCEPTED:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.invitationRequestAccepted", args[0], args[1]));

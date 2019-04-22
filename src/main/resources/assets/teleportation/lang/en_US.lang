@@ -15,13 +15,15 @@ teleportation.gui.menu.edit=Edit
 teleportation.gui.menu.remove=Remove
 teleportation.gui.menu.leave=Leave
 
+contextaction.moveToPlayer=Move to Player
+
 teleportation.gui.menu.players.profile=Profile
 
 teleportation.gui.menu.campsDownloadCallback=Download Camps
 teleportation.gui.menu.campsDownloadCallback.request=Download from server?
 teleportation.gui.menu.campCreationCallback=Camp Creation
-teleportation.gui.menu.invitationsCallback=Invitations
-teleportation.gui.menu.invitationsCallback.list=Invited players:
+teleportation.gui.menu.inviteCallback=Invite
+teleportation.gui.menu.inviteCallback.request=Send camp invitation.
 teleportation.gui.menu.removeCampCallback=Remove Camp
 teleportation.gui.menu.removeCallback.request=Point %s will be removed.
 teleportation.gui.menu.leaveCampCallback=Leave Camp

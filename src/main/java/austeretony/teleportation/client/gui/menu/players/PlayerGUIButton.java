@@ -1,8 +1,7 @@
 package austeretony.teleportation.client.gui.menu.players;
 
 import austeretony.alternateui.screen.button.GUIButton;
-import austeretony.alternateui.util.EnumGUIAlignment;
-import austeretony.oxygen.client.gui.friends.FriendsListGUIScreen;
+import austeretony.oxygen.client.gui.OxygenGUITextures;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.common.main.OxygenPlayerData;
 import austeretony.oxygen.common.main.SharedPlayerData;
@@ -23,27 +22,43 @@ public class PlayerGUIButton extends GUIButton {
         this.jumpProfile = jumpProfile;
         this.statusIconU = status.ordinal() * 3;
         this.setDisplayText(username, false, GUISettings.instance().getTextScale());//need for search mechanic
-        this.setTextAlignment(EnumGUIAlignment.LEFT, 24);
     }
 
     @Override
     public void draw(int mouseX, int mouseY) {
-        super.draw(mouseX, mouseY);
         if (this.isVisible()) {         
             GlStateManager.pushMatrix();           
-            GlStateManager.translate(this.getX(), this.getY(), 0.0F);    
-            this.mc.getTextureManager().bindTexture(FriendsListGUIScreen.STATUS_ICONS); 
-            this.drawCustomSizedTexturedRect(7, 3, this.statusIconU, 0, 3, 3, 12, 3); 
-            GlStateManager.scale(GUISettings.instance().getTextScale(), GUISettings.instance().getTextScale(), 0.0F);    
-            int color;                      
-            if (!this.isEnabled())                  
-                color = this.getDisabledTextColor();           
-            else if (this.isHovered() || this.isToggled())                                          
-                color = this.getHoveredTextColor();
-            else                    
-                color = this.getEnabledTextColor();        
-            this.mc.fontRenderer.drawString(this.dimension, 157, 2, color, this.isTextShadowEnabled());
-            this.mc.fontRenderer.drawString(this.jumpProfile, 278, 2, color, this.isTextShadowEnabled());
+            GlStateManager.translate(this.getX(), this.getY(), 0.0F);
+            int color, textColor, textY;                      
+            if (!this.isEnabled()) {                 
+                color = this.getDisabledBackgroundColor();
+                textColor = this.getDisabledTextColor();           
+            } else if (this.isHovered() || this.isToggled()) {                 
+                color = this.getHoveredBackgroundColor();
+                textColor = this.getHoveredTextColor();
+            } else {                   
+                color = this.getEnabledBackgroundColor(); 
+                textColor = this.getEnabledTextColor();      
+            }
+            drawRect(0, 0, this.getWidth(), this.getHeight(), color);
+            textY = (this.getHeight() - this.textHeight(this.getTextScale())) / 2 + 1;
+            GlStateManager.pushMatrix();           
+            GlStateManager.translate(24.0F, textY, 0.0F); 
+            GlStateManager.scale(this.getTextScale(), this.getTextScale(), 0.0F); 
+            this.mc.fontRenderer.drawString(this.getDisplayText(), 0, 0, textColor, this.isTextShadowEnabled());
+            GlStateManager.popMatrix();
+            GlStateManager.pushMatrix();    
+            GlStateManager.translate(110.0F, textY, 0.0F); 
+            GlStateManager.scale(this.getTextScale(), this.getTextScale(), 0.0F); 
+            this.mc.fontRenderer.drawString(this.dimension, 0, 0, textColor, this.isTextShadowEnabled());
+            GlStateManager.popMatrix();
+            GlStateManager.pushMatrix();    
+            GlStateManager.translate(195.0F, textY, 0.0F); 
+            GlStateManager.scale(this.getTextScale(), this.getTextScale(), 0.0F); 
+            this.mc.fontRenderer.drawString(this.jumpProfile, 0, 0, textColor, this.isTextShadowEnabled());
+            GlStateManager.popMatrix();
+            this.mc.getTextureManager().bindTexture(OxygenGUITextures.STATUS_ICONS); 
+            drawCustomSizedTexturedRect(7, 3, this.statusIconU, 0, 3, 3, 12, 3);   
             GlStateManager.popMatrix();
         }
     }

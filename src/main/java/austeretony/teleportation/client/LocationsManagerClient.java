@@ -4,7 +4,7 @@ import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.oxygen.common.core.api.ClientReference;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderClient;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.main.EnumPrivileges;
+import austeretony.teleportation.common.main.EnumTeleportationPrivileges;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.network.server.SPCreateWorldPoint;
 import austeretony.teleportation.common.network.server.SPEditWorldPoint;
@@ -30,7 +30,7 @@ public class LocationsManagerClient {
     public void moveToLocationSynced(long pointId) {        
         if (pointId != 0L) {
             TeleportationMain.network().sendToServer(new SPMoveToPoint(WorldPoint.EnumWorldPoints.LOCATION, pointId));
-            this.manager.setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.LOCATION_TELEPORTATION_DELAY.toString(), TeleportationConfig.LOCATIONS_TELEPORT_DELAY.getIntValue()));
+            this.manager.setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.LOCATION_TELEPORTATION_DELAY.toString(), TeleportationConfig.LOCATIONS_TELEPORT_DELAY.getIntValue()));
         }
     }
 
@@ -120,6 +120,8 @@ public class LocationsManagerClient {
     }
 
     private boolean canCreateLocation() {
-        return PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.LOCATIONS_CREATION.toString(), false) || PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.LOCATIONS_MANAGEMENT.toString(), false);
+        return TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.getBooleanValue() 
+                || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.LOCATIONS_CREATION.toString(), false) 
+                || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString(), false);
     }
 }

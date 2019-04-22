@@ -39,7 +39,7 @@ public class CampsLoaderServer {
         if (Files.exists(path)) {
             try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(folder))) {    
                 this.manager.getPlayerProfile(playerUUID).read(bis);
-                TeleportationMain.LOGGER.info("Player {} server data loaded.", playerUUID);
+                //TeleportationMain.LOGGER.info("Player {} server data loaded.", playerUUID);
             } catch (IOException exception) {
                 TeleportationMain.LOGGER.error("Player {} server data loading failed.", playerUUID);
                 exception.printStackTrace();

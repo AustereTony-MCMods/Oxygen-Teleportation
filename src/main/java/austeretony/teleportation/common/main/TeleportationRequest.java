@@ -55,27 +55,24 @@ public class TeleportationRequest extends AbstractNotification {
     public void accepted(EntityPlayer player) {
         if (OxygenHelperServer.isOnline(this.senderUUID)) {
             EntityPlayerMP senderPlayerMP = CommonReference.playerByUUID(this.senderUUID);
-            OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.JUMP_REQUEST_ACCEPTED_TARGET.ordinal());
-            OxygenHelperServer.sendMessage(senderPlayerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.JUMP_REQUEST_ACCEPTED_SENDER.ordinal());
+            OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_ACCEPTED_TARGET.ordinal());
+            OxygenHelperServer.sendMessage(senderPlayerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_ACCEPTED_SENDER.ordinal());
             TeleportationManagerServer.instance().getPlayersManager().move(senderPlayerMP, this.senderUUID, this.targetUUID);
         } else
-            OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.JUMP_REQUEST_VISITOR_OFFLINE.ordinal());
-        OxygenHelperServer.setRequested(this.targetUUID, false);
+            OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_VISITOR_OFFLINE.ordinal());
         OxygenHelperServer.setRequesting(this.senderUUID, false);
     }
 
     @Override
     public void rejected(EntityPlayer player) {
         if (OxygenHelperServer.isOnline(this.senderUUID))
-            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.senderUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.JUMP_REQUEST_REJECTED_SENDER.ordinal());
-        OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.JUMP_REQUEST_REJECTED_TARGET.ordinal());
-        OxygenHelperServer.setRequested(this.targetUUID, false);
+            OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.senderUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_REJECTED_SENDER.ordinal());
+        OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_REJECTED_TARGET.ordinal());
         OxygenHelperServer.setRequesting(this.senderUUID, false);
     }
 
     @Override
     public void expired() {
-        OxygenHelperServer.setRequested(this.targetUUID, false);
         OxygenHelperServer.setRequesting(this.senderUUID, false);
     }
 }

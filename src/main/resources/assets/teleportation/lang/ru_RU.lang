@@ -15,11 +15,13 @@ teleportation.gui.menu.edit=Редактировать
 teleportation.gui.menu.remove=Удалить
 teleportation.gui.menu.leave=Покинуть
 
+contextaction.moveToPlayer=Переместиться
+
 teleportation.gui.menu.players.profile=Профиль
 
 teleportation.gui.menu.campCreationCallback=Создание Лагеря
-teleportation.gui.menu.invitationsCallback=Приглашения
-teleportation.gui.menu.invitationsCallback.list=Приглашённые игроки:
+teleportation.gui.menu.inviteCallback=Пригласить
+teleportation.gui.menu.inviteCallback.request=Отправить приглашение в лагерь.
 teleportation.gui.menu.removeCampCallback=Удаление Лагеря
 teleportation.gui.menu.removeCallback.request=Позиция %s будет удалёна.
 teleportation.gui.menu.leaveCampCallback=Покинуть Лагерь

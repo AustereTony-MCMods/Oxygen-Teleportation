@@ -2,7 +2,6 @@ package austeretony.teleportation.common.network.server;
 
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.core.api.CommonReference;
-import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.main.TeleportationMain;
@@ -64,8 +63,7 @@ public class SPSendAbsentPointsIds extends ProxyPacket {
             TeleportationMain.network().sendTo(new CPSyncWorldPoints(WorldPoint.EnumWorldPoints.LOCATION, this.absentLocations), playerMP);
             TeleportationManagerServer.instance().getImagesManager().downloadLocationPreviewsToClientDelegated(playerMP, this.absentLocations);
         }
-        OxygenHelperServer.syncSharedPlayersData(playerMP, OxygenMain.STATUS_DATA_ID, TeleportationMain.JUMP_PROFILE_DATA_ID);
         TeleportationMain.network().sendTo(new CPCommand(CPCommand.EnumCommand.OPEN_MENU), playerMP);
-        TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP)).setSyncing(false);
+        OxygenHelperServer.setSyncing(CommonReference.uuid(playerMP), false);
     }
 }

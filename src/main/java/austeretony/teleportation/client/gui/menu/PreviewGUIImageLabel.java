@@ -23,7 +23,7 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
 
     private final Map<Long, ResourceLocation> cache = new HashMap<Long, ResourceLocation>();
 
-    private final List<String> description = new ArrayList<String>();
+    private final List<String> description = new ArrayList<String>(2);
 
     public PreviewGUIImageLabel(int xPosition, int yPosition) {
         super(xPosition, yPosition);
@@ -41,30 +41,30 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
             GlStateManager.enableBlend();             
             if (this.hasImage) {
                 this.mc.getTextureManager().bindTexture(this.getTexture());                         
-                this.drawCustomSizedTexturedRect(ZERO, ZERO, this.getTextureU(), this.getTextureV(), this.getTextureWidth(), this.getTextureHeight(), this.getImageWidth(), this.getImageHeight());  
+                drawCustomSizedTexturedRect(0, 0, this.getTextureU(), this.getTextureV(), this.getTextureWidth(), this.getTextureHeight(), this.getImageWidth(), this.getImageHeight());  
             } else {
-                this.drawRect(ZERO, ZERO, 240, 135, 0xFF333333);
+                drawRect(0, 0, 241, 135, 0xFF333333);
                 GlStateManager.pushMatrix();           
                 GlStateManager.translate(0.0F, 0.0F, 0.0F);           
                 GlStateManager.scale(1.3F, 1.3F, 0.0F);  
-                this.mc.fontRenderer.drawString(this.noImage, 240 / 2 - this.width(this.noImage, 1.3F) + 5, 48, GUISettings.instance().getEnabledTextColor());
+                this.mc.fontRenderer.drawString(this.noImage, 240 / 2 - this.textWidth(this.noImage, 1.3F) + 5, 48, GUISettings.instance().getEnabledTextColor());
                 GlStateManager.popMatrix();
             }
-            this.drawGradientRect(ZERO, ZERO, 240, 70, 0x00000000, 0xC8000000);
+            drawGradientRect(0, 0, 241, 70, 0x00000000, 0xC8000000);
             GlStateManager.disableBlend(); 
-            this.drawRect(0, 121, 240, 135, 0xB4101010);
+            drawRect(0, 120, 241, 135, 0xB4101010);
             if (this.sharedIconEnabled) {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.enableBlend(); 
                 this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.SHARED_ICON);                         
-                this.drawCustomSizedTexturedRect(10 + this.width(this.name, 1.2F), 6, 10, 0, 10, 10, 30, 10);           
+                drawCustomSizedTexturedRect(10 + this.textWidth(this.name, 1.2F), 6, 10, 0, 10, 10, 30, 10);           
                 GlStateManager.disableBlend(); 
             }
             if (this.favoriteIconEnabled) {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.enableBlend(); 
                 this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.FAVORITE_ICONS);                         
-                this.drawCustomSizedTexturedRect((this.sharedIconEnabled ? 20 : 10) + this.width(this.name, 1.2F), 6, 10, 0, 10, 10, 30, 10);       	
+                drawCustomSizedTexturedRect((this.sharedIconEnabled ? 20 : 10) + this.textWidth(this.name, 1.2F), 6, 10, 0, 10, 10, 30, 10);       	
                 GlStateManager.disableBlend(); 
             }
             GlStateManager.pushMatrix();           
@@ -94,7 +94,7 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
     public void show(WorldPoint worldPoint, boolean forceLoad) {
         ResourceLocation imageLocation = this.getPreviewImage(worldPoint.getId(), forceLoad);
         if (imageLocation != null)
-            this.setTexture(imageLocation, 240, 135);
+            this.setTexture(imageLocation, 241, 135);
         this.favoriteIconEnabled = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerData().getFavoriteCampId();
         this.sharedIconEnabled = TeleportationManagerClient.instance().getPlayerData().haveInvitedPlayers(worldPoint.getId());
         this.name = worldPoint.getName();
@@ -112,7 +112,7 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
         String[] words = description.split("[ ]");        
         if (words.length > 0) {                 
             for (int i = 0; i < words.length; i++) {            
-                if (this.width(stringBuilder.toString() + words[i]) < 220)                          
+                if (this.textWidth(stringBuilder.toString() + words[i], 1.0F) < 220)                          
                     stringBuilder.append(words[i]).append(" ");
                 else {                          
                     if (this.description.size() * 10 <= 20)                                      

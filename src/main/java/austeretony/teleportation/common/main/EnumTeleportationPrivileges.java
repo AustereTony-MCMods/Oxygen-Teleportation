@@ -2,7 +2,7 @@ package austeretony.teleportation.common.main;
 
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 
-public enum EnumPrivileges {
+public enum EnumTeleportationPrivileges {
 
     PROCESS_TELEPORTATION_ON_MOVE(":processTeleportationOnMove"),
     ENABLE_MOVE_TO_LOCKED_LOCATIONS(":enableMoveToLockedLocations"),
@@ -20,7 +20,7 @@ public enum EnumPrivileges {
 
     private final String name;
 
-    EnumPrivileges(String name) {
+    EnumTeleportationPrivileges(String name) {
         this.name = name;
         PrivilegeProviderServer.registerPrivilege(TeleportationMain.MODID + name, TeleportationMain.NAME);
     }

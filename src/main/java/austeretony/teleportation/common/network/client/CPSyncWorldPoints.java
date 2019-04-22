@@ -2,10 +2,12 @@ package austeretony.teleportation.common.network.client;
 
 import java.util.UUID;
 
+import austeretony.oxygen.common.api.OxygenGUIHelper;
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.common.TeleportationManagerServer;
+import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.main.TeleportationPlayerData;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -65,11 +67,13 @@ public class CPSyncWorldPoints extends ProxyPacket {
             for (i = 0; i < amount; i++)
                 TeleportationManagerClient.instance().getPlayerData().addCamp(WorldPoint.read(buffer));
             TeleportationManagerClient.instance().getCampsLoader().savePlayerDataDelegated();
+            OxygenGUIHelper.dataRecieved(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
             break;
         case LOCATION:
             for (i = 0; i < amount; i++)
                 TeleportationManagerClient.instance().getWorldProfile().addLocation(WorldPoint.read(buffer));
             TeleportationManagerClient.instance().getLocationsLoader().saveLocationsDataDelegated();
+            OxygenGUIHelper.dataRecieved(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
             break;
         }
     }

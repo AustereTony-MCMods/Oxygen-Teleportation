@@ -58,4 +58,8 @@ public class TeleportationWorldData {
         for (int i = 0; i < locations; i++)
             this.addLocation(WorldPoint.read(bis));    
     }
+
+    public void resetData() {
+        this.locations.clear();
+    }
 }

@@ -1,6 +1,7 @@
 package austeretony.teleportation.client.gui.menu.camps;
 
 import austeretony.alternateui.screen.contextmenu.AbstractContextAction;
+import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.teleportation.client.gui.menu.CampsGUISection;
 import net.minecraft.client.resources.I18n;
@@ -14,17 +15,17 @@ public class RemoveContextAction extends AbstractContextAction {
     }
 
     @Override
-    protected String getName() {
+    protected String getName(GUIBaseElement currElement) {
         return this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID()) ? I18n.format("teleportation.gui.menu.remove") : I18n.format("teleportation.gui.menu.leave");
     }
 
     @Override
-    public boolean isValid() {
+    public boolean isValid(GUIBaseElement currElement) {
         return true;
     }
 
     @Override
-    public void execute() {
+    public void execute(GUIBaseElement currElement) {
         if (this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID()))
             this.section.openRemovePointCallback();
         else

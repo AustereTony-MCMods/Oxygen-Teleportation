@@ -29,7 +29,7 @@ public class LeaveCampGUICallback extends AbstractGUICallback {
     }
 
     @Override
-    protected void init() {
+    public void init() {
         this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(GUISettings.instance().getBaseGUIBackgroundColor()));//main background 1st layer
         this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 11).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
         this.addElement(new GUIImageLabel(0, 12, this.getWidth(), this.getHeight() - 12).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
@@ -46,7 +46,7 @@ public class LeaveCampGUICallback extends AbstractGUICallback {
     }
 
     @Override
-    public void handleElementClick(AbstractGUISection section, GUIBaseElement element) {
+    public void handleElementClick(AbstractGUISection section, GUIBaseElement element, int mouseButton) {
         if (element == this.cancelButton)
             this.close();
         else if (element == this.confirmButton) {

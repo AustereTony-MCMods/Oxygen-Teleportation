@@ -6,8 +6,8 @@ import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.main.EnumChatMessages;
-import austeretony.teleportation.common.main.EnumPrivileges;
+import austeretony.teleportation.common.main.EnumTeleportationChatMessages;
+import austeretony.teleportation.common.main.EnumTeleportationPrivileges;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.main.TeleportationProcess;
 import austeretony.teleportation.common.world.WorldPoint;
@@ -28,16 +28,16 @@ public class LocationsManagerServer {
                 UUID playerUUID = CommonReference.uuid(playerMP);
                 WorldPoint worldPoint = this.getLocation(pointId);
                 if (this.locationAvailable(worldPoint, playerUUID) && !this.teleporting(playerUUID) && this.readyMoveToLocation(playerUUID)) {
-                    if (!PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.ENABLE_CROSS_DIM_TELEPORTATION.toString(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.getBooleanValue())
+                    if (!PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.ENABLE_CROSS_DIM_TELEPORTATION.toString(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.getBooleanValue())
                             && playerMP.dimension != worldPoint.getDimensionId()) {
-                        OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.CROSS_DIM_TELEPORTSTION_DISABLED.ordinal());
+                        OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.CROSS_DIM_TELEPORTSTION_DISABLED.ordinal());
                         return;
                     }
-                    int delay = PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.LOCATION_TELEPORTATION_DELAY.toString(), TeleportationConfig.LOCATIONS_TELEPORT_DELAY.getIntValue());
+                    int delay = PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.LOCATION_TELEPORTATION_DELAY.toString(), TeleportationConfig.LOCATIONS_TELEPORT_DELAY.getIntValue());
                     if (delay < 1)
                         delay = 1;
                     if (delay > 1)
-                        OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.PREPARE_FOR_TELEPORTATION.ordinal(), String.valueOf(delay));
+                        OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.PREPARE_FOR_TELEPORTATION.ordinal(), String.valueOf(delay));
                     TeleportationProcess.create(TeleportationProcess.EnumTeleportations.LOCATION, playerMP, pointId, delay);    
                 }
             }
@@ -64,7 +64,7 @@ public class LocationsManagerServer {
                 worldPoint.setId(pointId);
                 this.manager.getWorldData().addLocation(worldPoint);
                 this.manager.getLocationsLoader().saveLocationsDataDelegated();
-                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.LOCATION_CREATED.ordinal(), worldPoint.getName());
+                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.LOCATION_CREATED.ordinal(), worldPoint.getName());
             }
         }
     }
@@ -75,7 +75,7 @@ public class LocationsManagerServer {
             UUID playerUUID = CommonReference.uuid(playerMP);
             WorldPoint worldPoint = this.getLocation(pointId);
             if (this.canEditLocation(playerUUID, worldPoint)) {
-                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.LOCATION_REMOVED.ordinal(), worldPoint.getName());
+                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.LOCATION_REMOVED.ordinal(), worldPoint.getName());
                 this.manager.getWorldData().removeLocation(pointId);
                 this.manager.getLocationsLoader().saveLocationsDataDelegated();
                 this.manager.getImagesLoader().removeLocationPreviewImageDelegated(pointId);
@@ -97,9 +97,9 @@ public class LocationsManagerServer {
                 this.manager.getImagesLoader().renameLocationPreviewImageDelegated(oldPointId, worldPoint.getId());
                 this.manager.getImagesManager().replaceImageBytes(oldPointId, worldPoint.getId());
                 if (flag)
-                    OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.LOCATION_LOCKED.ordinal(), worldPoint.getName());
+                    OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.LOCATION_LOCKED.ordinal(), worldPoint.getName());
                 else
-                    OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumChatMessages.LOCATION_UNLOCKED.ordinal(), worldPoint.getName());
+                    OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.LOCATION_UNLOCKED.ordinal(), worldPoint.getName());
             }
         }
     }
@@ -137,8 +137,9 @@ public class LocationsManagerServer {
     }
 
     private boolean canCreateLocation(UUID playerUUID) {
-        return PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.LOCATIONS_CREATION.toString(), false) 
-                || PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.LOCATIONS_MANAGEMENT.toString(), false);
+        return TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.getBooleanValue() 
+                || PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.LOCATIONS_CREATION.toString(), false) 
+                || PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString(), false);
     }
 
     private boolean locationExist(long pointId) {
@@ -151,12 +152,12 @@ public class LocationsManagerServer {
 
     private boolean locationAvailable(WorldPoint worldPoint, UUID playerUUID) {
         return !worldPoint.isLocked() 
-                || PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.ENABLE_MOVE_TO_LOCKED_LOCATIONS.toString(), false) 
+                || PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.ENABLE_MOVE_TO_LOCKED_LOCATIONS.toString(), false) 
                 || worldPoint.isOwner(playerUUID);
     }
 
     private boolean canEditLocation(UUID playerUUID, WorldPoint worldPoint) {
-        return PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.LOCATIONS_MANAGEMENT.toString(), false) 
+        return PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString(), false) 
                 || worldPoint.isOwner(playerUUID);
     }
 
@@ -166,6 +167,6 @@ public class LocationsManagerServer {
 
     private boolean readyMoveToLocation(UUID playerUUID) {
         return System.currentTimeMillis() - this.manager.getPlayerProfile(playerUUID).getCooldownInfo().getLastLocationTime() 
-                > PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), TeleportationConfig.LOCATIONS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
+                > PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), TeleportationConfig.LOCATIONS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
     }
 }

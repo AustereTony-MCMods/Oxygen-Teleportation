@@ -3,28 +3,29 @@
     "image_width": 800,
     "image_height": 450,
     "process_teleportation_on_move": true,
-    "enable_cross_dim_teleportation": true,
-    "enable_favorite_camp": true,
-    "default_jump_profile": 1,
-    "jump_request_expire_seconds": 20,
-    "invitation_request_expire_time_seconds": 30
+    "enable_cross_dim_teleportation": true
   },
   "camps": {
     "enable_camps": true,
     "max_amount": 10,
     "teleport_delay_seconds": 0,
     "cooldown_seconds": 0,
+    "enable_favorite_camp": true,
+    "invitation_request_expire_time_seconds": 30,
     "max_invited_players_per_camp": 5   
   },
   "locations": {
     "enable_locations": true,
     "max_amount": 100,
     "teleport_delay_seconds": 0,
-    "cooldown_seconds": 0
+    "cooldown_seconds": 0,
+    "allow_locations_creation_for_all": false
   },
   "players": {
     "enable_players": true,
     "teleport_delay_seconds": 0,
-    "cooldown_seconds": 0
+    "cooldown_seconds": 0,
+    "default_jump_profile": 1,
+    "jump_request_expire_seconds": 20
   }
 }

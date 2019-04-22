@@ -2,12 +2,10 @@ package austeretony.teleportation.client.handler;
 
 import org.lwjgl.input.Keyboard;
 
-import austeretony.oxygen.client.handler.KeyBindingWrapper;
-import austeretony.oxygen.common.core.api.ClientReference;
+import austeretony.oxygen.client.input.KeyBindingWrapper;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import austeretony.teleportation.common.main.TeleportationMain;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 
@@ -18,7 +16,7 @@ public class TeleportationKeyHandler {
     MOVE_TO_CAMP = new KeyBindingWrapper();
 
     public TeleportationKeyHandler() {
-        OPEN_MENU.register("key.teleportation.openMenu", Keyboard.KEY_P, TeleportationMain.NAME);
+        OPEN_MENU.register("key.teleportation.openMenu", Keyboard.KEY_Y, TeleportationMain.NAME);
         if (TeleportationConfig.ENABLE_FAVORITE_CAMP.getBooleanValue())
             MOVE_TO_CAMP.register("key.teleportation.moveToCamp", Keyboard.KEY_H, TeleportationMain.NAME);
     }

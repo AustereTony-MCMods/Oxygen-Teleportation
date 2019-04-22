@@ -20,11 +20,13 @@ import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.alternateui.util.EnumGUIAlignment;
 import austeretony.oxygen.client.OxygenManagerClient;
-import austeretony.oxygen.client.gui.friends.FriendsListGUIScreen;
-import austeretony.oxygen.client.gui.friends.StatusGUIDropDownElement;
+import austeretony.oxygen.client.gui.OxygenGUITextures;
+import austeretony.oxygen.client.gui.StatusGUIDropDownElement;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.common.api.EnumDimensions;
+import austeretony.oxygen.common.api.OxygenGUIHelper;
 import austeretony.oxygen.common.api.OxygenHelperClient;
+import austeretony.oxygen.common.main.EnumOxygenPrivileges;
 import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.main.OxygenPlayerData;
 import austeretony.oxygen.common.main.SharedPlayerData;
@@ -32,9 +34,10 @@ import austeretony.oxygen.common.privilege.api.PrivilegeProviderClient;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.client.gui.menu.players.JumpProfileGUIDropDownElement;
 import austeretony.teleportation.client.gui.menu.players.PlayerGUIButton;
+import austeretony.teleportation.client.gui.menu.players.PlayersBackgroundGUIFiller;
 import austeretony.teleportation.client.handler.TeleportationKeyHandler;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.main.EnumPrivileges;
+import austeretony.teleportation.common.main.EnumTeleportationPrivileges;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.main.TeleportationPlayerData;
 import austeretony.teleportation.common.world.WorldPoint;
@@ -72,7 +75,7 @@ public class PlayersGUISection extends AbstractGUISection {
     moveToStr = I18n.format("teleportation.gui.menu.moveButton"), 
     requestStr = I18n.format("teleportation.gui.menu.requestButton");
 
-    private final int teleportationCooldown = PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.PLAYER_TELEPORTATION_COOLDOWN.toString(), 
+    private final int teleportationCooldown = PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.PLAYER_TELEPORTATION_COOLDOWN.toString(), 
             TeleportationConfig.PLAYERS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
 
     private boolean cooldown;
@@ -83,64 +86,56 @@ public class PlayersGUISection extends AbstractGUISection {
     }
 
     @Override
-    protected void init() {               
-        this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(GUISettings.instance().getBaseGUIBackgroundColor()));//main background
-        this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 15).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//title background
-        this.addElement(new GUIImageLabel(0, 17, 85, 65).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//client profile background
-        this.addElement(new GUIImageLabel(87, 17, 85, 9).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//players list search background
-        this.addElement(new GUIImageLabel(173, 17, 156, 9).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//players list amount background
-        this.addElement(new GUIImageLabel(87, 27, 240, 15).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//players list sorters background
-        this.addElement(new GUIImageLabel(87, 43, 237, 109).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//players list background
-        this.addElement(new GUIImageLabel(325, 43, 2, 109).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor())); //slider background
-        this.addElement(new GUIImageLabel(0, 84, 85, 68).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//point player background
+    public void init() {              
+        this.addElement(new PlayersBackgroundGUIFiller(0, 0, this.getWidth(), this.getHeight()));
         this.addElement(new GUITextLabel(2, 4).setDisplayText(I18n.format("teleportation.gui.menu.playersTitle"), false, GUISettings.instance().getTitleScale()));     
-        this.addElement(new GUITextLabel(111, 30).setDisplayText(I18n.format("oxygen.gui.friends.username"), false, GUISettings.instance().getTextScale())); 
-        this.addElement(new GUITextLabel(197, 30).setDisplayText(I18n.format("oxygen.gui.friends.dimension"), false, GUISettings.instance().getTextScale())); 
-        this.addElement(new GUITextLabel(282, 30).setDisplayText(I18n.format("teleportation.gui.menu.players.profile"), false, GUISettings.instance().getTextScale())); 
+        this.addElement(new GUITextLabel(111, 27).setDisplayText(I18n.format("oxygen.gui.friends.username"), false, GUISettings.instance().getTextScale())); 
+        this.addElement(new GUITextLabel(197, 27).setDisplayText(I18n.format("oxygen.gui.friends.dimension"), false, GUISettings.instance().getTextScale())); 
+        this.addElement(new GUITextLabel(282, 27).setDisplayText(I18n.format("teleportation.gui.menu.players.profile"), false, GUISettings.instance().getTextScale())); 
 
-        this.addElement(this.campsPageButton = new GUIButton(this.getWidth() - 44, 1,  14, 14).setTexture(TeleportationMenuGUIScreen.CAMP_ICONS, 14, 14).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.camps"), GUISettings.instance().getTooltipScale()));   
-        this.addElement(this.locationsPageButton = new GUIButton(this.getWidth() - 30, 1, 14, 14).setTexture(TeleportationMenuGUIScreen.LOCATION_ICONS, 14, 14).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.locations"), GUISettings.instance().getTooltipScale()));   
-        this.addElement(new GUIButton(this.getWidth() - 15, 1, 14, 14).setTexture(TeleportationMenuGUIScreen.PLAYERS_ICONS, 14, 14).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.players"), GUISettings.instance().getTooltipScale()).toggle());
+        this.addElement(this.campsPageButton = new GUIButton(this.getWidth() - 44, 0,  12, 12).setTexture(TeleportationMenuGUIScreen.CAMP_ICONS, 12, 12).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.camps"), GUISettings.instance().getTooltipScale()));   
+        this.addElement(this.locationsPageButton = new GUIButton(this.getWidth() - 30, 0, 12, 12).setTexture(TeleportationMenuGUIScreen.LOCATION_ICONS, 14, 14).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.locations"), GUISettings.instance().getTooltipScale()));   
+        this.addElement(new GUIButton(this.getWidth() - 15, 0, 12, 12).setTexture(TeleportationMenuGUIScreen.PLAYERS_ICONS, 14, 14).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.players"), GUISettings.instance().getTooltipScale()).toggle());
         if (!TeleportationConfig.ENABLE_CAMPS.getBooleanValue())
             this.campsPageButton.disable();
         if (!TeleportationConfig.ENABLE_LOCATIONS.getBooleanValue())
             this.locationsPageButton.disable();
 
-        this.addElement(this.searchButton = new GUIButton(91, 18, 7, 7).setTexture(FriendsListGUIScreen.SEARCH_ICONS, 7, 7).initSimpleTooltip(I18n.format("oxygen.tooltip.search"), GUISettings.instance().getTooltipScale()));  
+        this.addElement(this.searchButton = new GUIButton(91, 15, 7, 7).setTexture(OxygenGUITextures.SEARCH_ICONS, 7, 7).initSimpleTooltip(I18n.format("oxygen.tooltip.search"), GUISettings.instance().getTooltipScale()));  
 
-        this.addElement(this.sortDownStatusButton = new GUIButton(94, 34, 3, 3).setTexture(FriendsListGUIScreen.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale()));   
-        this.addElement(this.sortUpStatusButton = new GUIButton(94, 30, 3, 3).setTexture(FriendsListGUIScreen.SORT_UP_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
-        this.addElement(this.sortDownUsernameButton = new GUIButton(106, 34, 3, 3).setTexture(FriendsListGUIScreen.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale()));   
-        this.addElement(this.sortUpUsernameButton = new GUIButton(106, 30, 3, 3).setTexture(FriendsListGUIScreen.SORT_UP_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
+        this.addElement(this.sortDownStatusButton = new GUIButton(94, 31, 3, 3).setTexture(OxygenGUITextures.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale()));   
+        this.addElement(this.sortUpStatusButton = new GUIButton(94, 27, 3, 3).setTexture(OxygenGUITextures.SORT_UP_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
+        this.addElement(this.sortDownUsernameButton = new GUIButton(106, 31, 3, 3).setTexture(OxygenGUITextures.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale()));   
+        this.addElement(this.sortUpUsernameButton = new GUIButton(106, 27, 3, 3).setTexture(OxygenGUITextures.SORT_UP_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
 
-        this.addElement(this.refreshButton = new GUIButton(175, 17, 10, 10).setTexture(FriendsListGUIScreen.REFRESH_ICONS, 9, 9).initSimpleTooltip(I18n.format("oxygen.tooltip.refresh"), GUISettings.instance().getTooltipScale()));
-        this.addElement(this.playersAmountTextLabel = new GUITextLabel(0, 18).setTextScale(GUISettings.instance().getSubTextScale()));   
-        this.playersListPanel = new GUIButtonPanel(GUIEnumOrientation.VERTICAL, 87, 43, 237, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getTextScale());
+        this.addElement(this.refreshButton = new GUIButton(175, 14, 10, 10).setTexture(OxygenGUITextures.REFRESH_ICONS, 9, 9).initSimpleTooltip(I18n.format("oxygen.tooltip.refresh"), GUISettings.instance().getTooltipScale()));
+        this.addElement(this.playersAmountTextLabel = new GUITextLabel(0, 15).setTextScale(GUISettings.instance().getSubTextScale()));   
+
+        this.playersListPanel = new GUIButtonPanel(GUIEnumOrientation.VERTICAL, 87, 39, 237, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getPanelTextScale());
         this.addElement(this.playersListPanel);
-        this.addElement(this.searchTextField = new GUITextField(87, 18, 113, WorldPoint.MAX_POINT_NAME_LENGTH).setScale(0.7F).enableDynamicBackground().setDisplayText("...", false, GUISettings.instance().getTextScale()).cancelDraggedElementLogic().disableFull());
+        this.addElement(this.searchTextField = new GUITextField(87, 15, 113, WorldPoint.MAX_POINT_NAME_LENGTH).setScale(0.7F).enableDynamicBackground().setDisplayText("...", false, GUISettings.instance().getTextScale()).cancelDraggedElementLogic().disableFull());
         this.playersListPanel.initSearchField(this.searchTextField);
-        GUIScroller panelScroller = new GUIScroller(this.playerList.size() > 10 ? this.playerList.size() : 10, 10);
-        this.playersListPanel.initScroller(panelScroller);
-        GUISlider panelSlider = new GUISlider(325, 43, 2, 109);
-        panelScroller.initSlider(panelSlider);
+        GUIScroller scroller = new GUIScroller(this.playerList.size() > 10 ? this.playerList.size() : 10, 10);
+        this.playersListPanel.initScroller(scroller);
+        GUISlider slider = new GUISlider(325, 39, 2, 110);
+        slider.setDynamicBackgroundColor(GUISettings.instance().getEnabledSliderColor(), GUISettings.instance().getDisabledSliderColor(), GUISettings.instance().getHoveredSliderColor());
+        scroller.initSlider(slider);
 
-        this.addElement(this.targetUsernameTextLabel = new GUITextLabel(3, 104).setTextScale(GUISettings.instance().getTextScale()));  
-        this.addElement(this.targetDimensionTextLabel = new GUITextLabel(3, 112).setTextScale(GUISettings.instance().getSubTextScale()));    
-        this.addElement(this.moveButton = new GUIButton(22, 140,  40, 10)
+        this.addElement(this.targetUsernameTextLabel = new GUITextLabel(3, 101).setTextScale(GUISettings.instance().getTextScale()));  
+        this.addElement(this.targetDimensionTextLabel = new GUITextLabel(3, 109).setTextScale(GUISettings.instance().getSubTextScale()));    
+        this.addElement(this.moveButton = new GUIButton(22, 137,  40, 10)
                 .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor())
                 .setTextScale(GUISettings.instance().getButtonTextScale()).enableTextShadow().disableFull());
-
-        this.sortPlayers(0);
 
         SharedPlayerData clientSharedData = OxygenHelperClient.getSharedClientPlayerData();
         this.currentStatus = getPlayerStatus(clientSharedData);
 
-        this.addElement(new GUITextLabel(3, 36).setDisplayText(clientSharedData.getUsername(), false, GUISettings.instance().getTextScale()));  
-        this.addElement(new GUITextLabel(3, 53).setDisplayText(EnumDimensions.getLocalizedNameFromId(clientSharedData.getDimension()), false, GUISettings.instance().getSubTextScale()));   
+        this.addElement(new GUITextLabel(3, 33).setDisplayText(clientSharedData.getUsername(), false, GUISettings.instance().getTextScale()));  
+        this.addElement(new GUITextLabel(3, 50).setDisplayText(EnumDimensions.getLocalizedNameFromId(OxygenHelperClient.getPlayerDimension(clientSharedData)), false, GUISettings.instance().getSubTextScale()));   
 
         TeleportationPlayerData.EnumJumpProfile clientJumpProfile = getJumpProfile(clientSharedData);
         this.currentJumpProfile = clientJumpProfile;
-        this.jumpProfileDropDownList = new GUIDropDownList(2, 64, 70, 10).setDisplayText(clientJumpProfile.getLocalizedName())
+        this.jumpProfileDropDownList = new GUIDropDownList(2, 61, 70, 10).setDisplayText(clientJumpProfile.getLocalizedName())
                 .setScale(GUISettings.instance().getDropDownListScale()).setTextScale(GUISettings.instance().getTextScale()).setTextAlignment(EnumGUIAlignment.LEFT, 1);
         JumpProfileGUIDropDownElement jumpProfileElement;
         for (TeleportationPlayerData.EnumJumpProfile jumpProfile : TeleportationPlayerData.EnumJumpProfile.values()) {
@@ -152,8 +147,8 @@ public class PlayersGUISection extends AbstractGUISection {
         }
         this.addElement(this.jumpProfileDropDownList);   
 
-        this.addElement(this.statusImageLabel = new GUIImageLabel(3, 47).setTexture(FriendsListGUIScreen.STATUS_ICONS, 3, 3, this.currentStatus.ordinal() * 3, 0, 12, 3));   
-        this.statusDropDownList = new GUIDropDownList(9, 45, GUISettings.instance().getContextMenuWidth(), 10).setScale(GUISettings.instance().getDropDownListScale()).setDisplayText(this.currentStatus.getLocalizedName()).setTextScale(GUISettings.instance().getTextScale()).setTextAlignment(EnumGUIAlignment.LEFT, 1);
+        this.addElement(this.statusImageLabel = new GUIImageLabel(3, 44).setTexture(OxygenGUITextures.STATUS_ICONS, 3, 3, this.currentStatus.ordinal() * 3, 0, 12, 3));   
+        this.statusDropDownList = new GUIDropDownList(9, 42, GUISettings.instance().getContextMenuWidth(), 10).setScale(GUISettings.instance().getDropDownListScale()).setDisplayText(this.currentStatus.getLocalizedName()).setTextScale(GUISettings.instance().getTextScale()).setTextAlignment(EnumGUIAlignment.LEFT, 1);
         StatusGUIDropDownElement profileElement;
         for (OxygenPlayerData.EnumStatus status : OxygenPlayerData.EnumStatus.values()) {
             profileElement = new StatusGUIDropDownElement(status);
@@ -165,16 +160,21 @@ public class PlayersGUISection extends AbstractGUISection {
         this.addElement(this.statusDropDownList); 
 
         if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown) {
-            this.addElement(this.cooldownTextLabel = new GUITextLabel(64, 141).setTextScale(GUISettings.instance().getTextScale()).disableFull());  
+            this.addElement(this.cooldownTextLabel = new GUITextLabel(64, 138).setTextScale(GUISettings.instance().getTextScale()).disableFull());  
             this.cooldown = true;
         }      
+
+        if (!OxygenGUIHelper.isNeedSync(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID) || OxygenGUIHelper.isDataRecieved(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID))
+            this.sortPlayers(0);
+
+        OxygenGUIHelper.screenInitialized(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
     }
 
     public static OxygenPlayerData.EnumStatus getPlayerStatus(SharedPlayerData sharedData) {
         return OxygenPlayerData.EnumStatus.values()[sharedData.getData(OxygenMain.STATUS_DATA_ID).get(0)];
     }
 
-    private void sortPlayers(int mode) {
+    public void sortPlayers(int mode) {
         this.playerList.clear();
 
         SharedPlayerData clientSharedData = OxygenHelperClient.getSharedClientPlayerData();
@@ -182,8 +182,8 @@ public class PlayersGUISection extends AbstractGUISection {
         for (SharedPlayerData sharedData : OxygenHelperClient.getSharedPlayersData()) {
             jProfile = sharedData.getData(TeleportationMain.JUMP_PROFILE_DATA_ID).get(0);
             if (OxygenHelperClient.isOnline(sharedData.getPlayerUUID()) 
-                    && this.getPlayerStatus(sharedData) != OxygenPlayerData.EnumStatus.OFFLINE 
-                    && (jProfile != TeleportationPlayerData.EnumJumpProfile.DISABLED.ordinal() || PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false)) 
+                    && (this.getPlayerStatus(sharedData) != OxygenPlayerData.EnumStatus.OFFLINE || PrivilegeProviderClient.getPrivilegeValue(EnumOxygenPrivileges.EXPOSE_PLAYERS_OFFLINE.toString(), false))
+                    && (jProfile != TeleportationPlayerData.EnumJumpProfile.DISABLED.ordinal() || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false)) 
                     && sharedData != clientSharedData)
                 this.playerList.add(sharedData);
         }
@@ -212,13 +212,14 @@ public class PlayersGUISection extends AbstractGUISection {
                 }
             });
         }
+
         this.playersListPanel.reset();
         PlayerGUIButton button;
         for (SharedPlayerData sharedData : players) {
             button = new PlayerGUIButton(
                     sharedData,
                     sharedData.getUsername(), 
-                    EnumDimensions.getLocalizedNameFromId(sharedData.getDimension()), 
+                    EnumDimensions.getLocalizedNameFromId(OxygenHelperClient.getPlayerDimension(sharedData)), 
                     getJumpProfile(sharedData).getLocalizedName(),
                     OxygenHelperClient.getPlayerStatus(sharedData.getPlayerUUID()));
             button.enableDynamicBackground(GUISettings.instance().getEnabledElementColor(), GUISettings.instance().getEnabledElementColor(), GUISettings.instance().getHoveredElementColor());
@@ -227,7 +228,7 @@ public class PlayersGUISection extends AbstractGUISection {
         }
 
         this.playersAmountTextLabel.setDisplayText(String.valueOf(this.playerList.size()) + " / " + String.valueOf(OxygenHelperClient.getMaxPlayers()));   
-        this.playersAmountTextLabel.setX(325 - this.width(this.playersAmountTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale()));
+        this.playersAmountTextLabel.setX(325 - this.textWidth(this.playersAmountTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale()));
 
         this.playersListPanel.getScroller().resetPosition();
         this.playersListPanel.getScroller().getSlider().reset();
@@ -250,7 +251,7 @@ public class PlayersGUISection extends AbstractGUISection {
     }
 
     @Override
-    public void handleElementClick(AbstractGUISection section, GUIBaseElement element) {
+    public void handleElementClick(AbstractGUISection section, GUIBaseElement element, int mouseButton) {
         if (element == this.campsPageButton)                  
             this.screen.getCampsSection().open();
         else if (element == this.locationsPageButton)
@@ -329,18 +330,18 @@ public class PlayersGUISection extends AbstractGUISection {
 
     private void showPlayerInfo() {
         this.targetUsernameTextLabel.setDisplayText(this.currentPlayer.getUsername());
-        this.targetDimensionTextLabel.setDisplayText(EnumDimensions.getLocalizedNameFromId(this.currentPlayer.getDimension()));
+        this.targetDimensionTextLabel.setDisplayText(EnumDimensions.getLocalizedNameFromId(OxygenHelperClient.getPlayerDimension(this.currentPlayer)));
         TeleportationPlayerData.EnumJumpProfile jumpProfile = this.getJumpProfile(this.currentPlayer);
         switch (jumpProfile) {
         case DISABLED:
-            if (PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false))
+            if (PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false))
                 this.moveButton.setDisplayText(this.moveToStr, true);
             break;
         case FREE:
             this.moveButton.setDisplayText(this.moveToStr, true);
             break;
         case REQUEST:
-            if (PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false))
+            if (PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false))
                 this.moveButton.setDisplayText(this.moveToStr, true);
             else
                 this.moveButton.setDisplayText(this.requestStr, true);

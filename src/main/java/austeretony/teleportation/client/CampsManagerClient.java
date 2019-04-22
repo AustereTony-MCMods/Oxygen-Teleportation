@@ -6,7 +6,7 @@ import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.oxygen.common.core.api.ClientReference;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderClient;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.main.EnumPrivileges;
+import austeretony.teleportation.common.main.EnumTeleportationPrivileges;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.network.server.SPCreateWorldPoint;
 import austeretony.teleportation.common.network.server.SPEditWorldPoint;
@@ -35,13 +35,13 @@ public class CampsManagerClient {
     public void moveToCampSynced(long id) {        
         if (id != 0L) {
             TeleportationMain.network().sendToServer(new SPMoveToPoint(WorldPoint.EnumWorldPoints.CAMP, id));
-            this.manager.setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.CAMP_TELEPORTATION_DELAY.toString(), TeleportationConfig.CAMPS_TELEPORT_DELAY.getIntValue()));
+            this.manager.setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMP_TELEPORTATION_DELAY.toString(), TeleportationConfig.CAMPS_TELEPORT_DELAY.getIntValue()));
         }
     }
 
     public void createCampPointSynced(String name, String description) {
         if (this.manager.getPlayerData().getCampsAmount() 
-                < PrivilegeProviderClient.getPrivilegeValue(EnumPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue())) {
+                < PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue())) {
             WorldPoint worldPoint = new WorldPoint(
                     OxygenHelperClient.getPlayerUUID(),
                     ClientReference.getClientPlayer().getName(), 
@@ -137,10 +137,8 @@ public class CampsManagerClient {
         }
     }
 
-    public void invitePlayerSynced(long pointId, UUID playerUUID, String username) {
-        this.manager.getPlayerData().inviteToCamp(pointId, playerUUID, username);
+    public void invitePlayerSynced(long pointId, UUID playerUUID) {
         TeleportationMain.network().sendToServer(new SPManageInvitation(SPManageInvitation.EnumOperation.INVITE, pointId, playerUUID));
-        this.manager.getCampsLoader().savePlayerDataDelegated();
     }
 
     public void uninvitePlayerSynced(long pointId, UUID playerUUID) {

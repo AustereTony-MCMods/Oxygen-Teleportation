@@ -17,7 +17,7 @@ import net.minecraft.client.resources.I18n;
 
 public class TeleportationPlayerData {
 
-    public UUID playerUUID;
+    private UUID playerUUID;
 
     private final Map<Long, WorldPoint> ownedCamps = new ConcurrentHashMap<Long, WorldPoint>();
 
@@ -33,21 +33,23 @@ public class TeleportationPlayerData {
 
     private EnumJumpProfile jumpProfile;
 
-    private boolean syncing;
-
     private final CooldownInfo cooldownInfo = new CooldownInfo();
 
-    public TeleportationPlayerData(UUID playerUUID) {
-        this.playerUUID = playerUUID;
+    public TeleportationPlayerData() {
         this.jumpProfile = EnumJumpProfile.values()[TeleportationConfig.DEFAULT_JUMP_PROFILE.getIntValue()];
     }
 
-    public boolean isSyncing() {
-        return this.syncing;
+    public TeleportationPlayerData(UUID playerUUID) {
+        this();
+        this.playerUUID = playerUUID;
     }
 
-    public void setSyncing(boolean value) {
-        this.syncing = value;
+    public UUID getPlayerUUID() {
+        return this.playerUUID;
+    }
+
+    public void setPlayerUUID(UUID playerUUID) {
+        this.playerUUID = playerUUID;
     }
 
     public Collection<WorldPoint> getCamps() {
@@ -236,6 +238,13 @@ public class TeleportationPlayerData {
                 this.inviteToCamp(pointId, sharedCamps.playerUUID, sharedCamps.username);
         }
         this.cooldownInfo.read(bis);     
+    }
+
+    public void resetData() {
+        this.ownedCamps.clear();
+        this.otherCamps.clear();
+        this.sharedCamps.clear();
+        this.invitedPlayers.clear();
     }
 
     public enum EnumJumpProfile {

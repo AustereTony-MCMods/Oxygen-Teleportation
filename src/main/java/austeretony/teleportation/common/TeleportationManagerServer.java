@@ -57,7 +57,8 @@ public class TeleportationManagerServer {
     }
 
     public static void create() {
-        instance = new TeleportationManagerServer();
+        if (instance == null) 
+            instance = new TeleportationManagerServer();
     }
 
     public static TeleportationManagerServer instance() {
@@ -121,8 +122,7 @@ public class TeleportationManagerServer {
         if (!this.profileExist(playerUUID)) {
             this.createPlayerProfile(playerUUID);
             this.campsLoader.loadPlayerDataDelegated(playerUUID);
-        }
-        if (this.profileExist(playerUUID))
+        } else
             this.appendSharedPlayerDataDelegated(playerUUID);
     }
 
@@ -138,7 +138,7 @@ public class TeleportationManagerServer {
     }
 
     public void appendSharedPlayerData(UUID playerUUID) {
-        ByteBuffer byteBuff = ByteBuffer.allocate(1);
+        ByteBuffer byteBuff = ByteBuffer.allocate(Byte.BYTES);
         byteBuff.put((byte) this.getPlayerProfile(playerUUID).getJumpProfile().ordinal());
         OxygenHelperServer.getSharedPlayerData(playerUUID).addData(TeleportationMain.JUMP_PROFILE_DATA_ID, byteBuff);
     }
@@ -151,5 +151,10 @@ public class TeleportationManagerServer {
         UUID playerUUID = CommonReference.uuid(player);
         OxygenHelperServer.setRequesting(playerUUID, false);
         OxygenHelperServer.setRequested(playerUUID, false); 
+    }
+
+    public void reset() {
+        this.playersData.clear();
+        this.worldData.resetData();
     }
 }

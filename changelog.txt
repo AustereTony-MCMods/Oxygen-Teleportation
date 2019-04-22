@@ -1,3 +1,9 @@
+0.3.1a
++Added config option 'allow_locations_creation_for_all' to allow locations creation for everyone ('false' by
+default).
++Teleportation Menu keybinding remapped to 'Y' key.
++Performance and GUI improvements.
+
 0.3.0a
 +Increased points names maximum length (from 16 to 20 symbols).
 +Increased points descriptions maximum length (from 64 to 80 symbols).

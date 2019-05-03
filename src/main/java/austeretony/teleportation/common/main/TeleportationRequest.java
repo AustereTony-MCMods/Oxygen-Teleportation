@@ -17,11 +17,10 @@ public class TeleportationRequest extends AbstractNotification {
 
     public final String senderUsername;
 
-    public final UUID targetUUID, senderUUID;
+    public final UUID senderUUID;
 
-    public TeleportationRequest(int index, UUID targetUUID, UUID senderUUID, String senderUsername) {
+    public TeleportationRequest(int index, UUID senderUUID, String senderUsername) {
         this.index = index;
-        this.targetUUID = targetUUID;
         this.senderUUID = senderUUID;
         this.senderUsername = senderUsername;
     }
@@ -57,7 +56,7 @@ public class TeleportationRequest extends AbstractNotification {
             EntityPlayerMP senderPlayerMP = CommonReference.playerByUUID(this.senderUUID);
             OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_ACCEPTED_TARGET.ordinal());
             OxygenHelperServer.sendMessage(senderPlayerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_ACCEPTED_SENDER.ordinal());
-            TeleportationManagerServer.instance().getPlayersManager().move(senderPlayerMP, this.senderUUID, this.targetUUID);
+            TeleportationManagerServer.instance().getPlayersManager().move(senderPlayerMP, this.senderUUID, CommonReference.uuid(player));
         } else
             OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_VISITOR_OFFLINE.ordinal());
         OxygenHelperServer.setRequesting(this.senderUUID, false);

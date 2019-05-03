@@ -21,16 +21,17 @@ import austeretony.oxygen.client.gui.OxygenGUITextures;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.common.api.OxygenGUIHelper;
 import austeretony.oxygen.common.api.OxygenHelperClient;
+import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderClient;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.client.gui.menu.camps.CampsBackgroundGUIFiller;
 import austeretony.teleportation.client.gui.menu.locations.EditContextAction;
-import austeretony.teleportation.client.gui.menu.locations.EditLocationGUICallback;
-import austeretony.teleportation.client.gui.menu.locations.LocationCreationGUICallback;
-import austeretony.teleportation.client.gui.menu.locations.LocationRemoveGUICallback;
-import austeretony.teleportation.client.gui.menu.locations.LocationsDownloadGUICallback;
-import austeretony.teleportation.client.gui.menu.locations.LockContextAction;
-import austeretony.teleportation.client.gui.menu.locations.RemoveContextAction;
+import austeretony.teleportation.client.gui.menu.locations.callback.EditLocationGUICallback;
+import austeretony.teleportation.client.gui.menu.locations.callback.LocationCreationGUICallback;
+import austeretony.teleportation.client.gui.menu.locations.callback.LocationRemoveGUICallback;
+import austeretony.teleportation.client.gui.menu.locations.callback.LocationsDownloadGUICallback;
+import austeretony.teleportation.client.gui.menu.locations.context.LockContextAction;
+import austeretony.teleportation.client.gui.menu.locations.context.RemoveContextAction;
 import austeretony.teleportation.client.handler.TeleportationKeyHandler;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import austeretony.teleportation.common.main.EnumTeleportationPrivileges;
@@ -75,23 +76,23 @@ public class LocationsGUISection extends AbstractGUISection {
         this.addElement(new CampsBackgroundGUIFiller(0, 0, this.getWidth(), this.getHeight()));
         String title = I18n.format("teleportation.gui.menu.locationsTitle");
         this.addElement(new GUITextLabel(2, 4).setDisplayText(title, false, GUISettings.instance().getTitleScale()));   
-        this.addElement(this.downloadButton = new GUIButton(this.textWidth(title, GUISettings.instance().getTitleScale()) + 4, 4,  8, 8).setTexture(OxygenGUITextures.DOWNLOAD_ICONS, 8, 8).initSimpleTooltip(I18n.format("oxygen.tooltip.download"), GUISettings.instance().getTooltipScale()));
+        this.addElement(this.downloadButton = new GUIButton(this.textWidth(title, GUISettings.instance().getTitleScale()) + 4, 4,  8, 8).setSound(OxygenSoundEffects.BUTTON_CLICK).setTexture(OxygenGUITextures.DOWNLOAD_ICONS, 8, 8).initSimpleTooltip(I18n.format("oxygen.tooltip.download"), GUISettings.instance().getTooltipScale()));
 
-        this.addElement(this.campsPageButton = new GUIButton(this.getWidth() - 44, 0,  12, 12).setTexture(TeleportationMenuGUIScreen.CAMP_ICONS, 12, 12).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.camps"), GUISettings.instance().getTooltipScale()));       
+        this.addElement(this.campsPageButton = new GUIButton(this.getWidth() - 44, 0,  12, 12).setSound(OxygenSoundEffects.BUTTON_CLICK).setTexture(TeleportationMenuGUIScreen.CAMP_ICONS, 12, 12).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.camps"), GUISettings.instance().getTooltipScale()));       
         this.addElement(new GUIButton(this.getWidth() - 30, 0, 12, 12).setTexture(TeleportationMenuGUIScreen.LOCATION_ICONS, 14, 14).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.locations"), GUISettings.instance().getTooltipScale()).toggle());    
-        this.addElement(this.playersPageButton = new GUIButton(this.getWidth() - 15, 0, 12, 12).setTexture(TeleportationMenuGUIScreen.PLAYERS_ICONS, 14, 14).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.players"), GUISettings.instance().getTooltipScale()));
+        this.addElement(this.playersPageButton = new GUIButton(this.getWidth() - 15, 0, 12, 12).setSound(OxygenSoundEffects.BUTTON_CLICK).setTexture(TeleportationMenuGUIScreen.PLAYERS_ICONS, 14, 14).initSimpleTooltip(I18n.format("teleportation.gui.menu.tooltip.players"), GUISettings.instance().getTooltipScale()));
         if (!TeleportationConfig.ENABLE_CAMPS.getBooleanValue())
             this.campsPageButton.disable();
         if (!TeleportationConfig.ENABLE_PLAYERS.getBooleanValue())
             this.playersPageButton.disable();
 
-        this.addElement(this.searchButton = new GUIButton(7, 15, 7, 7).setTexture(OxygenGUITextures.SEARCH_ICONS, 7, 7).initSimpleTooltip(I18n.format("oxygen.tooltip.search"), GUISettings.instance().getTooltipScale()));
-        this.addElement(this.sortDownButton = new GUIButton(2, 19, 3, 3).setTexture(OxygenGUITextures.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
-        this.addElement(this.sortUpButton = new GUIButton(2, 15, 3, 3).setTexture(OxygenGUITextures.SORT_UP_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
-        this.addElement(this.refreshButton = new GUIButton(0, 14, 10, 10).setTexture(OxygenGUITextures.REFRESH_ICONS, 9, 9).initSimpleTooltip(I18n.format("oxygen.tooltip.refresh"), GUISettings.instance().getTooltipScale()));
+        this.addElement(this.searchButton = new GUIButton(7, 15, 7, 7).setSound(OxygenSoundEffects.BUTTON_CLICK).setTexture(OxygenGUITextures.SEARCH_ICONS, 7, 7).initSimpleTooltip(I18n.format("oxygen.tooltip.search"), GUISettings.instance().getTooltipScale()));
+        this.addElement(this.sortDownButton = new GUIButton(2, 19, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK).setTexture(OxygenGUITextures.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
+        this.addElement(this.sortUpButton = new GUIButton(2, 15, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK).setTexture(OxygenGUITextures.SORT_UP_ICONS, 3, 3).initSimpleTooltip(I18n.format("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
+        this.addElement(this.refreshButton = new GUIButton(0, 14, 10, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).setTexture(OxygenGUITextures.REFRESH_ICONS, 9, 9).initSimpleTooltip(I18n.format("oxygen.tooltip.refresh"), GUISettings.instance().getTooltipScale()));
         this.addElement(this.pointsAmountTextLabel = new GUITextLabel(0, 15).setTextScale(GUISettings.instance().getSubTextScale()));  
 
-        this.pointsListPanel = new GUIButtonPanel(GUIEnumOrientation.VERTICAL, 0, 24, 82, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getPanelTextScale());
+        this.pointsListPanel = new GUIButtonPanel(GUIEnumOrientation.VERTICAL, 0, 24, 82, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getTextScale());
         this.addElement(this.pointsListPanel);
         this.addElement(this.searchTextField = new GUITextField(0, 15, 113, WorldPoint.MAX_POINT_NAME_LENGTH).setScale(0.7F).enableDynamicBackground().setDisplayText("...", false, GUISettings.instance().getTextScale()).cancelDraggedElementLogic().disableFull());
         this.pointsListPanel.initSearchField(this.searchTextField);
@@ -101,12 +102,14 @@ public class LocationsGUISection extends AbstractGUISection {
         slider.setDynamicBackgroundColor(GUISettings.instance().getEnabledSliderColor(), GUISettings.instance().getDisabledSliderColor(), GUISettings.instance().getHoveredSliderColor());
         scroller.initSlider(slider);
 
-        this.addElement(this.createButton = new GUIButton(22, 137,  40, 10)
+        this.addElement(this.createButton = new GUIButton(22, 137,  40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK)
                 .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor())
                 .setDisplayText(I18n.format("teleportation.gui.menu.createButton"), true, GUISettings.instance().getButtonTextScale()));  
         this.lockCreateButton();     
 
         GUIContextMenu menu = new GUIContextMenu(GUISettings.instance().getContextMenuWidth(), 10).setScale(GUISettings.instance().getContextMenuScale()).setTextScale(GUISettings.instance().getTextScale()).setTextAlignment(EnumGUIAlignment.LEFT, 2);
+        menu.setOpenSound(OxygenSoundEffects.CONTEXT_OPEN);
+        menu.setCloseSound(OxygenSoundEffects.CONTEXT_CLOSE);
         this.pointsListPanel.initContextMenu(menu);
         menu.enableDynamicBackground(GUISettings.instance().getEnabledContextActionColor(), GUISettings.instance().getDisabledContextActionColor(), GUISettings.instance().getHoveredContextActionColor());
         menu.setTextDynamicColor(GUISettings.instance().getEnabledTextColor(), GUISettings.instance().getDisabledTextColor(), GUISettings.instance().getHoveredTextColor());
@@ -120,7 +123,7 @@ public class LocationsGUISection extends AbstractGUISection {
         this.removePointCallback = new LocationRemoveGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
 
         this.addElement(this.previewImageLabel = new PreviewGUIImageLabel(86, 14));
-        this.addElement(this.moveButton = new GUIButton(92, 137,  40, 10)
+        this.addElement(this.moveButton = new GUIButton(92, 137,  40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK)
                 .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor())
                 .setDisplayText(I18n.format("teleportation.gui.menu.moveButton"), true, GUISettings.instance().getButtonTextScale()).disableFull());
 

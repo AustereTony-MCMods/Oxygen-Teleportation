@@ -1,4 +1,4 @@
-package austeretony.teleportation.client.gui.menu.camps;
+package austeretony.teleportation.client.gui.menu.camps.callback;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +16,7 @@ import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.oxygen.common.main.EnumOxygenPrivileges;
 import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.main.OxygenPlayerData;
+import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.oxygen.common.main.SharedPlayerData;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderClient;
 import austeretony.teleportation.client.TeleportationManagerClient;
@@ -23,7 +24,7 @@ import austeretony.teleportation.client.gui.menu.CampsGUISection;
 import austeretony.teleportation.client.gui.menu.TeleportationMenuGUIScreen;
 import net.minecraft.client.resources.I18n;
 
-public class InviteGUICallback extends AbstractGUICallback {
+public class InviteToCampGUICallback extends AbstractGUICallback {
 
     private final TeleportationMenuGUIScreen screen;
 
@@ -41,7 +42,7 @@ public class InviteGUICallback extends AbstractGUICallback {
 
     private final Map<String, UUID> players = new HashMap<String, UUID>();
 
-    public InviteGUICallback(TeleportationMenuGUIScreen screen, CampsGUISection section, int width, int height) {
+    public InviteToCampGUICallback(TeleportationMenuGUIScreen screen, CampsGUISection section, int width, int height) {
         super(screen, section, width, height);
         this.screen = screen;
         this.section = section;
@@ -64,8 +65,8 @@ public class InviteGUICallback extends AbstractGUICallback {
         this.addElement(this.usernameField = new GUITextField(2, 35, 187, 24).setScale(0.7F).enableDynamicBackground().cancelDraggedElementLogic());       
         this.addElement(this.playerStatusLabel = new GUITextLabel(2, 43).setTextScale(GUISettings.instance().getSubTextScale()).disableFull());    
 
-        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
 
         this.confirmButton.disable();
     }

@@ -1,4 +1,4 @@
-package austeretony.teleportation.client.gui.menu.camps;
+package austeretony.teleportation.client.gui.menu.locations.callback;
 
 import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
@@ -7,20 +7,21 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.oxygen.client.gui.settings.GUISettings;
+import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.teleportation.client.TeleportationManagerClient;
-import austeretony.teleportation.client.gui.menu.CampsGUISection;
+import austeretony.teleportation.client.gui.menu.LocationsGUISection;
 import austeretony.teleportation.client.gui.menu.TeleportationMenuGUIScreen;
 import net.minecraft.client.resources.I18n;
 
-public class CampsDownloadGUICallback extends AbstractGUICallback {
+public class LocationsDownloadGUICallback extends AbstractGUICallback {
 
     private final TeleportationMenuGUIScreen screen;
 
-    private final CampsGUISection section;
+    private final LocationsGUISection section;
 
     private GUIButton confirmButton, cancelButton;
 
-    public CampsDownloadGUICallback(TeleportationMenuGUIScreen screen, CampsGUISection section, int width, int height) {
+    public LocationsDownloadGUICallback(TeleportationMenuGUIScreen screen, LocationsGUISection section, int width, int height) {
         super(screen, section, width, height);
         this.screen = screen;
         this.section = section;
@@ -34,8 +35,8 @@ public class CampsDownloadGUICallback extends AbstractGUICallback {
         this.addElement(new GUITextLabel(2, 2).setDisplayText(I18n.format("oxygen.gui.downloadCallback"), true, GUISettings.instance().getTitleScale()));
         this.addElement(new GUITextLabel(2, 16).setDisplayText(I18n.format("oxygen.gui.downloadCallback.request"), false, GUISettings.instance().getTextScale()));        
 
-        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
     }
 
     @Override
@@ -43,7 +44,7 @@ public class CampsDownloadGUICallback extends AbstractGUICallback {
         if (element == this.cancelButton)
             this.close();
         else if (element == this.confirmButton) {
-            TeleportationManagerClient.instance().getCampsManager().downloadCampsDataSynced();
+            TeleportationManagerClient.instance().getLocationsManager().downloadLocationsDataSynced();
             this.close();
         }
     }

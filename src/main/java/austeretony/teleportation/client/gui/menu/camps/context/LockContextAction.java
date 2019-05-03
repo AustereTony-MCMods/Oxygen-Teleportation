@@ -1,20 +1,18 @@
-package austeretony.teleportation.client.gui.menu.locations;
+package austeretony.teleportation.client.gui.menu.camps.context;
 
 import austeretony.alternateui.screen.contextmenu.AbstractContextAction;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.common.api.OxygenHelperClient;
-import austeretony.oxygen.common.privilege.api.PrivilegeProviderClient;
 import austeretony.teleportation.client.TeleportationManagerClient;
-import austeretony.teleportation.client.gui.menu.LocationsGUISection;
-import austeretony.teleportation.common.main.EnumTeleportationPrivileges;
+import austeretony.teleportation.client.gui.menu.CampsGUISection;
 import net.minecraft.client.resources.I18n;
 
 public class LockContextAction extends AbstractContextAction {
 
-    private LocationsGUISection section;
+    private CampsGUISection section;
 
-    public LockContextAction(LocationsGUISection section) {
+    public LockContextAction(CampsGUISection section) {
         this.section = section;
     }
 
@@ -25,17 +23,16 @@ public class LockContextAction extends AbstractContextAction {
 
     @Override
     public boolean isValid(GUIBaseElement currElement) {
-        return PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString(), false) 
-                || this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID());
+        return this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID());
     }
 
     @Override
     public void execute(GUIBaseElement currElement) {
         if (!this.section.getCurrentPoint().isLocked()) {
-            TeleportationManagerClient.instance().getLocationsManager().lockLocationSynced(this.section.getCurrentPoint(), true);
+            TeleportationManagerClient.instance().getCampsManager().lockCampSynced(this.section.getCurrentPoint(), true);
             this.section.getCurrentButton().setTextDynamicColor(GUISettings.instance().getEnabledTextColorDark(), GUISettings.instance().getDisabledTextColorDark(), GUISettings.instance().getHoveredTextColorDark());
         } else {
-            TeleportationManagerClient.instance().getLocationsManager().lockLocationSynced(this.section.getCurrentPoint(), false);
+            TeleportationManagerClient.instance().getCampsManager().lockCampSynced(this.section.getCurrentPoint(), false);
             this.section.getCurrentButton().setTextDynamicColor(GUISettings.instance().getEnabledTextColor(), GUISettings.instance().getDisabledTextColor(), GUISettings.instance().getHoveredTextColor());
         }
     }

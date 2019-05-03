@@ -16,11 +16,11 @@ import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 import austeretony.oxygen.common.privilege.api.PrivilegedGroup;
 import austeretony.teleportation.client.TeleportToPlayerContextAction;
 import austeretony.teleportation.client.TeleportationManagerClient;
+import austeretony.teleportation.client.event.TeleportationEventsClient;
 import austeretony.teleportation.client.handler.TeleportationKeyHandler;
-import austeretony.teleportation.client.listener.TeleportationListenerClient;
 import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.config.TeleportationConfig;
-import austeretony.teleportation.common.listener.TeleportationListenerServer;
+import austeretony.teleportation.common.event.TeleportationEventsServer;
 import austeretony.teleportation.common.network.client.CPCommand;
 import austeretony.teleportation.common.network.client.CPDownloadImagePart;
 import austeretony.teleportation.common.network.client.CPStartImageDownload;
@@ -53,7 +53,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = TeleportationMain.MODID, 
         name = TeleportationMain.NAME, 
         version = TeleportationMain.VERSION,
-        dependencies = "required-after:oxygen@[0.4.0,);",//TODO Always check required Oxygen version before build
+        dependencies = "required-after:oxygen@[0.4.1,);",//TODO Always check required Oxygen version before build
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = TeleportationMain.VERSIONS_FORGE_URL)
 public class TeleportationMain {
@@ -61,13 +61,13 @@ public class TeleportationMain {
     public static final String 
     MODID = "teleportation",
     NAME = "Teleportation",
-    VERSION = "0.3.1",
+    VERSION = "0.3.2",
     VERSION_CUSTOM = VERSION + ":alpha:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Teleportation/info/mod_versions_forge.json";
 
     public static final int 
-    TELEPORTATION_MOD_INDEX = 1,//Oxygen - 0
+    TELEPORTATION_MOD_INDEX = 1,//Oxygen - 0, Groups - 2
 
     JUMP_PROFILE_DATA_ID = 10,
 
@@ -91,9 +91,7 @@ public class TeleportationMain {
 
         TeleportationManagerServer.create();
 
-        TeleportationListenerServer listenerServer = new TeleportationListenerServer();
-        OxygenHelperServer.registerPlayerLogInListener(listenerServer);
-        OxygenHelperServer.registerPlayerLogOutListener(listenerServer);
+        CommonReference.registerEvent(new TeleportationEventsServer());
 
         OxygenHelperServer.registerSharedDataIdentifierForScreen(TELEPORTATION_MENU_SCREEN_ID, OxygenMain.STATUS_DATA_ID);
         OxygenHelperServer.registerSharedDataIdentifierForScreen(TELEPORTATION_MENU_SCREEN_ID, OxygenMain.DIMENSION_DATA_ID);
@@ -105,18 +103,16 @@ public class TeleportationMain {
         if (event.getSide() == Side.CLIENT) {
             TeleportationManagerClient.create();
 
+            CommonReference.registerEvent(new TeleportationEventsClient());
             CommonReference.registerEvent(new TeleportationKeyHandler());
 
             OxygenHelperClient.registerSharedDataBuffer(JUMP_PROFILE_DATA_ID, Byte.BYTES);
 
             OxygenGUIHelper.registerScreenId(TELEPORTATION_MENU_SCREEN_ID);
 
-            TeleportationListenerClient listenerClient = new TeleportationListenerClient();
-            OxygenHelperClient.registerClientInitListener(listenerClient);
-            OxygenHelperClient.registerChatMessageInfoListener(listenerClient);
-
             OxygenGUIHelper.registerContextAction(OxygenMain.PLAYER_LIST_SCREEN_ID, new TeleportToPlayerContextAction());
             OxygenGUIHelper.registerContextAction(OxygenMain.FRIEND_LIST_SCREEN_ID, new TeleportToPlayerContextAction());
+            OxygenGUIHelper.registerContextAction(20, new TeleportToPlayerContextAction());//20 - group menu 'screenId' (Oxygen: Groups)
 
             OxygenHelperClient.registerNotificationIcon(TELEPORTATION_REQUEST_ID, OxygenGUITextures.TELEPORT_REQUEST_ICON);
             OxygenHelperClient.registerNotificationIcon(INVITATION_TO_CAMP_ID, OxygenGUITextures.REQUEST_ICON);

@@ -22,6 +22,7 @@ public class TeleportToPlayerContextAction extends AbstractContextAction {
     protected boolean isValid(GUIBaseElement currElement) {
         UUID targetUUID = ((PlayerGUIButton) currElement).playerUUID;
         return !targetUUID.equals(OxygenHelperClient.getPlayerUUID()) 
+                && OxygenHelperClient.isOnline(targetUUID)
                 && (PlayersManagerClient.getPlayerJumpProfile(targetUUID) != TeleportationPlayerData.EnumJumpProfile.DISABLED || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false));
     }
 

@@ -10,19 +10,18 @@ import austeretony.teleportation.common.TeleportationManagerServer;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class InvitationRequest extends AbstractNotification {
+public class CampInvitationRequest extends AbstractNotification {
 
     public final int index;
 
     public final String ownerUsername, campName;
 
-    public final UUID targetUUID, ownerUUID;
+    public final UUID ownerUUID;
 
     public final long pointId;
 
-    public InvitationRequest(int index, UUID targetUUID, UUID ownerUUID, String ownerUsername, long pointId, String campName) {
+    public CampInvitationRequest(int index, UUID ownerUUID, String ownerUsername, long pointId, String campName) {
         this.index = index;
-        this.targetUUID = targetUUID;
         this.ownerUUID = ownerUUID;
         this.ownerUsername = ownerUsername;
         this.pointId = pointId;
@@ -56,10 +55,11 @@ public class InvitationRequest extends AbstractNotification {
 
     @Override
     public void accepted(EntityPlayer player) {
-        TeleportationManagerServer.instance().getPlayerProfile(this.ownerUUID).inviteToCamp(this.pointId, this.targetUUID, CommonReference.username(player));
-        TeleportationManagerServer.instance().getPlayerProfile(this.targetUUID).addOtherCamp(this.pointId, this.ownerUUID);
+        UUID targetUUID = CommonReference.uuid(player);
+        TeleportationManagerServer.instance().getPlayerProfile(this.ownerUUID).inviteToCamp(this.pointId, targetUUID);
+        TeleportationManagerServer.instance().getPlayerProfile(targetUUID).addOtherCamp(this.pointId, this.ownerUUID);
         TeleportationManagerServer.instance().getCampsLoader().savePlayerDataDelegated(this.ownerUUID);
-        TeleportationManagerServer.instance().getCampsLoader().savePlayerDataDelegated(this.targetUUID);
+        TeleportationManagerServer.instance().getCampsLoader().savePlayerDataDelegated(targetUUID);
         OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.INVITATION_REQUEST_ACCEPTED.ordinal(), this.ownerUsername, this.campName);
         if (OxygenHelperServer.isOnline(this.ownerUUID))
             OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.ownerUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.INVITATION_REQUEST_ACCEPTED_OWNER.ordinal(), this.campName, CommonReference.username(player));

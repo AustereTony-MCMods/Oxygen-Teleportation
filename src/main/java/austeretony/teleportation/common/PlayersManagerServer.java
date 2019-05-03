@@ -55,11 +55,7 @@ public class PlayersManagerServer {
                         else {
                             EntityPlayerMP targetPlayerMP = CommonReference.playerByUUID(targetUUID);
                             OxygenHelperServer.sendRequest(visitorPlayerMP, targetPlayerMP, 
-                                    new TeleportationRequest(
-                                            TeleportationMain.TELEPORTATION_REQUEST_ID,
-                                            targetUUID, 
-                                            visitorUUID, 
-                                            CommonReference.username(visitorPlayerMP)));
+                                    new TeleportationRequest(TeleportationMain.TELEPORTATION_REQUEST_ID, visitorUUID, CommonReference.username(visitorPlayerMP)), true);
                         }
                         break;
                     }  

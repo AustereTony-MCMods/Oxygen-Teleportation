@@ -32,7 +32,7 @@ public class CPSyncInvitedPlayers extends ProxyPacket {
         for (int i = 0; i < amount; i++) {
             sharedCamps = SharedCamps.read(buffer);
             for (long id : sharedCamps.getCamps())
-                TeleportationManagerClient.instance().getPlayerData().inviteToCamp(id, sharedCamps.playerUUID, sharedCamps.username);
+                TeleportationManagerClient.instance().getPlayerData().inviteToCamp(id, sharedCamps.playerUUID);
         }
     }
 }

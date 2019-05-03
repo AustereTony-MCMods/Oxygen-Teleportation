@@ -159,11 +159,11 @@ public class TeleportationPlayerData {
         return this.invitedPlayers.get(pointId);
     }
 
-    public void inviteToCamp(long pointId, UUID playerUUID, String username) {
+    public void inviteToCamp(long pointId, UUID playerUUID) {
         if (this.sharedCamps.containsKey(playerUUID))
             this.sharedCamps.get(playerUUID).getCamps().add(pointId);
         else {
-            SharedCamps sharedCamps = new SharedCamps(playerUUID, username);
+            SharedCamps sharedCamps = new SharedCamps(playerUUID);
             sharedCamps.getCamps().add(pointId);
             this.sharedCamps.put(playerUUID, sharedCamps);
         }        
@@ -235,7 +235,7 @@ public class TeleportationPlayerData {
         for (i = 0; i < sharedrCampsAmount; i++) {
             sharedCamps = SharedCamps.read(bis);
             for (long pointId : sharedCamps.getCamps())
-                this.inviteToCamp(pointId, sharedCamps.playerUUID, sharedCamps.username);
+                this.inviteToCamp(pointId, sharedCamps.playerUUID);
         }
         this.cooldownInfo.read(bis);     
     }
@@ -249,18 +249,12 @@ public class TeleportationPlayerData {
 
     public enum EnumJumpProfile {
 
-        FREE("teleportation.jumpProfile.free"),
-        REQUEST("teleportation.jumpProfile.request"),
-        DISABLED("teleportation.jumpProfile.disabled");
+        FREE,
+        REQUEST,
+        DISABLED;     
 
-        public final String key;
-
-        EnumJumpProfile(String key) {
-            this.key = key;
-        }       
-
-        public String getLocalizedName() {
-            return I18n.format(this.key);
+        public String localizedName() {
+            return I18n.format("teleportation.jumpProfile." + this.toString().toLowerCase());
         }
     }
 }

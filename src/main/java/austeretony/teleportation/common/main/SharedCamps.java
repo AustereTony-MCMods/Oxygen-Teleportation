@@ -15,13 +15,10 @@ public class SharedCamps {
 
     public final UUID playerUUID;
 
-    public final String username;
-
     private final Set<Long> camps = new ConcurrentSet<Long>();
 
-    public SharedCamps(UUID playerUUID, String username) {
+    public SharedCamps(UUID playerUUID) {
         this.playerUUID = playerUUID;
-        this.username = username;
     }
 
     public Set<Long> getCamps() {
@@ -30,16 +27,13 @@ public class SharedCamps {
 
     public void write(BufferedOutputStream bos) throws IOException {
         StreamUtils.write(this.playerUUID, bos);
-        StreamUtils.write(this.username, bos);
         StreamUtils.write((byte) this.camps.size(), bos);
         for (long id : this.camps)
             StreamUtils.write(id, bos);
     }
 
     public static SharedCamps read(BufferedInputStream bis) throws IOException {
-        SharedCamps sharedCamps = new SharedCamps(
-                StreamUtils.readUUID(bis), 
-                StreamUtils.readString(bis));
+        SharedCamps sharedCamps = new SharedCamps(StreamUtils.readUUID(bis));
         int size = StreamUtils.readByte(bis);
         for (int i = 0; i < size; i++)
             sharedCamps.getCamps().add(StreamUtils.readLong(bis));
@@ -48,16 +42,13 @@ public class SharedCamps {
 
     public void write(PacketBuffer buffer) {
         PacketBufferUtils.writeUUID(this.playerUUID, buffer);
-        PacketBufferUtils.writeString(this.username, buffer);
         buffer.writeByte(this.camps.size());
         for (long id : this.camps)
             buffer.writeLong(id);
     }
 
     public static SharedCamps read(PacketBuffer buffer) {
-        SharedCamps sharedCamps = new SharedCamps(
-                PacketBufferUtils.readUUID(buffer), 
-                PacketBufferUtils.readString(buffer));
+        SharedCamps sharedCamps = new SharedCamps(PacketBufferUtils.readUUID(buffer));
         int size = buffer.readByte();
         for (int i = 0; i < size; i++)
             sharedCamps.getCamps().add(buffer.readLong());

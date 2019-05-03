@@ -8,9 +8,9 @@ import austeretony.oxygen.common.main.EnumOxygenChatMessages;
 import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 import austeretony.teleportation.common.config.TeleportationConfig;
+import austeretony.teleportation.common.main.CampInvitationRequest;
 import austeretony.teleportation.common.main.EnumTeleportationChatMessages;
 import austeretony.teleportation.common.main.EnumTeleportationPrivileges;
-import austeretony.teleportation.common.main.InvitationRequest;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.main.TeleportationPlayerData;
 import austeretony.teleportation.common.main.TeleportationProcess;
@@ -143,7 +143,7 @@ public class CampsManagerServer {
 
                 if (playerProfile.haveInvitedPlayers(oldPointId))
                     for (UUID invitedUUID : playerProfile.getInvitedPlayersByCampId(oldPointId).getPlayers()) {
-                        playerProfile.inviteToCamp(worldPoint.getId(), invitedUUID, playerProfile.getSharedCampsByPlayerUUID(invitedUUID).username);
+                        playerProfile.inviteToCamp(worldPoint.getId(), invitedUUID);
                         playerProfile.uninviteFromCamp(oldPointId, invitedUUID);
                         if (!this.manager.profileExist(invitedUUID)) {
                             this.manager.createPlayerProfile(invitedUUID);
@@ -197,7 +197,7 @@ public class CampsManagerServer {
 
                     if (playerProfile.haveInvitedPlayers(oldPointId))
                         for (UUID invitedUUID : playerProfile.getInvitedPlayersByCampId(oldPointId).getPlayers()) {
-                            playerProfile.inviteToCamp(worldPoint.getId(), invitedUUID, playerProfile.getSharedCampsByPlayerUUID(invitedUUID).username);
+                            playerProfile.inviteToCamp(worldPoint.getId(), invitedUUID);
                             playerProfile.uninviteFromCamp(oldPointId, invitedUUID);
                             if (!this.manager.profileExist(invitedUUID)) {
                                 this.manager.createPlayerProfile(invitedUUID);
@@ -227,13 +227,12 @@ public class CampsManagerServer {
                 if (this.manager.getPlayerProfile(playerUUID).getInvitedPlayersAmount(pointId) < TeleportationConfig.MAX_INVITED_PLAYERS_PER_CAMP.getIntValue()) {
                     EntityPlayerMP invitedPlayerMP = CommonReference.playerByUUID(playerUUID);
                     OxygenHelperServer.sendRequest(playerMP, invitedPlayerMP, 
-                            new InvitationRequest(
+                            new CampInvitationRequest(
                                     TeleportationMain.INVITATION_TO_CAMP_ID,
-                                    playerUUID, 
                                     ownerUUID, 
                                     CommonReference.username(playerMP), 
                                     pointId, 
-                                    worldPoint.getName()));
+                                    worldPoint.getName()), true);
                 } else
                     OxygenHelperServer.sendMessage(playerMP, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessages.REQUEST_RESET.ordinal());
             }

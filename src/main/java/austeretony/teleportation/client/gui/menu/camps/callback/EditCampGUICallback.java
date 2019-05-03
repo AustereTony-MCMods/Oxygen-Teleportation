@@ -1,4 +1,4 @@
-package austeretony.teleportation.client.gui.menu.locations;
+package austeretony.teleportation.client.gui.menu.camps.callback;
 
 import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.alternateui.screen.button.GUICheckBoxButton;
@@ -9,19 +9,20 @@ import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.oxygen.client.gui.settings.GUISettings;
+import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.teleportation.client.TeleportationManagerClient;
-import austeretony.teleportation.client.gui.menu.LocationsGUISection;
+import austeretony.teleportation.client.gui.menu.CampsGUISection;
 import austeretony.teleportation.client.gui.menu.TeleportationMenuGUIScreen;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.client.resources.I18n;
 
-public class EditLocationGUICallback extends AbstractGUICallback {
+public class EditCampGUICallback extends AbstractGUICallback {
 
     private final TeleportationMenuGUIScreen screen;
 
-    private final LocationsGUISection section;
+    private final CampsGUISection section;
 
-    public GUITextField nameField, descriptionField;
+    private GUITextField nameField, descriptionField;
 
     private GUICheckBoxButton updateImageButton, updatePositionButton;
 
@@ -29,7 +30,7 @@ public class EditLocationGUICallback extends AbstractGUICallback {
 
     private GUIButton confirmButton, cancelButton;
 
-    public EditLocationGUICallback(TeleportationMenuGUIScreen screen, LocationsGUISection section, int width, int height) {
+    public EditCampGUICallback(TeleportationMenuGUIScreen screen, CampsGUISection section, int width, int height) {
         super(screen, section, width, height);
         this.screen = screen;
         this.section = section;
@@ -40,7 +41,7 @@ public class EditLocationGUICallback extends AbstractGUICallback {
         this.addElement(new GUIImageLabel(- 1, - 1, this.getWidth() + 2, this.getHeight() + 2).enableStaticBackground(GUISettings.instance().getBaseGUIBackgroundColor()));//main background 1st layer
         this.addElement(new GUIImageLabel(0, 0, this.getWidth(), 11).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
         this.addElement(new GUIImageLabel(0, 12, this.getWidth(), this.getHeight() - 12).enableStaticBackground(GUISettings.instance().getAdditionalGUIBackgroundColor()));//main background 2nd layer
-        this.addElement(new GUITextLabel(2, 2).setDisplayText(I18n.format("teleportation.gui.menu.editLocationCallback"), true, GUISettings.instance().getTitleScale()));       
+        this.addElement(new GUITextLabel(2, 2).setDisplayText(I18n.format("teleportation.gui.menu.editCampCallback"), true, GUISettings.instance().getTitleScale()));       
         this.addElement(new GUITextLabel(2, 16).setDisplayText(I18n.format("oxygen.gui.username"), false, GUISettings.instance().getSubTextScale()));    
         this.addElement(new GUITextLabel(2, 36).setDisplayText(I18n.format("oxygen.gui.note"), false, GUISettings.instance().getSubTextScale()));    
 
@@ -52,8 +53,8 @@ public class EditLocationGUICallback extends AbstractGUICallback {
         this.addElement(this.updateImageTextLabel = new GUITextLabel(15, 59).setDisplayText(I18n.format("teleportation.gui.menu.updateImage"), false, GUISettings.instance().getSubTextScale())); 
         this.addElement(this.updatePositionTextLabel = new GUITextLabel(15, 71).setDisplayText(I18n.format("teleportation.gui.menu.updatePosition"), false, GUISettings.instance().getSubTextScale()));    
 
-        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
     }
 
     @Override
@@ -76,10 +77,8 @@ public class EditLocationGUICallback extends AbstractGUICallback {
             this.close();
         else if (element == this.confirmButton) {
             this.section.resetPointInfo();
-            String 
-            name = this.nameField.getTypedText(),
-            description = this.descriptionField.getTypedText();
-            TeleportationManagerClient.instance().getLocationsManager().editLocationPointSynced(this.section.getCurrentPoint(), name, description, this.updateImageButton.isToggled(), this.updatePositionButton.isToggled());
+            TeleportationManagerClient.instance().getCampsManager().editCampPointSynced(this.section.getCurrentPoint(), this.nameField.getTypedText(), this.descriptionField.getTypedText(), 
+                    this.updateImageButton.isToggled(), this.updatePositionButton.isToggled());
             this.section.sortPoints(0);
             this.close();
         }

@@ -117,7 +117,7 @@ public class TeleportationManagerServer {
         return this.teleportations;
     }
 
-    public void onPlayerLoggedIn(EntityPlayer player) {
+    public void onPlayerLoaded(EntityPlayer player) {
         UUID playerUUID = CommonReference.uuid(player);
         if (!this.profileExist(playerUUID)) {
             this.createPlayerProfile(playerUUID);

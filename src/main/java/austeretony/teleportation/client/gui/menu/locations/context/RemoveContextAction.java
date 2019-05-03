@@ -1,4 +1,4 @@
-package austeretony.teleportation.client.gui.menu.locations;
+package austeretony.teleportation.client.gui.menu.locations.context;
 
 import austeretony.alternateui.screen.contextmenu.AbstractContextAction;
 import austeretony.alternateui.screen.core.GUIBaseElement;

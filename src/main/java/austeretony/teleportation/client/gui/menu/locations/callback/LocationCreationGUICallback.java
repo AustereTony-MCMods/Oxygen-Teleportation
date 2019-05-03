@@ -1,4 +1,4 @@
-package austeretony.teleportation.client.gui.menu.locations;
+package austeretony.teleportation.client.gui.menu.locations.callback;
 
 import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
@@ -8,6 +8,7 @@ import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.oxygen.client.gui.settings.GUISettings;
+import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.client.gui.menu.LocationsGUISection;
 import austeretony.teleportation.client.gui.menu.TeleportationMenuGUIScreen;
@@ -42,8 +43,8 @@ public class LocationCreationGUICallback extends AbstractGUICallback {
         this.addElement(this.nameField = new GUITextField(2, 25, 187, WorldPoint.MAX_POINT_NAME_LENGTH).setScale(0.7F).enableDynamicBackground().cancelDraggedElementLogic());
         this.addElement(this.descriptionField = new GUITextField(2, 45, 187, WorldPoint.MAX_POINT_DESCRIPTION_LENGTH).setScale(0.7F).enableDynamicBackground().cancelDraggedElementLogic());
 
-        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
     }
 
     @Override

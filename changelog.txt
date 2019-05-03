@@ -1,3 +1,7 @@
+0.3.2a
++Performance improvements.
++Added sound effects to GUI.
+
 0.3.1a
 +Added config option 'allow_locations_creation_for_all' to allow locations creation for everyone ('false' by
 default).

@@ -1,3 +1,7 @@
+0.4.0a
++Added camp invitation feature. Maximum invited players per camp limited to 5 (configurable). 
+To invite player use "Invite" context option in Camps section.
+
 0.3.2a
 +Performance improvements.
 +Added sound effects to GUI.

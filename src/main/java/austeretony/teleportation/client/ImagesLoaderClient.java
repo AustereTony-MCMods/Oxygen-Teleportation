@@ -25,6 +25,16 @@ public class ImagesLoaderClient {
         this.manager = manager;
     }
 
+    public void loadCampPreviewImagesDelegated() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
+
+            @Override
+            public void execute() {
+                loadCampPreviewImages();
+            }     
+        });
+    }
+
     public void loadCampPreviewImages() {
         String folder = OxygenHelperClient.getDataFolder() + "/client/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/images/camps";
         String[] files = new File(folder).list(new FilenameFilter() {
@@ -169,6 +179,16 @@ public class ImagesLoaderClient {
         }
     }
 
+    public void loadLocationPreviewImagesDelegated() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
+
+            @Override
+            public void execute() {
+                loadLocationPreviewImages();
+            }     
+        });
+    }
+
     public void loadLocationPreviewImages() {
         String folder = OxygenHelperClient.getDataFolder() + "/client/world/teleportation/locations/images";
         String[] files = new File(folder).list(new FilenameFilter() {
@@ -263,7 +283,7 @@ public class ImagesLoaderClient {
             Path path;
             for (String fileName : files) {
                 path = Paths.get(folder + "/" + fileName);
-                if (!TeleportationManagerClient.instance().getWorldProfile().locationExist(Long.parseLong(fileName.substring(0, 15)))) {
+                if (!TeleportationManagerClient.instance().getWorldData().locationExist(Long.parseLong(fileName.substring(0, 15)))) {
                     try {
                         Files.delete(path);
                     } catch (IOException exception) {

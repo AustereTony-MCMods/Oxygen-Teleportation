@@ -7,13 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperServer;
+import austeretony.teleportation.common.ImagesLoaderServer.SplittedByteArray;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.network.client.CPDownloadImagePart;
 import austeretony.teleportation.common.network.client.CPStartImageDownload;
 import austeretony.teleportation.common.util.BufferedImageUtils;
 import austeretony.teleportation.common.util.ImageTransferingClientBuffer;
 import austeretony.teleportation.common.util.ImageTransferingServerBuffer;
-import austeretony.teleportation.common.util.SplittedByteArray;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ImagesManagerServer {

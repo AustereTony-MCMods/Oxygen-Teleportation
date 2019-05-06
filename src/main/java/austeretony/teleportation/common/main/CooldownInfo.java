@@ -1,4 +1,4 @@
-package austeretony.teleportation.common;
+package austeretony.teleportation.common.main;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -57,5 +57,11 @@ public class CooldownInfo {
         this.camp = buffer.readLong();
         this.location = buffer.readLong();
         this.jump = buffer.readLong();
+    }
+    
+    public void reset() {
+        this.camp = 0L;
+        this.location = 0L;
+        this.jump = 0L;
     }
 }

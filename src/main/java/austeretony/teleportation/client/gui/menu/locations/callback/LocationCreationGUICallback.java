@@ -60,7 +60,7 @@ public class LocationCreationGUICallback extends AbstractGUICallback {
         else if (element == this.confirmButton) {
             this.section.resetPointInfo();
             String name = this.nameField.getTypedText().isEmpty() ? I18n.format("teleportation.gui.menu.locationGenericName") 
-                    + " #" + String.valueOf(TeleportationManagerClient.instance().getWorldProfile().getLocationsAmount() + 1) : this.nameField.getTypedText();
+                    + " #" + String.valueOf(TeleportationManagerClient.instance().getWorldData().getLocationsAmount() + 1) : this.nameField.getTypedText();
                     TeleportationManagerClient.instance().getLocationsManager().createLocationPointSynced(name, this.descriptionField.getTypedText());
                     this.section.sortPoints(0);
                     this.section.lockCreateButton();     

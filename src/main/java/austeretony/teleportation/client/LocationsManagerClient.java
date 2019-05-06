@@ -23,7 +23,7 @@ public class LocationsManagerClient {
     }
 
     public void downloadLocationsDataSynced() {
-        this.manager.getWorldProfile().getLocations().clear();
+        this.manager.getWorldData().getLocations().clear();
         this.manager.openMenuSynced();
     }
 
@@ -35,7 +35,7 @@ public class LocationsManagerClient {
     }
 
     public void createLocationPointSynced(String name, String description) {
-        if (this.canCreateLocation() && this.manager.getWorldProfile().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue()) {
+        if (this.canCreateLocation() && this.manager.getWorldData().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue()) {
             WorldPoint worldPoint = new WorldPoint(
                     OxygenHelperClient.getPlayerUUID(),
                     ClientReference.getClientPlayer().getName(), 
@@ -49,19 +49,19 @@ public class LocationsManagerClient {
                     ClientReference.getClientPlayer().rotationPitch);
             worldPoint.createId();
             worldPoint.createDate();
-            this.manager.getWorldProfile().addLocation(worldPoint);
+            this.manager.getWorldData().addLocation(worldPoint);
             TeleportationMain.network().sendToServer(new SPCreateWorldPoint(WorldPoint.EnumWorldPoints.LOCATION, worldPoint));
             this.manager.getImagesManager().cacheLatestImage(worldPoint.getId());
-            this.manager.getLocationsLoader().saveLocationsDataDelegated();
+            OxygenHelperClient.saveWorldDataDelegated(this.manager.getWorldData());
             this.manager.getImagesLoader().saveLatestLocationPreviewImageDelegated(worldPoint.getId());
             this.manager.getImagesManager().uploadLocationPreviewToServerDelegated(worldPoint.getId());
         }
     }  
 
     public void removeLocationPointSynced(long pointId) {
-        this.manager.getWorldProfile().removeLocation(pointId);
+        this.manager.getWorldData().removeLocation(pointId);
         TeleportationMain.network().sendToServer(new SPRemoveWorldPoint(WorldPoint.EnumWorldPoints.LOCATION, pointId));
-        this.manager.getLocationsLoader().saveLocationsDataDelegated();
+        OxygenHelperClient.saveWorldDataDelegated(this.manager.getWorldData());
         this.manager.getImagesManager().removeCachedImage(pointId);
     }
 
@@ -69,9 +69,9 @@ public class LocationsManagerClient {
         long oldPointId = worldPoint.getId();
         worldPoint.setLocked(flag);
         worldPoint.setId(worldPoint.getId() + 1L);
-        this.manager.getWorldProfile().addLocation(worldPoint);
-        this.manager.getWorldProfile().removeLocation(oldPointId);
-        this.manager.getLocationsLoader().saveLocationsDataDelegated();
+        this.manager.getWorldData().addLocation(worldPoint);
+        this.manager.getWorldData().removeLocation(oldPointId);
+        OxygenHelperClient.saveWorldDataDelegated(this.manager.getWorldData());
         TeleportationMain.network().sendToServer(new SPLockPoint(WorldPoint.EnumWorldPoints.LOCATION, oldPointId, flag));
         this.manager.getImagesLoader().renameLocationPreviewImageDelegated(oldPointId, worldPoint.getId());
         this.manager.getImagesManager().replaceCachedImage(oldPointId, worldPoint.getId());
@@ -107,9 +107,9 @@ public class LocationsManagerClient {
         edited = updateName || updateDescription || updateImage || updatePosition;
         if (edited) {
             worldPoint.setId(newPointId);
-            this.manager.getWorldProfile().addLocation(worldPoint);
-            this.manager.getWorldProfile().removeLocation(oldPointId);
-            this.manager.getLocationsLoader().saveLocationsDataDelegated();
+            this.manager.getWorldData().addLocation(worldPoint);
+            this.manager.getWorldData().removeLocation(oldPointId);
+            OxygenHelperClient.saveWorldDataDelegated(this.manager.getWorldData());
             TeleportationMain.network().sendToServer(new SPEditWorldPoint(WorldPoint.EnumWorldPoints.LOCATION, oldPointId, newName, newDescription, 
                     updateName, updateDescription, updateImage, updatePosition));
             if (!updateImage) {

@@ -4,25 +4,25 @@ import java.util.UUID;
 
 import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.oxygen.client.gui.OxygenGUITextures;
+import austeretony.oxygen.client.gui.PlayerGUIButton;
+import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class InvitedPlayerGUIButton extends GUIButton {
-
-    public final UUID playerUUID;
+public class InvitedPlayerGUIButton extends PlayerGUIButton {
 
     public final long pointId;
 
     private GUIButton uninviteButton;
 
     public InvitedPlayerGUIButton(UUID playerUUID, long pointId) {
-        this.playerUUID = playerUUID;
+        super(playerUUID);
         this.pointId = pointId;
     }
 
     @Override
     public void init() { 
-        this.uninviteButton = new GUIButton(this.getWidth() - 8, 2, 6, 6).setTexture(OxygenGUITextures.CROSS_ICONS, 6, 6).initScreen(this.getScreen());
+        this.uninviteButton = new GUIButton(this.getWidth() - 8, 2, 6, 6).setSound(OxygenSoundEffects.BUTTON_CLICK).setTexture(OxygenGUITextures.CROSS_ICONS, 6, 6).initScreen(this.getScreen());
     }
 
     @Override

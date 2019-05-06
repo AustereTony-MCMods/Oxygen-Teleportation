@@ -11,7 +11,7 @@ public class CPSyncCooldown extends ProxyPacket {
 
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
-        TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(getEntityPlayerMP(netHandler))).getCooldownInfo().write(buffer);
+        TeleportationManagerServer.instance().getPlayerData(CommonReference.uuid(getEntityPlayerMP(netHandler))).getCooldownInfo().write(buffer);
     }
 
     @Override

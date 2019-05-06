@@ -63,7 +63,7 @@ public class LocationsManagerServer {
                 worldPoint.createDate();
                 worldPoint.setId(pointId);
                 this.manager.getWorldData().addLocation(worldPoint);
-                this.manager.getLocationsLoader().saveLocationsDataDelegated();
+                OxygenHelperServer.saveWorldDataDelegated(this.manager.getWorldData());
                 OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.LOCATION_CREATED.ordinal(), worldPoint.getName());
             }
         }
@@ -77,7 +77,7 @@ public class LocationsManagerServer {
             if (this.canEditLocation(playerUUID, worldPoint)) {
                 OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.LOCATION_REMOVED.ordinal(), worldPoint.getName());
                 this.manager.getWorldData().removeLocation(pointId);
-                this.manager.getLocationsLoader().saveLocationsDataDelegated();
+                OxygenHelperServer.saveWorldDataDelegated(this.manager.getWorldData());
                 this.manager.getImagesLoader().removeLocationPreviewImageDelegated(pointId);
             }
         }
@@ -93,7 +93,7 @@ public class LocationsManagerServer {
                 worldPoint.setId(oldPointId + 1L);
                 this.manager.getWorldData().addLocation(worldPoint);
                 this.manager.getWorldData().removeLocation(oldPointId);
-                this.manager.getLocationsLoader().saveLocationsDataDelegated();
+                OxygenHelperServer.saveWorldDataDelegated(this.manager.getWorldData());
                 this.manager.getImagesLoader().renameLocationPreviewImageDelegated(oldPointId, worldPoint.getId());
                 this.manager.getImagesManager().replaceImageBytes(oldPointId, worldPoint.getId());
                 if (flag)
@@ -126,7 +126,7 @@ public class LocationsManagerServer {
                     worldPoint.setId(newPointId);
                     this.manager.getWorldData().addLocation(worldPoint);
                     this.manager.getWorldData().removeLocation(oldPointId);
-                    this.manager.getLocationsLoader().saveLocationsDataDelegated();
+                    OxygenHelperServer.saveWorldDataDelegated(this.manager.getWorldData());
                     if (!updateImage) {
                         this.manager.getImagesLoader().renameLocationPreviewImageDelegated(oldPointId, newPointId);
                         this.manager.getImagesManager().replaceImageBytes(oldPointId, newPointId);
@@ -166,7 +166,7 @@ public class LocationsManagerServer {
     }
 
     private boolean readyMoveToLocation(UUID playerUUID) {
-        return System.currentTimeMillis() - this.manager.getPlayerProfile(playerUUID).getCooldownInfo().getLastLocationTime() 
+        return System.currentTimeMillis() - this.manager.getPlayerData(playerUUID).getCooldownInfo().getLastLocationTime() 
                 > PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), TeleportationConfig.LOCATIONS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
     }
 }

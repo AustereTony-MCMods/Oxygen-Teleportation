@@ -27,8 +27,9 @@ public class PlayersManagerServer {
     public void changeJumpProfile(EntityPlayerMP playerMP, TeleportationPlayerData.EnumJumpProfile profile) {
         if (TeleportationConfig.ENABLE_PLAYERS.getBooleanValue()) {
             UUID playerUUID = CommonReference.uuid(playerMP);
-            this.manager.getPlayerProfile(playerUUID).setJumpProfile(profile);
-            this.manager.getCampsLoader().savePlayerData(playerUUID);
+            TeleportationPlayerData playerData = this.manager.getPlayerData(playerUUID);
+            playerData.setJumpProfile(profile);
+            OxygenHelperServer.savePlayerDataDelegated(playerUUID, playerData);
             this.manager.updateSharedPlayerData(playerUUID);
             OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_PROFILE_CHANGED.ordinal(), profile.toString().toLowerCase());
         }
@@ -40,7 +41,7 @@ public class PlayersManagerServer {
             if (!this.teleporting(visitorUUID) && this.readyMoveToPlayer(visitorUUID)) {
                 if (OxygenHelperServer.isOnline(targetUUID) 
                         && !visitorUUID.equals(targetUUID)) {
-                    TeleportationPlayerData.EnumJumpProfile targetJumpProfile = this.manager.getPlayerProfile(targetUUID).getJumpProfile();
+                    TeleportationPlayerData.EnumJumpProfile targetJumpProfile = this.manager.getPlayerData(targetUUID).getJumpProfile();
                     switch (targetJumpProfile) {
                     case DISABLED:
                         if (PrivilegeProviderServer.getPrivilegeValue(visitorUUID, EnumTeleportationPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false))
@@ -86,7 +87,7 @@ public class PlayersManagerServer {
     }
 
     private boolean readyMoveToPlayer(UUID playerUUID) {
-        return System.currentTimeMillis() - this.manager.getPlayerProfile(playerUUID).getCooldownInfo().getLastJumpTime() 
+        return System.currentTimeMillis() - this.manager.getPlayerData(playerUUID).getCooldownInfo().getLastJumpTime() 
                 > PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.PLAYER_TELEPORTATION_COOLDOWN.toString(), TeleportationConfig.PLAYERS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
     }
 }

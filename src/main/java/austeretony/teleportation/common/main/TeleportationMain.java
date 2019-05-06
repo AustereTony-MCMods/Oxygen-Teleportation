@@ -61,7 +61,7 @@ public class TeleportationMain {
     public static final String 
     MODID = "teleportation",
     NAME = "Teleportation",
-    VERSION = "0.3.2",
+    VERSION = "0.4.0",
     VERSION_CUSTOM = VERSION + ":alpha:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Teleportation/info/mod_versions_forge.json";
@@ -122,7 +122,9 @@ public class TeleportationMain {
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event) { 
         TeleportationManagerServer.instance().reset();
-        TeleportationManagerServer.instance().getLocationsLoader().loadLocationsDataDelegated();
+        OxygenHelperServer.loadWorldDataDelegated(TeleportationManagerServer.instance().getWorldData());
+        TeleportationManagerServer.instance().getImagesLoader().loadLocationPreviewImagesDelegated();
+        OxygenHelperServer.loadWorldDataDelegated(TeleportationManagerServer.instance().getSharedCampsManager());
 
         this.addDefaultPrivilegesDelegated();
     }

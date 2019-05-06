@@ -3,6 +3,8 @@ key.oxygen.reject=Отклонить
 key.teleportation.openMenu=Открыть Меню
 key.teleportation.moveToCamp=Избранный Лагерь
 
+teleportation.gui.closeButton=Закрыть
+
 teleportation.gui.menu.campsTitle=Лагеря
 teleportation.gui.menu.locationsTitle=Локации
 teleportation.gui.menu.playersTitle=Игроки
@@ -11,6 +13,7 @@ teleportation.gui.menu.makeFvorite=Сдел. Избранным
 teleportation.gui.menu.lock=Заблокировать
 teleportation.gui.menu.unlock=Разблокировать
 teleportation.gui.menu.invite=Пригласить
+teleportation.gui.menu.invitations=Приглашения
 teleportation.gui.menu.edit=Редактировать
 teleportation.gui.menu.remove=Удалить
 teleportation.gui.menu.leave=Покинуть
@@ -22,6 +25,7 @@ teleportation.gui.menu.players.profile=Профиль
 teleportation.gui.menu.campCreationCallback=Создание Лагеря
 teleportation.gui.menu.inviteCallback=Пригласить
 teleportation.gui.menu.inviteCallback.request=Отправить приглашение в лагерь.
+teleportation.gui.menu.invitationsCallback=Приглашения
 teleportation.gui.menu.removeCampCallback=Удаление Лагеря
 teleportation.gui.menu.removeCallback.request=Позиция %s будет удалёна.
 teleportation.gui.menu.leaveCampCallback=Покинуть Лагерь

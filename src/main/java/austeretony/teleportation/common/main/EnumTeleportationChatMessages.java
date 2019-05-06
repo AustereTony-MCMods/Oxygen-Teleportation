@@ -9,7 +9,6 @@ public enum EnumTeleportationChatMessages {
 
     CAMP_CREATED,
     CAMP_REMOVED,
-    SET_FAVORITE,
     CAMP_LOCKED,
     CAMP_UNLOCKED,
     LOCATION_CREATED,
@@ -44,9 +43,6 @@ public enum EnumTeleportationChatMessages {
             break;
         case CAMP_REMOVED:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.campRemoved", args[0]));
-            break;
-        case SET_FAVORITE:
-            ClientReference.showMessage(new TextComponentTranslation("teleportation.message.setFavorite", args[0]));
             break;
         case CAMP_LOCKED:
             ClientReference.showMessage(new TextComponentTranslation("teleportation.message.campLocked", args[0]));

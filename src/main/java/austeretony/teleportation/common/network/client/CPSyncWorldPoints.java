@@ -3,6 +3,7 @@ package austeretony.teleportation.common.network.client;
 import java.util.UUID;
 
 import austeretony.oxygen.common.api.OxygenGUIHelper;
+import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.teleportation.client.TeleportationManagerClient;
@@ -30,23 +31,17 @@ public class CPSyncWorldPoints extends ProxyPacket {
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
         EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
+        UUID playerUUID = CommonReference.uuid(playerMP);
         buffer.writeByte(this.type.ordinal());
         buffer.writeShort(this.points.length);
         switch (this.type) {
         case CAMP:
-            UUID otherUUID;
-            TeleportationPlayerData ownerProfile = TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP));
+            TeleportationPlayerData ownerData = TeleportationManagerServer.instance().getPlayerData(playerUUID);
             for (long id : this.points) {
-                if (ownerProfile.getOtherCampIds().contains(id)) {
-                    otherUUID = ownerProfile.getOtherCampOwner(id);
-                    if (TeleportationManagerServer.instance().profileExist(otherUUID))
-                        TeleportationManagerServer.instance().getPlayerProfile(otherUUID).getCamp(id).write(buffer);
-                    else {
-                        TeleportationManagerServer.instance().getCampsLoader().loadPlayerData(otherUUID);//TODO IO operation... this is not good - need reliable solution
-                        TeleportationManagerServer.instance().getPlayerProfile(otherUUID).getCamp(id).write(buffer);
-                    }
-                } else
-                    ownerProfile.getCamp(id).write(buffer);
+                if (TeleportationManagerServer.instance().getSharedCampsManager().haveInvitation(playerUUID, id))
+                    TeleportationManagerServer.instance().getSharedCampsManager().getCamp(id).write(buffer);
+                else
+                    ownerData.getCamp(id).write(buffer);
             }
             break;
         case LOCATION:
@@ -66,13 +61,13 @@ public class CPSyncWorldPoints extends ProxyPacket {
         case CAMP:
             for (i = 0; i < amount; i++)
                 TeleportationManagerClient.instance().getPlayerData().addCamp(WorldPoint.read(buffer));
-            TeleportationManagerClient.instance().getCampsLoader().savePlayerDataDelegated();
+            OxygenHelperClient.savePlayerDataDelegated(TeleportationManagerClient.instance().getPlayerData());
             OxygenGUIHelper.dataRecieved(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
             break;
         case LOCATION:
             for (i = 0; i < amount; i++)
-                TeleportationManagerClient.instance().getWorldProfile().addLocation(WorldPoint.read(buffer));
-            TeleportationManagerClient.instance().getLocationsLoader().saveLocationsDataDelegated();
+                TeleportationManagerClient.instance().getWorldData().addLocation(WorldPoint.read(buffer));
+            OxygenHelperClient.saveWorldDataDelegated(TeleportationManagerClient.instance().getWorldData());
             OxygenGUIHelper.dataRecieved(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
             break;
         }

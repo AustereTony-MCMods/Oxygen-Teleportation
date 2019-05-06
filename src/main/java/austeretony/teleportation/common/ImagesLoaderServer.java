@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -19,7 +20,6 @@ import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import austeretony.teleportation.common.main.TeleportationMain;
 import austeretony.teleportation.common.util.BufferedImageUtils;
-import austeretony.teleportation.common.util.SplittedByteArray;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ImagesLoaderServer {
@@ -41,13 +41,11 @@ public class ImagesLoaderServer {
     }
 
     public void loadAndSendCampPreviewImages(EntityPlayerMP playerMP, long[] campIds) {
-        UUID ownerUUID;
+        UUID ownerUUID = CommonReference.uuid(playerMP);
         BufferedImage bufferedImage;
         for (long id : campIds) {
-            if (this.manager.getPlayerProfile(CommonReference.uuid(playerMP)).getOtherCampIds().contains(id))
-                ownerUUID = this.manager.getPlayerProfile(CommonReference.uuid(playerMP)).getOtherCampOwner(id);
-            else
-                ownerUUID = CommonReference.uuid(playerMP);
+            if (this.manager.getSharedCampsManager().haveInvitation(ownerUUID, id))
+                ownerUUID = this.manager.getSharedCampsManager().getCampOwner(id);
             bufferedImage = this.loadCampPreviewImage(ownerUUID, id);
             if (bufferedImage != null)
                 this.manager.getImagesManager().downloadCampPreviewToClientDelegated(playerMP, id, bufferedImage);
@@ -145,6 +143,16 @@ public class ImagesLoaderServer {
         }
     }
 
+    public void loadLocationPreviewImagesDelegated() {
+        OxygenHelperServer.addIOTask(new IOxygenTask() {
+
+            @Override
+            public void execute() {
+                loadLocationPreviewImages();
+            }     
+        });
+    }
+
     public void loadLocationPreviewImages() {
         String folder = OxygenHelperServer.getDataFolder() + "/server/world/teleportation/locations/images";
         String[] files = new File(folder).list(new FilenameFilter() {
@@ -168,7 +176,9 @@ public class ImagesLoaderServer {
                         TeleportationMain.LOGGER.error("Invalid location preview image {}.", fileName);
                         return;
                     }
-                    this.manager.getImagesManager().getLocationPreviews().put(Long.parseLong(fileName.substring(0, 15)), new SplittedByteArray(BufferedImageUtils.convertBufferedImageToByteArraysList(bufferedImage)));              
+                    this.manager.getImagesManager().getLocationPreviews().put(
+                            Long.parseLong(fileName.substring(0, 15)), 
+                            new SplittedByteArray(BufferedImageUtils.convertBufferedImageToByteArraysList(bufferedImage)));              
                 } catch (IOException exception) {
                     TeleportationMain.LOGGER.error("Filed to load location preview image {}.", fileName);
                     exception.printStackTrace();
@@ -278,6 +288,19 @@ public class ImagesLoaderServer {
                 TeleportationMain.LOGGER.error("Failed to rename location preview image {}.png.", oldPointId);
                 exception.printStackTrace();
             }
+        }
+    }
+
+    public static class SplittedByteArray {
+
+        private final List<byte[]> parts;
+
+        public SplittedByteArray(List<byte[]> parts) {
+            this.parts = parts;
+        }
+
+        public List<byte[]> getParts() {
+            return this.parts;
         }
     }
 }

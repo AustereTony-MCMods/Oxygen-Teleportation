@@ -3,6 +3,8 @@ key.oxygen.reject=Reject
 key.teleportation.openMenu=Open Menu
 key.teleportation.moveToCamp=Move to Favorite Camp
 
+teleportation.gui.closeButton=Close
+
 teleportation.gui.menu.campsTitle=Camps
 teleportation.gui.menu.locationsTitle=Locations
 teleportation.gui.menu.playersTitle=Players
@@ -11,6 +13,7 @@ teleportation.gui.menu.makeFvorite=Make Favorite
 teleportation.gui.menu.lock=Lock
 teleportation.gui.menu.unlock=Unlock
 teleportation.gui.menu.invite=Invite
+teleportation.gui.menu.invitations=Invitations
 teleportation.gui.menu.edit=Edit
 teleportation.gui.menu.remove=Remove
 teleportation.gui.menu.leave=Leave
@@ -24,6 +27,7 @@ teleportation.gui.menu.campsDownloadCallback.request=Download from server?
 teleportation.gui.menu.campCreationCallback=Camp Creation
 teleportation.gui.menu.inviteCallback=Invite
 teleportation.gui.menu.inviteCallback.request=Send camp invitation.
+teleportation.gui.menu.invitationsCallback=Invitations
 teleportation.gui.menu.removeCampCallback=Remove Camp
 teleportation.gui.menu.removeCallback.request=Point %s will be removed.
 teleportation.gui.menu.leaveCampCallback=Leave Camp

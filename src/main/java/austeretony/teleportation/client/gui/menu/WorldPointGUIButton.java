@@ -8,7 +8,7 @@ public class WorldPointGUIButton extends GUIButton {
 
     public final WorldPoint worldPoint;
 
-    private boolean favorite, shared;
+    private boolean favorite, shared, downloaded;
 
     public WorldPointGUIButton(WorldPoint worldPoint) {
         super();
@@ -40,19 +40,18 @@ public class WorldPointGUIButton extends GUIButton {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableBlend(); 
         if (this.shared) {
-            this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.SHARED_ICON);                        
-            drawCustomSizedTexturedRect(this.getWidth() - 8, 1, 8, 0, 8, 8, 24, 8);      
+            this.mc.getTextureManager().bindTexture(TeleportationGUITextures.SHARED_ICON);                        
+            drawCustomSizedTexturedRect(this.getWidth() - 8, 1, 8, 0, 8, 8, 8, 8);      
+        } else if (this.downloaded) {
+            this.mc.getTextureManager().bindTexture(TeleportationGUITextures.DOWNLOADED_ICON);                        
+            drawCustomSizedTexturedRect(this.getWidth() - 8, 1, 8, 0, 8, 8, 8, 8);
         }
         if (this.favorite) {
-            this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.FAVORITE_ICONS);                        
-            drawCustomSizedTexturedRect(this.getWidth() - (this.shared ? 16 : 8), 1, 8, 0, 8, 8, 24, 8);      
+            this.mc.getTextureManager().bindTexture(TeleportationGUITextures.FAVORITE_ICON);                        
+            drawCustomSizedTexturedRect(this.getWidth() - (this.shared || this.downloaded ? 16 : 8), 1, 0, 0, 8, 8, 8, 8);      
         }
         GlStateManager.disableBlend(); 
         GlStateManager.popMatrix();
-    }
-
-    public boolean isFavorite() {
-        return this.favorite;
     }
 
     public void setFavorite() {
@@ -63,15 +62,11 @@ public class WorldPointGUIButton extends GUIButton {
         this.favorite = false;
     }
 
-    public boolean isShared() {
-        return this.shared;
-    }
-
     public void setShared() {
         this.shared = true;
     }
 
-    public void resetShared() {
-        this.shared = false;
+    public void setDownloaded() {
+        this.downloaded = true;
     }
 }

@@ -19,12 +19,10 @@ public class TeleportationManagerClient {
     //Camps
     private final CampsManagerClient campsManager;
 
-    private final CampsLoaderClient campsLoader;
+    private final SharedCampsManagerClient sharedCampsManager;
 
     //Locations
     private final LocationsManagerClient locationsManager;
-
-    private final LocationsLoaderClient locationsLoader;
 
     //Players
     private final PlayersManagerClient playersManager;
@@ -40,9 +38,8 @@ public class TeleportationManagerClient {
         this.playerData = new TeleportationPlayerData();
         this.worldData = new TeleportationWorldData();
         this.campsManager = new CampsManagerClient(this);
-        this.campsLoader = new CampsLoaderClient(this);
+        this.sharedCampsManager = new SharedCampsManagerClient(this);
         this.locationsManager = new LocationsManagerClient(this);
-        this.locationsLoader = new LocationsLoaderClient(this);
         this.playersManager = new PlayersManagerClient(this);
         this.imagesManager = new ImagesManagerClient(this);
         this.imagesLoader = new ImagesLoaderClient(this);
@@ -61,7 +58,7 @@ public class TeleportationManagerClient {
         return this.playerData;
     }
 
-    public TeleportationWorldData getWorldProfile() {
+    public TeleportationWorldData getWorldData() {
         return this.worldData;
     }
 
@@ -69,16 +66,12 @@ public class TeleportationManagerClient {
         return this.campsManager;
     }
 
-    public CampsLoaderClient getCampsLoader() {
-        return this.campsLoader;
+    public SharedCampsManagerClient getSharedCampsManager() {
+        return this.sharedCampsManager;
     }
 
     public LocationsManagerClient getLocationsManager() {
         return this.locationsManager;
-    }
-
-    public LocationsLoaderClient getLocationsLoader() {
-        return this.locationsLoader;
     }
 
     public PlayersManagerClient getPlayersManager() {
@@ -128,7 +121,8 @@ public class TeleportationManagerClient {
     }
 
     public void reset() {
-        this.playerData.resetData();
-        this.worldData.resetData();
+        this.playerData.reset();
+        this.worldData.reset();
+        this.sharedCampsManager.reset();
     }
 }

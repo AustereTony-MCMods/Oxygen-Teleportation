@@ -43,22 +43,25 @@ public class SPRequest extends ProxyPacket {
 
     private void processOpenMenuRequest(EntityPlayerMP playerMP) {
         UUID playerUUID = CommonReference.uuid(playerMP);
-        if (TeleportationManagerServer.instance().profileExist(playerUUID)) {//for sure
-            if (!OxygenHelperServer.isSyncing(playerUUID) && !TeleportationProcess.exist(playerUUID)) {
-                TeleportationPlayerData playerProfile = TeleportationManagerServer.instance().getPlayerProfile(playerUUID);
+        if (TeleportationManagerServer.instance().dataExist(playerUUID)) {//for sure
+            if (!OxygenHelperServer.isSyncing(playerUUID) 
+                    && !TeleportationProcess.exist(playerUUID)) {
+                TeleportationPlayerData playerData = TeleportationManagerServer.instance().getPlayerData(playerUUID);
                 OxygenHelperServer.setSyncing(playerUUID, true);
                 TeleportationMain.network().sendTo(new CPSyncCooldown(), playerMP);
-                long[] camps = new long[playerProfile.getCampsAmount() + playerProfile.getOtherCampsAmount()];
+                long[] camps = new long[playerData.getCampsAmount() + TeleportationManagerServer.instance().getSharedCampsManager().getInvitationsAmount(playerUUID)];
                 int index = 0;
-                for (long id : playerProfile.getCampIds())
+                for (long id : playerData.getCampIds())
                     camps[index++] = id;
-                for (long id : playerProfile.getOtherCampIds())
-                    camps[index++] = id;
+                if (TeleportationManagerServer.instance().getSharedCampsManager().haveInvitations(playerUUID))
+                    for (long id : TeleportationManagerServer.instance().getSharedCampsManager().getInvitations(playerUUID))
+                        camps[index++] = id;
                 long[] locations = new long[TeleportationManagerServer.instance().getWorldData().getLocationsAmount()];
                 index = 0;
                 for (long id : TeleportationManagerServer.instance().getWorldData().getLocationIds())
                     locations[index++] = id;
-                TeleportationMain.network().sendTo(new CPSyncValidWorldPointsIds(camps, locations), playerMP); 
+                long invitationsId = TeleportationManagerServer.instance().getSharedCampsManager().haveInvitedPlayers(playerUUID) ? TeleportationManagerServer.instance().getSharedCampsManager().getInvitationsContainer(playerUUID).getId() : 0L;
+                TeleportationMain.network().sendTo(new CPSyncValidWorldPointsIds(camps, locations, invitationsId), playerMP); 
                 OxygenHelperServer.syncSharedPlayersData(playerMP, OxygenHelperServer.getSharedDataIdentifiersForScreen(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID));
             }
         }

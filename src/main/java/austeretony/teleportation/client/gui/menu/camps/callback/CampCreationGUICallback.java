@@ -60,7 +60,7 @@ public class CampCreationGUICallback extends AbstractGUICallback {
         else if (element == this.confirmButton) {
             this.section.resetPointInfo();
             String name = this.nameField.getTypedText().isEmpty() ? I18n.format("teleportation.gui.menu.campGenericName") 
-                    + " #" + String.valueOf(TeleportationManagerClient.instance().getPlayerData().getCampsAmount() + 1) : this.nameField.getTypedText();
+                    + " #" + String.valueOf(TeleportationManagerClient.instance().getPlayerData().getOwnedCampsAmount() + 1) : this.nameField.getTypedText();
                     TeleportationManagerClient.instance().getCampsManager().createCampPointSynced(name, this.descriptionField.getTypedText());
                     this.section.sortPoints(0);
                     this.section.lockCreateButton();     

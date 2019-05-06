@@ -28,12 +28,10 @@ public class TeleportationManagerServer {
     //Camps
     private final CampsManagerServer campsManager;
 
-    private final CampsLoaderServer campsLoader;
+    private final SharedCampsManagerServer sharedCampsManager;
 
     //Locations
     private final LocationsManagerServer locationsManager;
-
-    private final LocationsLoaderServer locationsLoader;
 
     //Players
     private final PlayersManagerServer playersManager;
@@ -48,9 +46,8 @@ public class TeleportationManagerServer {
     private TeleportationManagerServer() {
         this.worldData = new TeleportationWorldData();
         this.campsManager = new CampsManagerServer(this);
-        this.campsLoader = new CampsLoaderServer(this);
+        this.sharedCampsManager = new SharedCampsManagerServer(this);
         this.locationsManager = new LocationsManagerServer(this);
-        this.locationsLoader = new LocationsLoaderServer(this);
         this.playersManager = new PlayersManagerServer(this);
         this.imagesManager = new ImagesManagerServer(this);
         this.imagesLoader = new ImagesLoaderServer(this);
@@ -69,15 +66,15 @@ public class TeleportationManagerServer {
         return this.playersData.values();
     }
 
-    public boolean profileExist(UUID playerUUID) {
+    public boolean dataExist(UUID playerUUID) {
         return this.playersData.containsKey(playerUUID);
     }
 
-    public void createPlayerProfile(UUID playerUUID) {
+    public void createPlayerData(UUID playerUUID) {
         this.playersData.put(playerUUID, new TeleportationPlayerData(playerUUID));
     }    
 
-    public TeleportationPlayerData getPlayerProfile(UUID playerUUID) {
+    public TeleportationPlayerData getPlayerData(UUID playerUUID) {
         return this.playersData.get(playerUUID);
     }
 
@@ -89,16 +86,12 @@ public class TeleportationManagerServer {
         return this.campsManager;
     }
 
-    public CampsLoaderServer getCampsLoader() {
-        return this.campsLoader;
-    }
+    public SharedCampsManagerServer getSharedCampsManager() {
+        return this.sharedCampsManager;
+    }  
 
     public LocationsManagerServer getLocationsManager() {
         return this.locationsManager;
-    }
-
-    public LocationsLoaderServer getLocationsLoader() {
-        return this.locationsLoader;
     }
 
     public PlayersManagerServer getPlayersManager() {
@@ -117,14 +110,18 @@ public class TeleportationManagerServer {
         return this.teleportations;
     }
 
+    //TODO onPlayerLoaded()
     public void onPlayerLoaded(EntityPlayer player) {
         UUID playerUUID = CommonReference.uuid(player);
-        if (!this.profileExist(playerUUID)) {
-            this.createPlayerProfile(playerUUID);
-            this.campsLoader.loadPlayerDataDelegated(playerUUID);
-        } else
-            this.appendSharedPlayerDataDelegated(playerUUID);
+        if (!this.dataExist(playerUUID)) {
+            this.createPlayerData(playerUUID);
+            OxygenHelperServer.loadPlayerDataDelegated(playerUUID, this.getPlayerData(playerUUID));
+        }
+        this.appendSharedPlayerDataDelegated(playerUUID);
     }
+
+    //TODO onPlayerLoggedOut()
+    public void onPlayerLoggedOut(EntityPlayer player) {}//remove data from cache
 
     //TODO Need better solution. May be implement some queue for shared data attaching?
     private void appendSharedPlayerDataDelegated(UUID playerUUID) {
@@ -139,22 +136,17 @@ public class TeleportationManagerServer {
 
     public void appendSharedPlayerData(UUID playerUUID) {
         ByteBuffer byteBuff = ByteBuffer.allocate(Byte.BYTES);
-        byteBuff.put((byte) this.getPlayerProfile(playerUUID).getJumpProfile().ordinal());
+        byteBuff.put((byte) this.getPlayerData(playerUUID).getJumpProfile().ordinal());
         OxygenHelperServer.getSharedPlayerData(playerUUID).addData(TeleportationMain.JUMP_PROFILE_DATA_ID, byteBuff);
     }
 
     public void updateSharedPlayerData(UUID playerUUID) {
-        OxygenHelperServer.getSharedPlayerData(playerUUID).getData(TeleportationMain.JUMP_PROFILE_DATA_ID).put(0, (byte) this.getPlayerProfile(playerUUID).getJumpProfile().ordinal());
-    }
-
-    public void onPlayerLoggedOut(EntityPlayer player) {
-        UUID playerUUID = CommonReference.uuid(player);
-        OxygenHelperServer.setRequesting(playerUUID, false);
-        OxygenHelperServer.setRequested(playerUUID, false); 
+        OxygenHelperServer.getSharedPlayerData(playerUUID).getData(TeleportationMain.JUMP_PROFILE_DATA_ID).put(0, (byte) this.getPlayerData(playerUUID).getJumpProfile().ordinal());
     }
 
     public void reset() {
         this.playersData.clear();
-        this.worldData.resetData();
+        this.worldData.reset();
+        this.sharedCampsManager.reset();
     }
 }

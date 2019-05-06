@@ -137,7 +137,7 @@ public class LocationsGUISection extends AbstractGUISection {
     }
 
     public void sortPoints(int mode) {
-        List<WorldPoint> points = new ArrayList<WorldPoint>(TeleportationManagerClient.instance().getWorldProfile().getLocations());
+        List<WorldPoint> points = new ArrayList<WorldPoint>(TeleportationManagerClient.instance().getWorldData().getLocations());
         Collections.sort(points, new Comparator<WorldPoint>() {
 
             @Override
@@ -152,7 +152,7 @@ public class LocationsGUISection extends AbstractGUISection {
         this.pointsListPanel.reset();
         WorldPointGUIButton button;
         for (WorldPoint worldPoint : points) {
-            worldPoint = TeleportationManagerClient.instance().getWorldProfile().getLocation(worldPoint.getId());
+            worldPoint = TeleportationManagerClient.instance().getWorldData().getLocation(worldPoint.getId());
             button = new WorldPointGUIButton(worldPoint);
             button.enableDynamicBackground(GUISettings.instance().getEnabledElementColor(), GUISettings.instance().getEnabledElementColor(), GUISettings.instance().getHoveredElementColor());
             button.setTextDynamicColor(GUISettings.instance().getEnabledTextColor(), GUISettings.instance().getDisabledTextColor(), GUISettings.instance().getHoveredTextColor());
@@ -162,7 +162,7 @@ public class LocationsGUISection extends AbstractGUISection {
             this.pointsListPanel.addButton(button);
         }
 
-        this.pointsAmountTextLabel.setDisplayText(String.valueOf(TeleportationManagerClient.instance().getWorldProfile().getLocationsAmount()) + 
+        this.pointsAmountTextLabel.setDisplayText(String.valueOf(TeleportationManagerClient.instance().getWorldData().getLocationsAmount()) + 
                 " / " + TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue());    
         this.pointsAmountTextLabel.setX(83 - this.textWidth(this.pointsAmountTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale()));
         this.refreshButton.setX(this.pointsAmountTextLabel.getX() - 11);
@@ -273,13 +273,13 @@ public class LocationsGUISection extends AbstractGUISection {
 
     public void lockCreateButton() {
         if (!(TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.getBooleanValue() || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.LOCATIONS_CREATION.toString(), false) || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString(), false))
-                || TeleportationManagerClient.instance().getWorldProfile().getLocationsAmount() >= TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue())
+                || TeleportationManagerClient.instance().getWorldData().getLocationsAmount() >= TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue())
             this.createButton.disable();
     }
 
     public void unlockCreateButton() {
         if ((TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.getBooleanValue() || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.LOCATIONS_CREATION.toString(), false) || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString(), false)) 
-                && TeleportationManagerClient.instance().getWorldProfile().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue())
+                && TeleportationManagerClient.instance().getWorldData().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue())
             this.createButton.enable();
     }
 

@@ -1,5 +1,7 @@
 package austeretony.teleportation.common.network.server;
 
+import java.util.UUID;
+
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.network.ProxyPacket;
@@ -19,17 +21,21 @@ public class SPSendAbsentPointsIds extends ProxyPacket {
 
     private int campsSize, locationsSize;
 
+    private boolean downloadInvitations;
+
     public SPSendAbsentPointsIds() {}
 
-    public SPSendAbsentPointsIds(int campsSize, long[] absentCamps, int locationsSize, long[] absentLocations) {
+    public SPSendAbsentPointsIds(int campsSize, long[] absentCamps, int locationsSize, long[] absentLocations, boolean downloadInvitations) {
         this.campsSize = campsSize;
         this.absentCamps = absentCamps;
         this.locationsSize = locationsSize;
         this.absentLocations = absentLocations;
+        this.downloadInvitations = downloadInvitations;
     }
 
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
+        buffer.writeBoolean(this.downloadInvitations);
         buffer.writeShort(this.campsSize);
         for (long id : this.absentCamps) {
             if (id == 0L) break;
@@ -45,6 +51,10 @@ public class SPSendAbsentPointsIds extends ProxyPacket {
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
         EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
+        UUID playerUUID = CommonReference.uuid(playerMP);
+        if (buffer.readBoolean() 
+                && TeleportationManagerServer.instance().getSharedCampsManager().haveInvitedPlayers(playerUUID))
+            TeleportationMain.network().sendTo(new CPSyncInvitedPlayers(TeleportationManagerServer.instance().getSharedCampsManager().getInvitationsContainer(playerUUID)), playerMP);
         this.absentCamps = new long[buffer.readShort()];
         int i = 0;
         if (this.absentCamps.length > 0) {
@@ -52,8 +62,6 @@ public class SPSendAbsentPointsIds extends ProxyPacket {
                 this.absentCamps[i] = buffer.readLong(); 
             TeleportationMain.network().sendTo(new CPSyncWorldPoints(WorldPoint.EnumWorldPoints.CAMP, this.absentCamps), playerMP);
             TeleportationManagerServer.instance().getImagesLoader().loadAndSendCampPreviewImagesDelegated(playerMP, this.absentCamps);
-            if (TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(playerMP)).getSharedCampsAmount() > 0)
-                TeleportationMain.network().sendTo(new CPSyncInvitedPlayers(), playerMP);
         }
         this.absentLocations = new long[buffer.readShort()];
         if (this.absentLocations.length > 0) {
@@ -64,6 +72,6 @@ public class SPSendAbsentPointsIds extends ProxyPacket {
             TeleportationManagerServer.instance().getImagesManager().downloadLocationPreviewsToClientDelegated(playerMP, this.absentLocations);
         }
         TeleportationMain.network().sendTo(new CPCommand(CPCommand.EnumCommand.OPEN_MENU), playerMP);
-        OxygenHelperServer.setSyncing(CommonReference.uuid(playerMP), false);
+        OxygenHelperServer.setSyncing(playerUUID, false);
     }
 }

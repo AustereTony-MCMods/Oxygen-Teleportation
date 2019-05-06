@@ -5,7 +5,6 @@ import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.core.GUIWorkspace;
 import austeretony.oxygen.common.api.OxygenGUIHelper;
-import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.common.config.TeleportationConfig;
 import austeretony.teleportation.common.main.TeleportationMain;
 import net.minecraft.util.ResourceLocation;
@@ -17,9 +16,7 @@ public class TeleportationMenuGUIScreen extends AbstractGUIScreen {
     PLAYERS_BACKGROUND = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/players_background.png"),
     CAMP_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/camp_icons.png"),
     LOCATION_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/location_icons.png"),
-    PLAYERS_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/players_icons.png"),
-    FAVORITE_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/favorite_icons.png"),
-    SHARED_ICON = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/shared_icon.png");
+    PLAYERS_ICONS = new ResourceLocation(TeleportationMain.MODID, "textures/gui/menu/players_icons.png");
 
     private CampsGUISection campsSection;
 
@@ -84,7 +81,6 @@ public class TeleportationMenuGUIScreen extends AbstractGUIScreen {
         OxygenGUIHelper.resetNeedSync(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
         OxygenGUIHelper.resetScreenInitialized(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
         OxygenGUIHelper.resetDataRecieved(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
-        TeleportationManagerClient.instance().getCampsLoader().savePlayerDataDelegated();
     }
 
     public CampsGUISection getCampsSection() {

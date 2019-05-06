@@ -29,9 +29,11 @@ import austeretony.teleportation.client.gui.menu.camps.callback.CampCreationGUIC
 import austeretony.teleportation.client.gui.menu.camps.callback.CampRemoveGUICallback;
 import austeretony.teleportation.client.gui.menu.camps.callback.CampsDownloadGUICallback;
 import austeretony.teleportation.client.gui.menu.camps.callback.EditCampGUICallback;
+import austeretony.teleportation.client.gui.menu.camps.callback.InvitationsGUICallback;
 import austeretony.teleportation.client.gui.menu.camps.callback.InviteToCampGUICallback;
 import austeretony.teleportation.client.gui.menu.camps.callback.LeaveCampGUICallback;
 import austeretony.teleportation.client.gui.menu.camps.context.EditContextAction;
+import austeretony.teleportation.client.gui.menu.camps.context.InvitationsContextAction;
 import austeretony.teleportation.client.gui.menu.camps.context.InviteContextAction;
 import austeretony.teleportation.client.gui.menu.camps.context.LockContextAction;
 import austeretony.teleportation.client.gui.menu.camps.context.MakeFavoriteContextAction;
@@ -63,7 +65,8 @@ public class CampsGUISection extends AbstractGUISection {
 
     private GUITextField searchTextField;
 
-    private AbstractGUICallback downloadCallback, creationCallback, inviteCallback, pointEditingCallback, removePointCallback, leavePointCallback;
+    private AbstractGUICallback downloadCallback, creationCallback, inviteCallback, invitationsCallback, pointEditingCallback, 
+    removePointCallback, leavePointCallback;
 
     private final int teleportationCooldown = PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMP_TELEPORTATION_COOLDOWN.toString(), 
             TeleportationConfig.CAMPS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
@@ -78,6 +81,9 @@ public class CampsGUISection extends AbstractGUISection {
     @Override
     public void init() {	
         int maxCamps = PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue());
+
+        if (TeleportationManagerClient.instance().getPlayerData().getCampsAmount() > maxCamps)//owned + invitations
+            maxCamps = TeleportationManagerClient.instance().getPlayerData().getCampsAmount();
 
         this.addElement(new CampsBackgroundGUIFiller(0, 0, this.getWidth(), this.getHeight()));
         String title = I18n.format("teleportation.gui.menu.campsTitle");
@@ -122,12 +128,16 @@ public class CampsGUISection extends AbstractGUISection {
         menu.addElement(new MakeFavoriteContextAction(this));
         menu.addElement(new LockContextAction(this));
         menu.addElement(new InviteContextAction(this));
+        menu.addElement(new InvitationsContextAction(this));
         menu.addElement(new EditContextAction(this));
         menu.addElement(new RemoveContextAction(this));
 
         this.downloadCallback = new CampsDownloadGUICallback(this.screen, this, 140, 40).enableDefaultBackground();
         this.creationCallback = new CampCreationGUICallback(this.screen, this, 140, 71).enableDefaultBackground();
-        this.inviteCallback = new InviteToCampGUICallback(this.screen, this, 140, 132).enableDefaultBackground();
+
+        this.inviteCallback = new InviteToCampGUICallback(this.screen, this, 140, 68).enableDefaultBackground();
+        this.invitationsCallback = new InvitationsGUICallback(this.screen, this, 140, 81).enableDefaultBackground();
+
         this.pointEditingCallback = new EditCampGUICallback(this.screen, this, 140, 100).enableDefaultBackground();
         this.removePointCallback = new CampRemoveGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
         this.leavePointCallback = new LeaveCampGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
@@ -170,9 +180,11 @@ public class CampsGUISection extends AbstractGUISection {
                 this.prevFavButton = button;
                 button.setFavorite();
             }
-            if (worldPoint.isLocked() || !worldPoint.isOwner(OxygenHelperClient.getPlayerUUID()))
+            if (worldPoint.isLocked())
                 button.setTextDynamicColor(GUISettings.instance().getEnabledTextColorDark(), GUISettings.instance().getDisabledTextColorDark(), GUISettings.instance().getHoveredTextColorDark());
-            if (TeleportationManagerClient.instance().getPlayerData().haveInvitedPlayers(worldPoint.getId()))
+            if (!worldPoint.isOwner(OxygenHelperClient.getPlayerUUID()))
+                button.setDownloaded();
+            if (TeleportationManagerClient.instance().getSharedCampsManager().invitedPlayersExist(worldPoint.getId()))
                 button.setShared();
             this.pointsListPanel.addButton(button);
         }
@@ -248,6 +260,9 @@ public class CampsGUISection extends AbstractGUISection {
             this.cooldownTextLabel.enableFull();
             this.moveButton.disable();
         }
+
+        if (this.currentPoint.isLocked() && !this.currentPoint.isOwner(OxygenHelperClient.getPlayerUUID()))
+            this.moveButton.disable();
     }
 
     public void showFavoriteMark() {
@@ -288,17 +303,21 @@ public class CampsGUISection extends AbstractGUISection {
     }
 
     public void lockCreateButton() {
-        if (TeleportationManagerClient.instance().getPlayerData().getCampsAmount() >= PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue()))
+        if (TeleportationManagerClient.instance().getPlayerData().getOwnedCampsAmount() >= PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue()))
             this.createButton.disable();
     }
 
     public void unlockCreateButton() {
-        if (TeleportationManagerClient.instance().getPlayerData().getCampsAmount() < PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue()))
+        if (TeleportationManagerClient.instance().getPlayerData().getOwnedCampsAmount() < PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue()))
             this.createButton.enable();
     }
 
-    public void openInvitationCallback() {
+    public void openInviteCallback() {
         this.inviteCallback.open();
+    }
+
+    public void openInvitationsCallback() {
+        this.invitationsCallback.open();
     }
 
     public void openPointEditingCallback() {

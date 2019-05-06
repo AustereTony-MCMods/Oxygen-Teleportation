@@ -8,6 +8,7 @@ import java.util.Map;
 import austeretony.alternateui.screen.image.GUIImageLabel;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.common.api.EnumDimensions;
+import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.common.world.WorldPoint;
 import net.minecraft.client.renderer.GlStateManager;
@@ -19,7 +20,7 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
 
     private String name, owner, creationDate, position, dimension, noImage;
 
-    private boolean favoriteIconEnabled, sharedIconEnabled, hasImage;
+    private boolean favorite, shared, downloaded, hasImage;
 
     private final Map<Long, ResourceLocation> cache = new HashMap<Long, ResourceLocation>();
 
@@ -53,18 +54,24 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
             drawGradientRect(0, 0, 241, 70, 0x00000000, 0xC8000000);
             GlStateManager.disableBlend(); 
             drawRect(0, 120, 241, 135, 0xB4101010);
-            if (this.sharedIconEnabled) {
+            if (this.shared) {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.enableBlend(); 
-                this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.SHARED_ICON);                         
-                drawCustomSizedTexturedRect(10 + this.textWidth(this.name, 1.2F), 6, 10, 0, 10, 10, 30, 10);           
+                this.mc.getTextureManager().bindTexture(TeleportationGUITextures.SHARED_ICON);                         
+                drawCustomSizedTexturedRect(10 + this.textWidth(this.name, 1.2F), 6, 10, 0, 10, 10, 10, 10);           
+                GlStateManager.disableBlend(); 
+            } else if (this.downloaded) {
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                GlStateManager.enableBlend(); 
+                this.mc.getTextureManager().bindTexture(TeleportationGUITextures.DOWNLOADED_ICON);                         
+                drawCustomSizedTexturedRect(10 + this.textWidth(this.name, 1.2F), 6, 10, 0, 10, 10, 10, 10);           
                 GlStateManager.disableBlend(); 
             }
-            if (this.favoriteIconEnabled) {
+            if (this.favorite) {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 GlStateManager.enableBlend(); 
-                this.mc.getTextureManager().bindTexture(TeleportationMenuGUIScreen.FAVORITE_ICONS);                         
-                drawCustomSizedTexturedRect((this.sharedIconEnabled ? 20 : 10) + this.textWidth(this.name, 1.2F), 6, 10, 0, 10, 10, 30, 10);       	
+                this.mc.getTextureManager().bindTexture(TeleportationGUITextures.FAVORITE_ICON);                         
+                drawCustomSizedTexturedRect((this.shared || this.downloaded ? 20 : 10) + this.textWidth(this.name, 1.2F), 6, 0, 0, 10, 10, 10, 10);       	
                 GlStateManager.disableBlend(); 
             }
             GlStateManager.pushMatrix();           
@@ -95,8 +102,9 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
         ResourceLocation imageLocation = this.getPreviewImage(worldPoint.getId(), forceLoad);
         if (imageLocation != null)
             this.setTexture(imageLocation, 241, 135);
-        this.favoriteIconEnabled = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerData().getFavoriteCampId();
-        this.sharedIconEnabled = TeleportationManagerClient.instance().getPlayerData().haveInvitedPlayers(worldPoint.getId());
+        this.favorite = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerData().getFavoriteCampId();
+        this.shared = TeleportationManagerClient.instance().getSharedCampsManager().invitedPlayersExist(worldPoint.getId());
+        this.downloaded = !worldPoint.isOwner(OxygenHelperClient.getPlayerUUID());
         this.name = worldPoint.getName();
         this.owner = I18n.format("teleportation.gui.menu.info.owner") + " " + worldPoint.ownerName;
         this.creationDate = worldPoint.getCreationDate();

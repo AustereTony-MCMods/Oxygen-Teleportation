@@ -5,30 +5,29 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.client.gui.menu.CampsGUISection;
-import austeretony.teleportation.common.config.TeleportationConfig;
 import net.minecraft.client.resources.I18n;
 
-public class InviteContextAction extends AbstractContextAction {
+public class InvitationsContextAction extends AbstractContextAction {
 
     private CampsGUISection section;
 
-    public InviteContextAction(CampsGUISection section) {
+    public InvitationsContextAction(CampsGUISection section) {
         this.section = section;
     }
 
     @Override
     protected String getName(GUIBaseElement currElement) {
-        return I18n.format("teleportation.gui.menu.invite");
+        return I18n.format("teleportation.gui.menu.invitations");
     }
 
     @Override
-    public boolean isValid(GUIBaseElement currElement) {
+    protected boolean isValid(GUIBaseElement currElement) {
         return this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID())
-                && TeleportationManagerClient.instance().getSharedCampsManager().getInvitedPlayersAmountForCamp(this.section.getCurrentPoint().getId()) < TeleportationConfig.MAX_INVITED_PLAYERS_PER_CAMP.getIntValue();
+                && TeleportationManagerClient.instance().getSharedCampsManager().invitedPlayersExist(this.section.getCurrentPoint().getId());
     }
 
     @Override
-    public void execute(GUIBaseElement currElement) {
-        this.section.openInviteCallback();
+    protected void execute(GUIBaseElement currElement) {
+        this.section.openInvitationsCallback();
     }
 }

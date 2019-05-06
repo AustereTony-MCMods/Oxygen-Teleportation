@@ -56,10 +56,11 @@ public class CampInvitationRequest extends AbstractNotification {
     @Override
     public void accepted(EntityPlayer player) {
         UUID targetUUID = CommonReference.uuid(player);
-        TeleportationManagerServer.instance().getPlayerProfile(this.ownerUUID).inviteToCamp(this.pointId, targetUUID);
-        TeleportationManagerServer.instance().getPlayerProfile(targetUUID).addOtherCamp(this.pointId, this.ownerUUID);
-        TeleportationManagerServer.instance().getCampsLoader().savePlayerDataDelegated(this.ownerUUID);
-        TeleportationManagerServer.instance().getCampsLoader().savePlayerDataDelegated(targetUUID);
+        TeleportationManagerServer.instance().getSharedCampsManager().invite(this.ownerUUID, this.pointId, targetUUID);
+        OxygenHelperServer.saveWorldDataDelegated(TeleportationManagerServer.instance().getSharedCampsManager());
+
+        OxygenHelperServer.addObservedPlayer(this.ownerUUID, targetUUID, true);
+
         OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.INVITATION_REQUEST_ACCEPTED.ordinal(), this.ownerUsername, this.campName);
         if (OxygenHelperServer.isOnline(this.ownerUUID))
             OxygenHelperServer.sendMessage(CommonReference.playerByUUID(this.ownerUUID), TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.INVITATION_REQUEST_ACCEPTED_OWNER.ordinal(), this.campName, CommonReference.username(player));

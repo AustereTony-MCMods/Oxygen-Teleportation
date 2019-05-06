@@ -8,10 +8,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import austeretony.oxygen.common.api.IPersistentData;
 import austeretony.oxygen.common.util.StreamUtils;
 import austeretony.teleportation.common.world.WorldPoint;
 
-public class TeleportationWorldData {
+public class TeleportationWorldData implements IPersistentData {
 
     private final Map<Long, WorldPoint> locations = new ConcurrentHashMap<Long, WorldPoint>();
 
@@ -47,19 +48,36 @@ public class TeleportationWorldData {
         this.locations.remove(pointId);
     }
 
+    @Override
+    public String getName() {
+        return "teleportation world data";
+    }
+
+    @Override
+    public String getModId() {
+        return TeleportationMain.MODID;
+    }
+
+    @Override
+    public String getPath() {
+        return "teleportation/locations.dat";
+    }
+
+    @Override
     public void write(BufferedOutputStream bos) throws IOException {
         StreamUtils.write((short) this.getLocationsAmount(), bos);
         for (WorldPoint worldPoint : this.getLocations())
             worldPoint.write(bos);
     }
 
+    @Override
     public void read(BufferedInputStream bis) throws IOException {
         int locations = StreamUtils.readShort(bis);
         for (int i = 0; i < locations; i++)
             this.addLocation(WorldPoint.read(bis));    
     }
 
-    public void resetData() {
+    public void reset() {
         this.locations.clear();
     }
 }

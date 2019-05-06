@@ -15,16 +15,20 @@ public class CPSyncValidWorldPointsIds extends ProxyPacket {
 
     private long[] camps, locations;
 
+    private long invitationsId;
+
     public CPSyncValidWorldPointsIds() {}
 
-    public CPSyncValidWorldPointsIds(long[] camps, long[] locations) {
+    public CPSyncValidWorldPointsIds(long[] camps, long[] locations, long invitationsId) {
         this.camps = camps;
         this.locations = locations;
+        this.invitationsId = invitationsId;
     }
 
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeLong(TeleportationManagerServer.instance().getPlayerProfile(CommonReference.uuid(getEntityPlayerMP(netHandler))).getFavoriteCampId());
+        buffer.writeLong(TeleportationManagerServer.instance().getPlayerData(CommonReference.uuid(getEntityPlayerMP(netHandler))).getFavoriteCampId());
+        buffer.writeLong(this.invitationsId);
         buffer.writeShort(this.camps.length);
         for (long id : this.camps) 
             buffer.writeLong(id);
@@ -36,6 +40,7 @@ public class CPSyncValidWorldPointsIds extends ProxyPacket {
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
         TeleportationManagerClient.instance().getPlayerData().setFavoriteCampId(buffer.readLong());
+        boolean downloadInvitations = TeleportationManagerClient.instance().getSharedCampsManager().getInvitationsContainer().getId() !=  buffer.readLong();
         int 
         indexNeedSync = 0,
         indexValidPoint = 0,
@@ -55,6 +60,7 @@ public class CPSyncValidWorldPointsIds extends ProxyPacket {
             }
             nscSize = indexNeedSync;
             TeleportationManagerClient.instance().getPlayerData().getCamps().clear();
+            TeleportationManagerClient.instance().getPlayerData().resetOwnedAmount();
             for (WorldPoint worldPoint : existingValidCamps) {
                 if (worldPoint == null) break;
                 TeleportationManagerClient.instance().getPlayerData().addCamp(worldPoint);
@@ -68,19 +74,19 @@ public class CPSyncValidWorldPointsIds extends ProxyPacket {
                 this.locations[i] = buffer.readLong(); 
             WorldPoint[] existingValidLocations = new WorldPoint[needSyncLocations.length];
             for (long id : this.locations) {
-                if (!TeleportationManagerClient.instance().getWorldProfile().locationExist(id))
+                if (!TeleportationManagerClient.instance().getWorldData().locationExist(id))
                     needSyncLocations[indexNeedSync++] = id;
                 else               
-                    existingValidLocations[indexValidPoint++] = TeleportationManagerClient.instance().getWorldProfile().getLocation(id);
+                    existingValidLocations[indexValidPoint++] = TeleportationManagerClient.instance().getWorldData().getLocation(id);
             }
-            TeleportationManagerClient.instance().getWorldProfile().getLocations().clear();
+            TeleportationManagerClient.instance().getWorldData().getLocations().clear();
             for (WorldPoint worldPoint : existingValidLocations) {
                 if (worldPoint == null) break;
-                TeleportationManagerClient.instance().getWorldProfile().addLocation(worldPoint);
+                TeleportationManagerClient.instance().getWorldData().addLocation(worldPoint);
             }
         }
         if (nscSize > 0 || indexNeedSync > 0)
             OxygenGUIHelper.needSync(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
-        TeleportationMain.network().sendToServer(new SPSendAbsentPointsIds(nscSize, needSyncCamps, indexNeedSync, needSyncLocations));
+        TeleportationMain.network().sendToServer(new SPSendAbsentPointsIds(nscSize, needSyncCamps, indexNeedSync, needSyncLocations, downloadInvitations));
     }
 }

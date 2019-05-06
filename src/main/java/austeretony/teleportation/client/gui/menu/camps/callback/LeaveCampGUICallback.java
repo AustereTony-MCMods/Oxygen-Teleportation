@@ -43,7 +43,7 @@ public class LeaveCampGUICallback extends AbstractGUICallback {
 
     @Override
     protected void onOpen() {
-        this.requestLabel.setDisplayText(I18n.format("teleportation.menu.leaveCallback.gui.request", this.section.getCurrentPoint().getName()), true, GUISettings.instance().getTextScale());
+        this.requestLabel.setDisplayText(I18n.format("teleportation.gui.menu.leaveCallback.request", this.section.getCurrentPoint().getName()), true, GUISettings.instance().getTextScale());
     }
 
     @Override

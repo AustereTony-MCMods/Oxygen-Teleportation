@@ -56,11 +56,7 @@ public class InvitationsGUICallback extends AbstractGUICallback {
         this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).enableDynamicBackground().setDisplayText(I18n.format("teleportation.gui.closeButton"), true, GUISettings.instance().getButtonTextScale()));
     }
 
-    private OxygenPlayerData.EnumStatus getPlayerStatus(SharedPlayerData playerData) {
-        return OxygenPlayerData.EnumStatus.values()[playerData.getData(OxygenMain.STATUS_DATA_ID).get(0)];
-    }
-
-    private void updatePlayers() {
+    public void updatePlayers() {
         this.invitedPlayersPanel.reset();
         InvitedPlayerGUIButton button;
         for (UUID playerUUID : TeleportationManagerClient.instance().getSharedCampsManager().getInvitedPlayers(this.section.getCurrentPoint().getId())) {

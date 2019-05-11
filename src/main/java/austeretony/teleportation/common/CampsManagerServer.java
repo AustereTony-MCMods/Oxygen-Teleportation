@@ -183,7 +183,8 @@ public class CampsManagerServer {
 
     public void invitePlayer(EntityPlayerMP playerMP, long pointId, UUID playerUUID) {
         UUID ownerUUID = CommonReference.uuid(playerMP);
-        if (this.campExist(ownerUUID, pointId)) { 
+        if (TeleportationConfig.ENABLE_CAMP_INVITATIONS.getBooleanValue() 
+                && this.campExist(ownerUUID, pointId)) { 
             WorldPoint worldPoint = this.getCamp(ownerUUID, pointId);
             if (this.isOwner(ownerUUID, worldPoint) 
                     && OxygenHelperServer.isOnline(playerUUID)
@@ -206,7 +207,8 @@ public class CampsManagerServer {
 
     public void uninvitePlayer(EntityPlayerMP playerMP, long pointId, UUID playerUUID) {
         UUID ownerUUID = CommonReference.uuid(playerMP);
-        if (this.campExist(ownerUUID, pointId)) {
+        if (TeleportationConfig.ENABLE_CAMP_INVITATIONS.getBooleanValue() 
+                && this.campExist(ownerUUID, pointId)) {
             WorldPoint worldPoint = this.getCamp(ownerUUID, pointId);
             if (this.isOwner(ownerUUID, worldPoint)
                     && this.manager.getSharedCampsManager().haveInvitation(playerUUID, pointId)) {

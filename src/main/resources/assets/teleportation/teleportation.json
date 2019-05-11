@@ -11,6 +11,7 @@
     "teleport_delay_seconds": 0,
     "cooldown_seconds": 0,
     "enable_favorite_camp": true,
+    "enable_camp_invitations": true,
     "invitation_request_expire_time_seconds": 30,
     "max_invited_players_per_camp": 5   
   },

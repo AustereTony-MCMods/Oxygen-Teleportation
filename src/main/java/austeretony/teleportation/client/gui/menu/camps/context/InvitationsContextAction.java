@@ -5,6 +5,7 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen.common.api.OxygenHelperClient;
 import austeretony.teleportation.client.TeleportationManagerClient;
 import austeretony.teleportation.client.gui.menu.CampsGUISection;
+import austeretony.teleportation.common.config.TeleportationConfig;
 import net.minecraft.client.resources.I18n;
 
 public class InvitationsContextAction extends AbstractContextAction {
@@ -22,7 +23,8 @@ public class InvitationsContextAction extends AbstractContextAction {
 
     @Override
     protected boolean isValid(GUIBaseElement currElement) {
-        return this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID())
+        return TeleportationConfig.ENABLE_CAMP_INVITATIONS.getBooleanValue() 
+                && this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID())
                 && TeleportationManagerClient.instance().getSharedCampsManager().invitedPlayersExist(this.section.getCurrentPoint().getId());
     }
 

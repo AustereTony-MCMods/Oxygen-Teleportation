@@ -45,13 +45,15 @@ public class EditCampGUICallback extends AbstractGUICallback {
         this.addElement(new GUITextLabel(2, 16).setDisplayText(I18n.format("oxygen.gui.username"), false, GUISettings.instance().getSubTextScale()));    
         this.addElement(new GUITextLabel(2, 36).setDisplayText(I18n.format("oxygen.gui.note"), false, GUISettings.instance().getSubTextScale()));    
 
-        this.addElement(this.nameField = new GUITextField(2, 25, 162, WorldPoint.MAX_POINT_NAME_LENGTH).setScale(0.7F).enableDynamicBackground().cancelDraggedElementLogic());
-        this.addElement(this.descriptionField = new GUITextField(2, 45, 162, WorldPoint.MAX_POINT_DESCRIPTION_LENGTH).setScale(0.7F).enableDynamicBackground().cancelDraggedElementLogic());
+        this.addElement(this.nameField = new GUITextField(2, 25, 187, WorldPoint.MAX_POINT_NAME_LENGTH).setScale(0.7F).enableDynamicBackground().cancelDraggedElementLogic());
+        this.addElement(this.descriptionField = new GUITextField(2, 45, 187, WorldPoint.MAX_POINT_DESCRIPTION_LENGTH).setScale(0.7F).enableDynamicBackground().cancelDraggedElementLogic());
 
-        this.addElement(this.updateImageButton = new GUICheckBoxButton(2, 58, 10).enableDynamicBackground());    
-        this.addElement(this.updatePositionButton = new GUICheckBoxButton(2, 70, 10).enableDynamicBackground());   
-        this.addElement(this.updateImageTextLabel = new GUITextLabel(15, 59).setDisplayText(I18n.format("teleportation.gui.menu.updateImage"), false, GUISettings.instance().getSubTextScale())); 
-        this.addElement(this.updatePositionTextLabel = new GUITextLabel(15, 71).setDisplayText(I18n.format("teleportation.gui.menu.updatePosition"), false, GUISettings.instance().getSubTextScale()));    
+        this.addElement(this.updateImageButton = new GUICheckBoxButton(2, 58, 6).setSound(OxygenSoundEffects.BUTTON_CLICK)
+                .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor()));
+        this.addElement(this.updatePositionButton = new GUICheckBoxButton(2, 68, 6).setSound(OxygenSoundEffects.BUTTON_CLICK)
+                .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor()));
+        this.addElement(this.updateImageTextLabel = new GUITextLabel(10, 57).setDisplayText(I18n.format("teleportation.gui.menu.updateImage"), false, GUISettings.instance().getSubTextScale())); 
+        this.addElement(this.updatePositionTextLabel = new GUITextLabel(10, 67).setDisplayText(I18n.format("teleportation.gui.menu.updatePosition"), false, GUISettings.instance().getSubTextScale()));    
 
         this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
         this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK).enableDynamicBackground().setDisplayText(I18n.format("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));

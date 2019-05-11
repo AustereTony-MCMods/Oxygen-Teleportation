@@ -35,8 +35,8 @@ teleportation.gui.menu.locationCreationCallback=Создание Локации
 teleportation.gui.menu.removeLocationCallback=Удаление Локации
 teleportation.gui.menu.editLocationCallback=Редактирование Локации
 
-teleportation.gui.menu.updateImage=Обновить изображение
-teleportation.gui.menu.updatePosition=Обновить позицию
+teleportation.gui.menu.updateImage=Обновить Изображение
+teleportation.gui.menu.updatePosition=Обновить Позицию
 
 teleportation.gui.menu.createButton=Создать
 teleportation.gui.menu.moveButton=Посетить

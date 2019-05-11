@@ -20,6 +20,7 @@ public class TeleportationConfig extends AbstractConfigHolder {
     CAMPS_TELEPORT_DELAY = new ConfigValue(ConfigValue.EnumValueType.INT, "camps", "teleport_delay_seconds"),
     CAMPS_TELEPORT_COOLDOWN = new ConfigValue(ConfigValue.EnumValueType.INT, "camps", "cooldown_seconds"),
     ENABLE_FAVORITE_CAMP = new ConfigValue(ConfigValue.EnumValueType.BOOLEAN, "camps", "enable_favorite_camp"),
+    ENABLE_CAMP_INVITATIONS = new ConfigValue(ConfigValue.EnumValueType.BOOLEAN, "camps", "enable_camp_invitations"),
     MAX_INVITED_PLAYERS_PER_CAMP = new ConfigValue(ConfigValue.EnumValueType.INT, "camps", "max_invited_players_per_camp"),
     INVITATION_REQUEST_EXPIRE_TIME = new ConfigValue(ConfigValue.EnumValueType.INT, "camps", "invitation_request_expire_time_seconds"),
 
@@ -67,6 +68,7 @@ public class TeleportationConfig extends AbstractConfigHolder {
         values.add(CAMPS_TELEPORT_DELAY);
         values.add(CAMPS_TELEPORT_COOLDOWN);
         values.add(ENABLE_FAVORITE_CAMP);
+        values.add(ENABLE_CAMP_INVITATIONS);
         values.add(MAX_INVITED_PLAYERS_PER_CAMP);
         values.add(INVITATION_REQUEST_EXPIRE_TIME);
 

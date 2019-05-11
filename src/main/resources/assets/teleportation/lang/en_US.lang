@@ -38,8 +38,8 @@ teleportation.gui.menu.locationCreationCallback=Location Creation
 teleportation.gui.menu.removeLocationCallback=Remove Location
 teleportation.gui.menu.editLocationCallback=Edit Location
 
-teleportation.gui.menu.updateImage=Update image
-teleportation.gui.menu.updatePosition=Update position
+teleportation.gui.menu.updateImage=Update Image
+teleportation.gui.menu.updatePosition=Update Position
 
 teleportation.gui.menu.createButton=Create
 teleportation.gui.menu.moveButton=Move

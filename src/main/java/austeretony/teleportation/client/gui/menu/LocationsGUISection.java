@@ -119,7 +119,7 @@ public class LocationsGUISection extends AbstractGUISection {
 
         this.downloadCallback = new LocationsDownloadGUICallback(this.screen, this, 140, 40).enableDefaultBackground();
         this.createCallback = new LocationCreationGUICallback(this.screen, this, 140, 71).enableDefaultBackground();
-        this.pointEditingCallback = new EditLocationGUICallback(this.screen, this, 140, 100).enableDefaultBackground();
+        this.pointEditingCallback = new EditLocationGUICallback(this.screen, this, 140, 92).enableDefaultBackground();
         this.removePointCallback = new LocationRemoveGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
 
         this.addElement(this.previewImageLabel = new PreviewGUIImageLabel(86, 14));

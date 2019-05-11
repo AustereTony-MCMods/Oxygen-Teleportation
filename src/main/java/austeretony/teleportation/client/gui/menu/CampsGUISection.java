@@ -138,7 +138,7 @@ public class CampsGUISection extends AbstractGUISection {
         this.inviteCallback = new InviteToCampGUICallback(this.screen, this, 140, 68).enableDefaultBackground();
         this.invitationsCallback = new InvitationsGUICallback(this.screen, this, 140, 81).enableDefaultBackground();
 
-        this.pointEditingCallback = new EditCampGUICallback(this.screen, this, 140, 100).enableDefaultBackground();
+        this.pointEditingCallback = new EditCampGUICallback(this.screen, this, 140, 92).enableDefaultBackground();
         this.removePointCallback = new CampRemoveGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
         this.leavePointCallback = new LeaveCampGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
 

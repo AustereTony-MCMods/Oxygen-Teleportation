@@ -22,8 +22,9 @@ public class InviteContextAction extends AbstractContextAction {
     }
 
     @Override
-    public boolean isValid(GUIBaseElement currElement) {
-        return this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID())
+    public boolean isValid(GUIBaseElement currElement) {      
+        return TeleportationConfig.ENABLE_CAMP_INVITATIONS.getBooleanValue() 
+                && this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID())
                 && TeleportationManagerClient.instance().getSharedCampsManager().getInvitedPlayersAmountForCamp(this.section.getCurrentPoint().getId()) < TeleportationConfig.MAX_INVITED_PLAYERS_PER_CAMP.getIntValue();
     }
 

@@ -1,5 +1,10 @@
+0.4.2a
++Removed 'downloaded' icon for locations, created by other players.
++Fixed impossibility to disable favorite camp keybind from server.
++All GUIs will be closed on player teleportation context action usage.
+
 0.4.1a
-+Added config option to disable cam invitations.
++Added config option to disable camp invitations.
 +GUI fixes.
 
 0.4.0a

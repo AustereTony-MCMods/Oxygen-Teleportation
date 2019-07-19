@@ -1,10 +1,10 @@
 {
   "homepage": "https://minecraft.curseforge.com/projects/teleportation",
   "1.12.2": {
-    "0.4.2": "Minor improvements. Requires Oxygen Core 0.6.0a."
+    "0.4.3": "Compatibility with Oxygen Core 0.7.0a."
   },
   "promos": {
-    "1.12.2-latest": "0.4.2",
-    "1.12.2-recommended": "0.4.2"
+    "1.12.2-latest": "0.4.3",
+    "1.12.2-recommended": "0.4.3"
   }
 }

@@ -36,7 +36,7 @@ public class SPStartImageUpload extends ProxyPacket {
         if (!ImageTransferingServerBuffer.exist(this.pointId))
             ImageTransferingServerBuffer.create(
                     this.operation, 
-                    CommonReference.uuid(getEntityPlayerMP(netHandler)), 
+                    CommonReference.getPersistentUUID(getEntityPlayerMP(netHandler)), 
                     this.pointId, 
                     buffer.readShort());
     }

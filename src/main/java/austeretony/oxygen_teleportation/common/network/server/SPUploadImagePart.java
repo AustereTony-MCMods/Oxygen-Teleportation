@@ -51,7 +51,7 @@ public class SPUploadImagePart extends ProxyPacket {
         else {
             ImageTransferingServerBuffer.create(
                     operation, 
-                    CommonReference.uuid(getEntityPlayerMP(netHandler)), 
+                    CommonReference.getPersistentUUID(getEntityPlayerMP(netHandler)), 
                     this.pointId, 
                     this.partsAmount);
             ImageTransferingServerBuffer.get(this.pointId).addPart(this.index, recieved);

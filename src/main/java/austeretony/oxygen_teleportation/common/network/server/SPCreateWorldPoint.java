@@ -1,7 +1,7 @@
 package austeretony.oxygen_teleportation.common.network.server;
 
 import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.oxygen.common.util.PacketBufferUtils;
+import austeretony.oxygen.util.PacketBufferUtils;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
 import austeretony.oxygen_teleportation.common.world.WorldPoint;
 import net.minecraft.network.INetHandler;

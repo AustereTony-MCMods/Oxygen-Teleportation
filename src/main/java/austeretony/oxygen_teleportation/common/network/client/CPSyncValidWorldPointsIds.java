@@ -27,7 +27,7 @@ public class CPSyncValidWorldPointsIds extends ProxyPacket {
 
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeLong(TeleportationManagerServer.instance().getPlayerData(CommonReference.uuid(getEntityPlayerMP(netHandler))).getFavoriteCampId());
+        buffer.writeLong(TeleportationManagerServer.instance().getPlayerData(CommonReference.getPersistentUUID(getEntityPlayerMP(netHandler))).getFavoriteCampId());
         buffer.writeLong(this.invitationsId);
         buffer.writeShort(this.camps.length);
         for (long id : this.camps) 

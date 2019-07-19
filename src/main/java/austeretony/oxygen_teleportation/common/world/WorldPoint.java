@@ -8,9 +8,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-import austeretony.oxygen.common.util.OxygenUtils;
-import austeretony.oxygen.common.util.PacketBufferUtils;
-import austeretony.oxygen.common.util.StreamUtils;
+import austeretony.oxygen.util.OxygenUtils;
+import austeretony.oxygen.util.PacketBufferUtils;
+import austeretony.oxygen.util.StreamUtils;
 import net.minecraft.network.PacketBuffer;
 
 public class WorldPoint {

@@ -4,7 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 
-import austeretony.oxygen.common.util.StreamUtils;
+import austeretony.oxygen.util.StreamUtils;
 import net.minecraft.network.PacketBuffer;
 
 public class CooldownInfo {
@@ -58,7 +58,7 @@ public class CooldownInfo {
         this.location = buffer.readLong();
         this.jump = buffer.readLong();
     }
-    
+
     public void reset() {
         this.camp = 0L;
         this.location = 0L;

@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.IPersistentData;
-import austeretony.oxygen.common.util.StreamUtils;
+import austeretony.oxygen.util.StreamUtils;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.world.WorldPoint;
 import net.minecraft.client.resources.I18n;
@@ -29,13 +29,12 @@ public class TeleportationPlayerData implements IPersistentData {
 
     private final CooldownInfo cooldownInfo = new CooldownInfo();
 
-    public TeleportationPlayerData() {
-        this.jumpProfile = EnumJumpProfile.values()[TeleportationConfig.DEFAULT_JUMP_PROFILE.getIntValue()];
-    }
+    public final String dataPath;
 
     public TeleportationPlayerData(UUID playerUUID) {
-        this();
         this.playerUUID = playerUUID;
+        this.jumpProfile = EnumJumpProfile.values()[TeleportationConfig.DEFAULT_JUMP_PROFILE.getIntValue()];
+        this.dataPath = "players/" + this.playerUUID + "/teleportation/profile.dat";
     }
 
     public UUID getPlayerUUID() {
@@ -118,7 +117,7 @@ public class TeleportationPlayerData implements IPersistentData {
 
     @Override
     public String getName() {
-        return "teleportation player data";
+        return "player_data";
     }
 
     @Override
@@ -128,7 +127,7 @@ public class TeleportationPlayerData implements IPersistentData {
 
     @Override
     public String getPath() {
-        return "teleportation/profile.dat";
+        return this.dataPath;
     }
 
     @Override

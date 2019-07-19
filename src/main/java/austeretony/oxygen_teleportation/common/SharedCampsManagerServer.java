@@ -9,8 +9,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.IPersistentData;
-import austeretony.oxygen.common.util.OxygenUtils;
-import austeretony.oxygen.common.util.StreamUtils;
+import austeretony.oxygen.util.OxygenUtils;
+import austeretony.oxygen.util.StreamUtils;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.world.WorldPoint;
 import io.netty.util.internal.ConcurrentSet;
@@ -188,7 +188,7 @@ public class SharedCampsManagerServer implements IPersistentData {
 
     @Override
     public String getName() {
-        return "shared camps manager";
+        return "shared_camps_data";
     }
 
     @Override
@@ -198,7 +198,7 @@ public class SharedCampsManagerServer implements IPersistentData {
 
     @Override
     public String getPath() {
-        return "teleportation/shared_camps.dat";
+        return "world/teleportation/shared_camps.dat";
     }
 
     @Override

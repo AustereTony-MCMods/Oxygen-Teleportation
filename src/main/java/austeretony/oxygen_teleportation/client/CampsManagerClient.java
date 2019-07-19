@@ -41,7 +41,7 @@ public class CampsManagerClient {
             this.manager.setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.CAMP_TELEPORTATION_DELAY.toString(), TeleportationConfig.CAMPS_TELEPORT_DELAY.getIntValue()));
         }
     }
-    
+
     public void moveToFavoriteCampSynced(long id) {        
         if (id != 0L) {
             TeleportationMain.network().sendToServer(new SPMoveToFavoriteCamp(id));
@@ -67,7 +67,7 @@ public class CampsManagerClient {
             worldPoint.createDate();
             this.manager.getPlayerData().addCamp(worldPoint);
             TeleportationMain.network().sendToServer(new SPCreateWorldPoint(WorldPoint.EnumPointType.CAMP, worldPoint));
-            OxygenHelperClient.savePlayerDataDelegated(this.manager.getPlayerData());
+            OxygenHelperClient.savePersistentDataDelegated(this.manager.getPlayerData());
             this.manager.getImagesManager().cacheLatestImage(worldPoint.getId());
             this.manager.getImagesLoader().saveLatestCampPreviewImageDelegated(worldPoint.getId());
             this.manager.getImagesManager().uploadCampPreviewToServerDelegated(worldPoint.getId());
@@ -79,14 +79,14 @@ public class CampsManagerClient {
         TeleportationMain.network().sendToServer(new SPRemoveWorldPoint(WorldPoint.EnumPointType.CAMP, pointId));
         if (pointId == this.manager.getPlayerData().getFavoriteCampId())
             this.manager.getPlayerData().setFavoriteCampId(0L);
-        OxygenHelperClient.savePlayerDataDelegated(this.manager.getPlayerData());
+        OxygenHelperClient.savePersistentDataDelegated(this.manager.getPlayerData());
         this.manager.getImagesManager().getPreviewImages().remove(pointId);
     }
 
     public void setFavoriteCampSynced(long pointId) {        
         this.manager.getPlayerData().setFavoriteCampId(pointId);
         TeleportationMain.network().sendToServer(new SPSetFavoriteCamp(pointId));
-        OxygenHelperClient.savePlayerDataDelegated(this.manager.getPlayerData());
+        OxygenHelperClient.savePersistentDataDelegated(this.manager.getPlayerData());
     }
 
     public void lockCampSynced(WorldPoint worldPoint, boolean flag) {    
@@ -97,7 +97,7 @@ public class CampsManagerClient {
         if (this.manager.getPlayerData().getFavoriteCampId() == oldPointId)
             this.manager.getPlayerData().setFavoriteCampId(worldPoint.getId());
         this.manager.getPlayerData().removeCamp(oldPointId);
-        OxygenHelperClient.savePlayerDataDelegated(this.manager.getPlayerData());
+        OxygenHelperClient.savePersistentDataDelegated(this.manager.getPlayerData());
         TeleportationMain.network().sendToServer(new SPLockPoint(WorldPoint.EnumPointType.CAMP, oldPointId, flag));
         this.manager.getImagesLoader().renameCampPreviewImageDelegated(oldPointId, worldPoint.getId());
         this.manager.getImagesManager().replaceCachedImage(oldPointId, worldPoint.getId());
@@ -142,7 +142,7 @@ public class CampsManagerClient {
             if (this.manager.getPlayerData().getFavoriteCampId() == oldPointId)
                 this.manager.getPlayerData().setFavoriteCampId(newPointId);
             this.manager.getPlayerData().removeCamp(oldPointId);
-            OxygenHelperClient.savePlayerDataDelegated(this.manager.getPlayerData());
+            OxygenHelperClient.savePersistentDataDelegated(this.manager.getPlayerData());
             TeleportationMain.network().sendToServer(new SPEditWorldPoint(WorldPoint.EnumPointType.CAMP, oldPointId, newName, newDescription, 
                     updateName, updateDescription, updateImage, updatePosition));
             if (!updateImage) {
@@ -163,7 +163,7 @@ public class CampsManagerClient {
 
     public void uninvitePlayerSynced(long pointId, UUID playerUUID) {
         TeleportationMain.network().sendToServer(new SPManageInvitation(SPManageInvitation.EnumOperation.UNINVITE, pointId, playerUUID));
-        OxygenHelperClient.savePlayerDataDelegated(this.manager.getPlayerData());
+        OxygenHelperClient.savePersistentDataDelegated(this.manager.getPlayerData());
     }
 
     public void leaveCampPointSynced(long pointId) {
@@ -171,7 +171,7 @@ public class CampsManagerClient {
         TeleportationMain.network().sendToServer(new SPLeaveCampPoint(pointId));
         if (pointId == this.manager.getPlayerData().getFavoriteCampId())
             this.manager.getPlayerData().setFavoriteCampId(0L);
-        OxygenHelperClient.savePlayerDataDelegated(this.manager.getPlayerData());
+        OxygenHelperClient.savePersistentDataDelegated(this.manager.getPlayerData());
         this.manager.getImagesManager().getPreviewImages().remove(pointId);
     }
 }

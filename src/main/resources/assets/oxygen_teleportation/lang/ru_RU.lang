@@ -1,7 +1,5 @@
-key.oxygen.accept=Принять
-key.oxygen.reject=Отклонить
-key.teleportation.openMenu=Открыть Меню
-key.teleportation.moveToCamp=Избранный Лагерь
+key.teleportation.openMenu=Открыть Меню Перемещение
+key.teleportation.moveToCamp=Переместиться в Избранный Лагерь
 
 teleportation.gui.closeButton=Закрыть
 

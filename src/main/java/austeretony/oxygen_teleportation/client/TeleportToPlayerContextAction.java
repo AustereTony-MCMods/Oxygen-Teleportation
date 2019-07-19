@@ -10,13 +10,12 @@ import austeretony.oxygen.client.gui.PlayerGUIButton;
 import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivileges;
 import austeretony.oxygen_teleportation.common.main.TeleportationPlayerData;
-import net.minecraft.client.resources.I18n;
 
 public class TeleportToPlayerContextAction extends AbstractContextAction {
 
     @Override
     protected String getName(GUIBaseElement currElement) {
-        return I18n.format("contextaction.moveToPlayer");
+        return ClientReference.localize("contextaction.moveToPlayer");
     }   
 
     @Override
@@ -30,7 +29,7 @@ public class TeleportToPlayerContextAction extends AbstractContextAction {
     @Override
     protected void execute(GUIBaseElement currElement) {
         UUID targetUUID = ((PlayerGUIButton) currElement).playerUUID;
-        TeleportationManagerClient.instance().getPlayersManager().moveToPlayerSynced(targetUUID);
+        TeleportationManagerClient.instance().getPlayersManager().moveToPlayerSynced(OxygenHelperClient.getPlayerIndex(targetUUID));
         if (ClientReference.getMinecraft().currentScreen != null)
             ClientReference.getMinecraft().displayGuiScreen(null);
     }

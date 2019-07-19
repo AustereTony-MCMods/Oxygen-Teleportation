@@ -52,7 +52,7 @@ public class LocationsManagerClient {
             this.manager.getWorldData().addLocation(worldPoint);
             TeleportationMain.network().sendToServer(new SPCreateWorldPoint(WorldPoint.EnumPointType.LOCATION, worldPoint));
             this.manager.getImagesManager().cacheLatestImage(worldPoint.getId());
-            OxygenHelperClient.saveWorldDataDelegated(this.manager.getWorldData());
+            OxygenHelperClient.savePersistentDataDelegated(this.manager.getWorldData());
             this.manager.getImagesLoader().saveLatestLocationPreviewImageDelegated(worldPoint.getId());
             this.manager.getImagesManager().uploadLocationPreviewToServerDelegated(worldPoint.getId());
         }
@@ -61,7 +61,7 @@ public class LocationsManagerClient {
     public void removeLocationPointSynced(long pointId) {
         this.manager.getWorldData().removeLocation(pointId);
         TeleportationMain.network().sendToServer(new SPRemoveWorldPoint(WorldPoint.EnumPointType.LOCATION, pointId));
-        OxygenHelperClient.saveWorldDataDelegated(this.manager.getWorldData());
+        OxygenHelperClient.savePersistentDataDelegated(this.manager.getWorldData());
         this.manager.getImagesManager().removeCachedImage(pointId);
     }
 
@@ -71,7 +71,7 @@ public class LocationsManagerClient {
         worldPoint.setId(worldPoint.getId() + 1L);
         this.manager.getWorldData().addLocation(worldPoint);
         this.manager.getWorldData().removeLocation(oldPointId);
-        OxygenHelperClient.saveWorldDataDelegated(this.manager.getWorldData());
+        OxygenHelperClient.savePersistentDataDelegated(this.manager.getWorldData());
         TeleportationMain.network().sendToServer(new SPLockPoint(WorldPoint.EnumPointType.LOCATION, oldPointId, flag));
         this.manager.getImagesLoader().renameLocationPreviewImageDelegated(oldPointId, worldPoint.getId());
         this.manager.getImagesManager().replaceCachedImage(oldPointId, worldPoint.getId());
@@ -109,7 +109,7 @@ public class LocationsManagerClient {
             worldPoint.setId(newPointId);
             this.manager.getWorldData().addLocation(worldPoint);
             this.manager.getWorldData().removeLocation(oldPointId);
-            OxygenHelperClient.saveWorldDataDelegated(this.manager.getWorldData());
+            OxygenHelperClient.savePersistentDataDelegated(this.manager.getWorldData());
             TeleportationMain.network().sendToServer(new SPEditWorldPoint(WorldPoint.EnumPointType.LOCATION, oldPointId, newName, newDescription, 
                     updateName, updateDescription, updateImage, updatePosition));
             if (!updateImage) {

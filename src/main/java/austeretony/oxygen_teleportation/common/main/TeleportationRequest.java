@@ -5,7 +5,7 @@ import java.util.UUID;
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.api.notification.AbstractNotification;
 import austeretony.oxygen.common.core.api.CommonReference;
-import austeretony.oxygen.common.notification.EnumNotifications;
+import austeretony.oxygen.common.notification.EnumNotification;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,8 +26,8 @@ public class TeleportationRequest extends AbstractNotification {
     }
 
     @Override
-    public EnumNotifications getType() {
-        return EnumNotifications.REQUEST;
+    public EnumNotification getType() {
+        return EnumNotification.REQUEST;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class TeleportationRequest extends AbstractNotification {
             EntityPlayerMP senderPlayerMP = CommonReference.playerByUUID(this.senderUUID);
             OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_ACCEPTED_TARGET.ordinal());
             OxygenHelperServer.sendMessage(senderPlayerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_ACCEPTED_SENDER.ordinal());
-            TeleportationManagerServer.instance().getPlayersManager().move(senderPlayerMP, this.senderUUID, CommonReference.uuid(player));
+            TeleportationManagerServer.instance().getPlayersManager().move(senderPlayerMP, this.senderUUID, CommonReference.getPersistentUUID(player));
         } else
             OxygenHelperServer.sendMessage(player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_REQUEST_VISITOR_OFFLINE.ordinal());
         OxygenHelperServer.setRequesting(this.senderUUID, false);

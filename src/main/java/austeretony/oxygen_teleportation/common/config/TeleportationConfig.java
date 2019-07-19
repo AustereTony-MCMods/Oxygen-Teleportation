@@ -48,7 +48,7 @@ public class TeleportationConfig extends AbstractConfigHolder {
 
     @Override
     public String getExternalPath() {
-        return CommonReference.getGameFolder() + "/config/oxygen/teleportation/teleportation.json";
+        return CommonReference.getGameFolder() + "/config/oxygen/teleportation.json";
     }
 
     @Override

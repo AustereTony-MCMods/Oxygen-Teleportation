@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.IPersistentData;
-import austeretony.oxygen.common.util.StreamUtils;
+import austeretony.oxygen.util.StreamUtils;
 import austeretony.oxygen_teleportation.common.SharedCampsManagerServer.PlayersContainer;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 

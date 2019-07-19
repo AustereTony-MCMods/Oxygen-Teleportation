@@ -51,7 +51,7 @@ public class SPSendAbsentPointsIds extends ProxyPacket {
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
         EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
-        UUID playerUUID = CommonReference.uuid(playerMP);
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
         if (buffer.readBoolean() 
                 && TeleportationManagerServer.instance().getSharedCampsManager().haveInvitedPlayers(playerUUID))
             TeleportationMain.network().sendTo(new CPSyncInvitedPlayers(TeleportationManagerServer.instance().getSharedCampsManager().getInvitationsContainer(playerUUID)), playerMP);

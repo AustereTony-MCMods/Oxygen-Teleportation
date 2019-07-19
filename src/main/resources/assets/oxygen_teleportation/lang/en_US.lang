@@ -1,6 +1,4 @@
-key.oxygen.accept=Accept
-key.oxygen.reject=Reject
-key.teleportation.openMenu=Open Menu
+key.teleportation.openMenu=Open Teleportation Menu
 key.teleportation.moveToCamp=Move to Favorite Camp
 
 teleportation.gui.closeButton=Close

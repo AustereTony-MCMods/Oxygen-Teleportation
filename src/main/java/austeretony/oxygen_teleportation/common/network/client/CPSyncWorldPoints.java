@@ -31,7 +31,7 @@ public class CPSyncWorldPoints extends ProxyPacket {
     @Override
     public void write(PacketBuffer buffer, INetHandler netHandler) {
         EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
-        UUID playerUUID = CommonReference.uuid(playerMP);
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
         buffer.writeByte(this.type.ordinal());
         buffer.writeShort(this.points.length);
         switch (this.type) {
@@ -61,13 +61,13 @@ public class CPSyncWorldPoints extends ProxyPacket {
         case CAMP:
             for (i = 0; i < amount; i++)        
                 TeleportationManagerClient.instance().getPlayerData().addCamp(WorldPoint.read(buffer));
-            OxygenHelperClient.savePlayerDataDelegated(TeleportationManagerClient.instance().getPlayerData());
+            OxygenHelperClient.savePersistentDataDelegated(TeleportationManagerClient.instance().getPlayerData());
             OxygenGUIHelper.dataRecieved(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
             break;
         case LOCATION:
             for (i = 0; i < amount; i++)
                 TeleportationManagerClient.instance().getWorldData().addLocation(WorldPoint.read(buffer));
-            OxygenHelperClient.saveWorldDataDelegated(TeleportationManagerClient.instance().getWorldData());
+            OxygenHelperClient.savePersistentDataDelegated(TeleportationManagerClient.instance().getWorldData());
             OxygenGUIHelper.dataRecieved(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
             break;
         }

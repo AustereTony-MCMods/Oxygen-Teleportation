@@ -26,21 +26,25 @@ public class PlayersManagerServer {
 
     public void changeJumpProfile(EntityPlayerMP playerMP, TeleportationPlayerData.EnumJumpProfile profile) {
         if (TeleportationConfig.ENABLE_PLAYERS.getBooleanValue()) {
-            UUID playerUUID = CommonReference.uuid(playerMP);
+            UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
             TeleportationPlayerData playerData = this.manager.getPlayerData(playerUUID);
             playerData.setJumpProfile(profile);
-            OxygenHelperServer.savePlayerDataDelegated(playerUUID, playerData);
+            OxygenHelperServer.savePersistentDataDelegated(playerData);
             this.manager.updateSharedPlayerData(playerUUID);
             OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.JUMP_PROFILE_CHANGED.ordinal(), profile.toString().toLowerCase());
         }
     }
 
-    public void moveToPlayer(EntityPlayerMP visitorPlayerMP, UUID targetUUID) {
+    public void moveToPlayer(EntityPlayerMP visitorPlayerMP, int targetIndex) {
         if (TeleportationConfig.ENABLE_PLAYERS.getBooleanValue()) {
-            UUID visitorUUID = CommonReference.uuid(visitorPlayerMP);
-            if (!this.teleporting(visitorUUID) && this.readyMoveToPlayer(visitorUUID)) {
-                if (OxygenHelperServer.isOnline(targetUUID) 
-                        && !visitorUUID.equals(targetUUID)) {
+            UUID 
+            visitorUUID = CommonReference.getPersistentUUID(visitorPlayerMP),
+            targetUUID;
+            if (!this.teleporting(visitorUUID) 
+                    && this.readyMoveToPlayer(visitorUUID)
+                    && OxygenHelperServer.isOnline(targetIndex)) { 
+                targetUUID = OxygenHelperServer.getSharedPlayerData(targetIndex).getPlayerUUID();
+                if (!visitorUUID.equals(targetUUID)) {
                     TeleportationPlayerData.EnumJumpProfile targetJumpProfile = this.manager.getPlayerData(targetUUID).getJumpProfile();
                     switch (targetJumpProfile) {
                     case DISABLED:
@@ -56,7 +60,7 @@ public class PlayersManagerServer {
                         else {
                             EntityPlayerMP targetPlayerMP = CommonReference.playerByUUID(targetUUID);
                             OxygenHelperServer.sendRequest(visitorPlayerMP, targetPlayerMP, 
-                                    new TeleportationRequest(TeleportationMain.TELEPORTATION_REQUEST_ID, visitorUUID, CommonReference.username(visitorPlayerMP)), true);
+                                    new TeleportationRequest(TeleportationMain.TELEPORTATION_REQUEST_ID, visitorUUID, CommonReference.getName(visitorPlayerMP)), true);
                         }
                         break;
                     }  

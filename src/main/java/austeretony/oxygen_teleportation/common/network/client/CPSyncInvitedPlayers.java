@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import austeretony.oxygen.client.api.OxygenHelperClient;
 import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.oxygen.common.util.PacketBufferUtils;
+import austeretony.oxygen.util.PacketBufferUtils;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.common.SharedCampsManagerServer.InvitationsContainerServer;
 import austeretony.oxygen_teleportation.common.SharedCampsManagerServer.PlayersContainer;
@@ -51,6 +51,6 @@ public class CPSyncInvitedPlayers extends ProxyPacket {
                 players.players.add(PacketBufferUtils.readUUID(buffer));
             TeleportationManagerClient.instance().getSharedCampsManager().getInvitationsContainer().invitedPlayers.put(buffer.readLong(), players);
         }
-        OxygenHelperClient.savePlayerDataDelegated(TeleportationManagerClient.instance().getSharedCampsManager());
+        OxygenHelperClient.savePersistentDataDelegated(TeleportationManagerClient.instance().getSharedCampsManager());
     }
 }

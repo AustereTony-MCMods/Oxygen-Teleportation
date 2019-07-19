@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import austeretony.alternateui.screen.image.GUIImageLabel;
+import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen.client.gui.settings.GUISettings;
-import austeretony.oxygen.common.api.EnumDimensions;
+import austeretony.oxygen.common.api.EnumDimension;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.common.world.WorldPoint;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
 public class PreviewGUIImageLabel extends GUIImageLabel {
@@ -28,7 +28,7 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
     public PreviewGUIImageLabel(int xPosition, int yPosition) {
         super(xPosition, yPosition);
         this.disableFull();
-        this.noImage = I18n.format("teleportation.gui.menu.noImage");
+        this.noImage = ClientReference.localize("teleportation.gui.menu.noImage");
     }
 
     @Override
@@ -104,10 +104,10 @@ public class PreviewGUIImageLabel extends GUIImageLabel {
         this.favorite = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerData().getFavoriteCampId();
         this.shared = TeleportationManagerClient.instance().getSharedCampsManager().invitedPlayersExist(worldPoint.getId());
         this.name = worldPoint.getName();
-        this.owner = I18n.format("teleportation.gui.menu.info.owner") + " " + worldPoint.ownerName;
+        this.owner = ClientReference.localize("teleportation.gui.menu.info.owner") + " " + worldPoint.ownerName;
         this.creationDate = worldPoint.getCreationDate();
         this.position = String.valueOf((int) worldPoint.getXPos()) + ", " + String.valueOf((int) worldPoint.getYPos()) + ", " + String.valueOf((int) worldPoint.getZPos());
-        this.dimension = EnumDimensions.getLocalizedNameFromId(worldPoint.getDimensionId());
+        this.dimension = EnumDimension.getLocalizedNameFromId(worldPoint.getDimensionId());
         this.processDescription(worldPoint.getDescription());
         this.setVisible(true);
     }

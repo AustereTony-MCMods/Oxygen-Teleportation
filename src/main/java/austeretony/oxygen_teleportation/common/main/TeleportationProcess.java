@@ -9,7 +9,6 @@ import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.network.client.CPSyncCooldown;
-import austeretony.oxygen_teleportation.common.world.SimpleTeleporter;
 import austeretony.oxygen_teleportation.common.world.WorldPoint;
 import net.minecraft.entity.player.EntityPlayerMP;
 
@@ -34,7 +33,7 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
         this.prevX = player.posX;
         this.prevY = player.posY;
         this.prevZ = player.posZ;
-        this.processOnMove = PrivilegeProviderServer.getPrivilegeValue(CommonReference.uuid(player), EnumTeleportationPrivileges.PROCESS_TELEPORTATION_ON_MOVE.toString(), 
+        this.processOnMove = PrivilegeProviderServer.getPrivilegeValue(CommonReference.getPersistentUUID(player), EnumTeleportationPrivileges.PROCESS_TELEPORTATION_ON_MOVE.toString(), 
                 TeleportationConfig.PROCESS_TELEPORTATION_ON_MOVE.getBooleanValue());
         this.counter = delay * 20;
     }
@@ -56,7 +55,7 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
     public static void create(EntityPlayerMP player, EntityPlayerMP target, int delay) {
         OxygenHelperServer.addPlayerTemporaryProcess(player, new TeleportationProcess(EnumTeleportations.JUMP, player, target, delay));
     }
-    
+
     public static boolean exist(UUID playerUUID) {
         return TeleportationManagerServer.instance().getTeleportations().contains(playerUUID);
     }
@@ -73,9 +72,9 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
             this.counter--;
         }
         if (this.counter == 0) {
-            if (!OxygenHelperServer.isOnline(CommonReference.uuid(this.player)))
+            if (!OxygenHelperServer.isOnline(CommonReference.getPersistentUUID(this.player)))
                 return true;
-            if (this.type == EnumTeleportations.JUMP && !OxygenHelperServer.isOnline(CommonReference.uuid(this.target)))
+            if (this.type == EnumTeleportations.JUMP && !OxygenHelperServer.isOnline(CommonReference.getPersistentUUID(this.target)))
                 return true;
             this.expired();
             return true;
@@ -90,7 +89,7 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
 
     @Override
     public void expired() {
-        UUID playerUUID = CommonReference.uuid(this.player);
+        UUID playerUUID = CommonReference.getPersistentUUID(this.player);
         WorldPoint point;
         switch (this.type) {
         case CAMP:
@@ -99,7 +98,7 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
                 point = TeleportationManagerServer.instance().getSharedCampsManager().getCamp(this.pointId);
             else
                 point = playerData.getCamp(this.pointId);
-            this.move(point.getDimensionId(), point.getXPos(), point.getYPos(), point.getZPos(), point.getYaw(), point.getPitch());
+            CommonReference.teleportPlayer(this.player, point.getDimensionId(), point.getXPos(), point.getYPos(), point.getZPos(), point.getYaw(), point.getPitch());
             if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.CAMP_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.CAMPS_TELEPORT_COOLDOWN.getIntValue()) > 0) {
                 playerData.getCooldownInfo().movedToCamp();
@@ -109,7 +108,7 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
             break;
         case LOCATION:
             point = TeleportationManagerServer.instance().getWorldData().getLocation(this.pointId);
-            this.move(point.getDimensionId(), point.getXPos(), point.getYPos(), point.getZPos(), point.getYaw(), point.getPitch());
+            CommonReference.teleportPlayer(this.player, point.getDimensionId(), point.getXPos(), point.getYPos(), point.getZPos(), point.getYaw(), point.getPitch());
             if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.LOCATIONS_TELEPORT_COOLDOWN.getIntValue()) > 0) {
                 TeleportationManagerServer.instance().getPlayerData(playerUUID).getCooldownInfo().movedToLocation();
@@ -118,26 +117,17 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
             OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.MOVED_TO_LOCATION.ordinal(), point.getName());
             break;
         case JUMP:
-            this.move(this.target.dimension, (float) this.target.posX, (float) this.target.posY, (float) this.target.posZ, this.target.rotationYawHead, this.target.rotationPitch);
+            CommonReference.teleportPlayer(this.player, this.target.dimension, (float) this.target.posX, (float) this.target.posY, (float) this.target.posZ, this.target.rotationYawHead, this.target.rotationPitch);
             if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.PLAYER_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.PLAYERS_TELEPORT_COOLDOWN.getIntValue()) > 0) {
                 TeleportationManagerServer.instance().getPlayerData(playerUUID).getCooldownInfo().jumped();
                 TeleportationMain.network().sendTo(new CPSyncCooldown(), this.player);
             }
-            OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.MOVED_TO_PLAYER.ordinal(), CommonReference.username(this.target));
+            OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.MOVED_TO_PLAYER.ordinal(), CommonReference.getName(this.target));
             break;
         }        
-        OxygenHelperServer.savePlayerDataDelegated(playerUUID, TeleportationManagerServer.instance().getPlayerData(playerUUID));
+        OxygenHelperServer.savePersistentDataDelegated(TeleportationManagerServer.instance().getPlayerData(playerUUID));
         TeleportationManagerServer.instance().getTeleportations().remove(playerUUID);
-    }
-
-    private void move(int dimId, float x, float y, float z, float yaw, float pitch) {
-        this.player.rotationYaw = this.player.rotationYawHead = yaw;
-        this.player.rotationPitch = pitch;        
-        if (this.player.dimension == dimId)                                                 
-            this.player.setPositionAndUpdate(x, y, z);    
-        else                                                
-            SimpleTeleporter.transferToDimension(this.player, dimId, x, y, z);
     }
 
     public enum EnumTeleportations {

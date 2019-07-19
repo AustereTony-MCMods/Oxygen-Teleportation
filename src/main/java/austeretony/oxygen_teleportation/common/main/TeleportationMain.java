@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 
 import austeretony.oxygen.client.api.OxygenHelperClient;
 import austeretony.oxygen.client.gui.OxygenGUITextures;
-import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenGUIHelper;
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.api.network.OxygenNetwork;
@@ -14,7 +13,6 @@ import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.privilege.api.Privilege;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 import austeretony.oxygen.common.privilege.api.PrivilegedGroup;
-import austeretony.oxygen.common.util.OxygenUtils;
 import austeretony.oxygen_teleportation.client.TeleportToPlayerContextAction;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.client.event.TeleportationEventsClient;
@@ -48,14 +46,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(
         modid = TeleportationMain.MODID, 
         name = TeleportationMain.NAME, 
         version = TeleportationMain.VERSION,
-        dependencies = "required-after:oxygen@[0.6.0,);",//TODO Always check required Oxygen version before build
+        dependencies = "required-after:oxygen@[0.7.0,);",//TODO Always check required Oxygen version before build
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = TeleportationMain.VERSIONS_FORGE_URL)
 public class TeleportationMain {
@@ -63,15 +60,15 @@ public class TeleportationMain {
     public static final String 
     MODID = "oxygen_teleportation",    
     NAME = "Oxygen: Teleportation",
-    VERSION = "0.4.2",
+    VERSION = "0.4.4",
     VERSION_CUSTOM = VERSION + ":alpha:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Teleportation/info/mod_versions_forge.json";
 
     public static final int 
-    TELEPORTATION_MOD_INDEX = 1,//Oxygen - 0, Groups - 2, Exchange - 3, Merchants - 4
+    TELEPORTATION_MOD_INDEX = 1,//Oxygen - 0, Groups - 2, Exchange - 3, Merchants - 4, Players List - 5, Friends List - 6, Interaction - 7
 
-    JUMP_PROFILE_DATA_ID = 10,
+    JUMP_PROFILE_SHARED_DATA_ID = 10,
 
     TELEPORTATION_REQUEST_ID = 10,
     INVITATION_TO_CAMP_ID = 11,
@@ -84,8 +81,6 @@ public class TeleportationMain {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        OxygenUtils.removePreviousData("teleportation", false);//TODO If 'true' previous version data for 'teleportation' module will be removed.
-
         OxygenHelperServer.registerConfig(new TeleportationConfig());
     }
 
@@ -97,12 +92,14 @@ public class TeleportationMain {
 
         CommonReference.registerEvent(new TeleportationEventsServer());
 
-        OxygenHelperServer.registerSharedDataIdentifierForScreen(TELEPORTATION_MENU_SCREEN_ID, OxygenMain.STATUS_DATA_ID);
-        OxygenHelperServer.registerSharedDataIdentifierForScreen(TELEPORTATION_MENU_SCREEN_ID, OxygenMain.DIMENSION_DATA_ID);
-        OxygenHelperServer.registerSharedDataIdentifierForScreen(TELEPORTATION_MENU_SCREEN_ID, JUMP_PROFILE_DATA_ID);
+        OxygenHelperServer.registerSharedDataValue(JUMP_PROFILE_SHARED_DATA_ID, Byte.BYTES);
 
-        OxygenHelperServer.registerSharedDataIdentifierForScreen(OxygenMain.PLAYER_LIST_SCREEN_ID, JUMP_PROFILE_DATA_ID);
-        OxygenHelperServer.registerSharedDataIdentifierForScreen(OxygenMain.FRIEND_LIST_SCREEN_ID, JUMP_PROFILE_DATA_ID);
+        OxygenHelperServer.registerSharedDataIdentifierForScreen(TELEPORTATION_MENU_SCREEN_ID, OxygenMain.ACTIVITY_STATUS_SHARED_DATA_ID);
+        OxygenHelperServer.registerSharedDataIdentifierForScreen(TELEPORTATION_MENU_SCREEN_ID, OxygenMain.DIMENSION_SHARED_DATA_ID);
+        OxygenHelperServer.registerSharedDataIdentifierForScreen(TELEPORTATION_MENU_SCREEN_ID, JUMP_PROFILE_SHARED_DATA_ID);
+
+        OxygenHelperServer.registerSharedDataIdentifierForScreen(50, JUMP_PROFILE_SHARED_DATA_ID);//50 - players list menu id
+        OxygenHelperServer.registerSharedDataIdentifierForScreen(60, JUMP_PROFILE_SHARED_DATA_ID);//60 - friends list menu id
 
         if (event.getSide() == Side.CLIENT) {
             TeleportationManagerClient.create();
@@ -110,55 +107,38 @@ public class TeleportationMain {
             CommonReference.registerEvent(new TeleportationEventsClient());
             CommonReference.registerEvent(new TeleportationKeyHandler());
 
-            OxygenHelperClient.registerSharedDataBuffer(JUMP_PROFILE_DATA_ID, Byte.BYTES);
+            OxygenHelperClient.registerSharedDataValue(JUMP_PROFILE_SHARED_DATA_ID, Byte.BYTES);
 
             OxygenGUIHelper.registerScreenId(TELEPORTATION_MENU_SCREEN_ID);
 
-            OxygenGUIHelper.registerContextAction(OxygenMain.PLAYER_LIST_SCREEN_ID, new TeleportToPlayerContextAction());
-            OxygenGUIHelper.registerContextAction(OxygenMain.FRIEND_LIST_SCREEN_ID, new TeleportToPlayerContextAction());
-            OxygenGUIHelper.registerContextAction(20, new TeleportToPlayerContextAction());//20 - group menu 'screenId' (Oxygen: Groups)
+            OxygenGUIHelper.registerContextAction(50, new TeleportToPlayerContextAction());
+            OxygenGUIHelper.registerContextAction(60, new TeleportToPlayerContextAction());
+            OxygenGUIHelper.registerContextAction(20, new TeleportToPlayerContextAction());//20 - group menu id
 
             OxygenHelperClient.registerNotificationIcon(TELEPORTATION_REQUEST_ID, OxygenGUITextures.TELEPORT_REQUEST_ICON);
             OxygenHelperClient.registerNotificationIcon(INVITATION_TO_CAMP_ID, OxygenGUITextures.REQUEST_ICON);
         }
     }
 
-    @EventHandler
-    public void serverStarting(FMLServerStartingEvent event) { 
-        TeleportationManagerServer.instance().reset();
-        OxygenHelperServer.loadWorldDataDelegated(TeleportationManagerServer.instance().getWorldData());
-        TeleportationManagerServer.instance().getImagesLoader().loadLocationPreviewImagesDelegated();
-        OxygenHelperServer.loadWorldDataDelegated(TeleportationManagerServer.instance().getSharedCampsManager());
+    public static void addDefaultPrivilegesDelegated() {
+        if (!PrivilegeProviderServer.getGroup(PrivilegedGroup.OPERATORS_GROUP.groupName).hasPrivilege(EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString())) {
+            PrivilegeProviderServer.addPrivileges(PrivilegedGroup.OPERATORS_GROUP.groupName, true,  
+                    new Privilege(EnumTeleportationPrivileges.PROCESS_TELEPORTATION_ON_MOVE.toString(), true),
+                    new Privilege(EnumTeleportationPrivileges.ENABLE_MOVE_TO_LOCKED_LOCATIONS.toString(), true),
+                    new Privilege(EnumTeleportationPrivileges.ENABLE_CROSS_DIM_TELEPORTATION.toString(), true),
+                    new Privilege(EnumTeleportationPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), true),
 
-        this.addDefaultPrivilegesDelegated();
-    }
+                    new Privilege(EnumTeleportationPrivileges.CAMP_TELEPORTATION_DELAY.toString(), 0),
+                    new Privilege(EnumTeleportationPrivileges.CAMP_TELEPORTATION_COOLDOWN.toString(), 0),
 
-    //TODO Need better solution (queue or something).
-    private void addDefaultPrivilegesDelegated() {
-        OxygenHelperServer.addIOTask(new IOxygenTask() {//delayed to insure this will be done after privileges loaded from disc.
+                    new Privilege(EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString(), true),
+                    new Privilege(EnumTeleportationPrivileges.LOCATION_TELEPORTATION_DELAY.toString(), 0),
+                    new Privilege(EnumTeleportationPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), 0),
 
-            @Override   
-            public void execute() {
-                if (!PrivilegeProviderServer.getGroup(PrivilegedGroup.OPERATORS_GROUP.groupName).hasPrivilege(EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString())) {
-                    PrivilegeProviderServer.addPrivileges(PrivilegedGroup.OPERATORS_GROUP.groupName, true,  
-                            new Privilege(EnumTeleportationPrivileges.PROCESS_TELEPORTATION_ON_MOVE.toString(), true),
-                            new Privilege(EnumTeleportationPrivileges.ENABLE_MOVE_TO_LOCKED_LOCATIONS.toString(), true),
-                            new Privilege(EnumTeleportationPrivileges.ENABLE_CROSS_DIM_TELEPORTATION.toString(), true),
-                            new Privilege(EnumTeleportationPrivileges.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), true),
-
-                            new Privilege(EnumTeleportationPrivileges.CAMP_TELEPORTATION_DELAY.toString(), 0),
-                            new Privilege(EnumTeleportationPrivileges.CAMP_TELEPORTATION_COOLDOWN.toString(), 0),
-
-                            new Privilege(EnumTeleportationPrivileges.LOCATIONS_MANAGEMENT.toString(), true),
-                            new Privilege(EnumTeleportationPrivileges.LOCATION_TELEPORTATION_DELAY.toString(), 0),
-                            new Privilege(EnumTeleportationPrivileges.LOCATION_TELEPORTATION_COOLDOWN.toString(), 0),
-
-                            new Privilege(EnumTeleportationPrivileges.PLAYER_TELEPORTATION_DELAY.toString(), 0),
-                            new Privilege(EnumTeleportationPrivileges.PLAYER_TELEPORTATION_COOLDOWN.toString(), 0));
-                    LOGGER.info("Default <{}> group privileges added.", PrivilegedGroup.OPERATORS_GROUP.groupName);
-                }
-            }
-        });
+                    new Privilege(EnumTeleportationPrivileges.PLAYER_TELEPORTATION_DELAY.toString(), 0),
+                    new Privilege(EnumTeleportationPrivileges.PLAYER_TELEPORTATION_COOLDOWN.toString(), 0));
+            LOGGER.info("Default <{}> group privileges added.", PrivilegedGroup.OPERATORS_GROUP.groupName);
+        }
     }
 
     private void initNetwork() {

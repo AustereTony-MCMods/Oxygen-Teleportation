@@ -2,30 +2,29 @@ package austeretony.oxygen_teleportation.client.input;
 
 import org.lwjgl.input.Keyboard;
 
-import austeretony.oxygen.client.input.KeyBindingWrapper;
+import austeretony.oxygen.client.core.api.ClientReference;
+import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
-import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
-import austeretony.oxygen_teleportation.common.main.TeleportationMain;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 
 public class TeleportationKeyHandler {
 
-    public static final KeyBindingWrapper 
-    OPEN_MENU = new KeyBindingWrapper(),
-    MOVE_TO_CAMP = new KeyBindingWrapper();
+    public static final KeyBinding 
+    OPEN_MENU = new KeyBinding("key.teleportation.openMenu", Keyboard.KEY_Y, OxygenMain.NAME),
+    MOVE_TO_CAMP = new KeyBinding("key.teleportation.moveToCamp", Keyboard.KEY_H, OxygenMain.NAME);
 
     public TeleportationKeyHandler() {
-        OPEN_MENU.register("key.teleportation.openMenu", Keyboard.KEY_Y, TeleportationMain.NAME);
-        if (TeleportationConfig.ENABLE_FAVORITE_CAMP.getBooleanValue())
-            MOVE_TO_CAMP.register("key.teleportation.moveToCamp", Keyboard.KEY_H, TeleportationMain.NAME);
+        ClientReference.registerKeyBinding(OPEN_MENU);
+        ClientReference.registerKeyBinding(MOVE_TO_CAMP);
     }
 
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
-        if (OPEN_MENU.registered() && OPEN_MENU.getKeyBinding().isPressed())
+        if (OPEN_MENU.isPressed())
             TeleportationManagerClient.instance().openMenuSynced();
-        else if (MOVE_TO_CAMP.registered() && MOVE_TO_CAMP.getKeyBinding().isPressed()) 
+        else if (MOVE_TO_CAMP.isPressed()) 
             TeleportationManagerClient.instance().getCampsManager().moveToFavoriteCampSynced(TeleportationManagerClient.instance().getPlayerData().getFavoriteCampId());       
     }   
 }

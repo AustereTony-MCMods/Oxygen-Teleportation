@@ -42,7 +42,7 @@ public class SPRequest extends ProxyPacket {
     }
 
     private void processOpenMenuRequest(EntityPlayerMP playerMP) {
-        UUID playerUUID = CommonReference.uuid(playerMP);
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
         if (TeleportationManagerServer.instance().dataExist(playerUUID)) {//for sure
             if (!OxygenHelperServer.isSyncing(playerUUID) 
                     && !TeleportationProcess.exist(playerUUID)) {

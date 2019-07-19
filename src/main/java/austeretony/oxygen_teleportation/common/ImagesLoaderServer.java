@@ -42,7 +42,7 @@ public class ImagesLoaderServer {
     }
 
     public void loadAndSendCampPreviewImages(EntityPlayerMP playerMP, long[] campIds) {
-        UUID ownerUUID = CommonReference.uuid(playerMP);
+        UUID ownerUUID = CommonReference.getPersistentUUID(playerMP);
         BufferedImage bufferedImage;
         for (long id : campIds) {
             if (this.manager.getSharedCampsManager().haveInvitation(ownerUUID, id))

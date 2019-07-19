@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.IPersistentData;
-import austeretony.oxygen.common.util.StreamUtils;
+import austeretony.oxygen.util.StreamUtils;
 import austeretony.oxygen_teleportation.common.world.WorldPoint;
 
 public class TeleportationWorldData implements IPersistentData {
@@ -50,7 +50,7 @@ public class TeleportationWorldData implements IPersistentData {
 
     @Override
     public String getName() {
-        return "teleportation world data";
+        return "world_data";
     }
 
     @Override
@@ -60,7 +60,7 @@ public class TeleportationWorldData implements IPersistentData {
 
     @Override
     public String getPath() {
-        return "teleportation/locations.dat";
+        return "world/teleportation/locations.dat";
     }
 
     @Override

@@ -7,7 +7,6 @@ import austeretony.oxygen.client.gui.OxygenGUITextures;
 import austeretony.oxygen.client.gui.PlayerGUIButton;
 import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
-import austeretony.oxygen_teleportation.client.gui.menu.camps.callback.InvitationsGUICallback;
 import net.minecraft.client.renderer.GlStateManager;
 
 public class InvitedPlayerGUIButton extends PlayerGUIButton {
@@ -25,7 +24,7 @@ public class InvitedPlayerGUIButton extends PlayerGUIButton {
     public void init() { 
         this.uninviteButton = new GUIButton(this.getWidth() - 8, 2, 6, 6).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.CROSS_ICONS, 6, 6).initScreen(this.getScreen());
     }
-    
+
     @Override
     public void draw(int mouseX, int mouseY) {
         super.draw(mouseX, mouseY);
@@ -42,7 +41,7 @@ public class InvitedPlayerGUIButton extends PlayerGUIButton {
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {       
         if (this.uninviteButton.mouseClicked(mouseX, mouseY, mouseButton)) {
             TeleportationManagerClient.instance().getCampsManager().uninvitePlayerSynced(this.pointId, this.playerUUID);
-            ((InvitationsGUICallback) this.screen.getWorkspace().getCurrentSection().getCurrentCallback()).updatePlayers();
+            this.setEnabled(false);
             return true;
         }
         return false;

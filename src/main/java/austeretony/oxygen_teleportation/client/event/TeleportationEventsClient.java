@@ -13,14 +13,14 @@ public class TeleportationEventsClient {
     @SubscribeEvent
     public void onClientInit(OxygenClientInitEvent event) {
         TeleportationManagerClient.instance().reset();
-        TeleportationManagerClient.instance().getPlayerData().setPlayerUUID(OxygenHelperClient.getPlayerUUID());
+        TeleportationManagerClient.instance().initPlayerData();
 
-        OxygenHelperClient.loadPlayerDataDelegated(TeleportationManagerClient.instance().getPlayerData());
+        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getPlayerData());
         TeleportationManagerClient.instance().getImagesLoader().loadCampPreviewImagesDelegated();
 
-        OxygenHelperClient.loadPlayerDataDelegated(TeleportationManagerClient.instance().getSharedCampsManager());
+        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getSharedCampsManager());
 
-        OxygenHelperClient.loadWorldDataDelegated(TeleportationManagerClient.instance().getWorldData());
+        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getWorldData());
         TeleportationManagerClient.instance().getImagesLoader().loadLocationPreviewImagesDelegated();   
     }
 

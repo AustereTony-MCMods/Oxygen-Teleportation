@@ -20,15 +20,15 @@ public class PlayersManagerClient {
     }
 
     public static TeleportationPlayerData.EnumJumpProfile getPlayerJumpProfile(UUID playerUUID) {
-        return TeleportationPlayerData.EnumJumpProfile.values()[OxygenHelperClient.getSharedPlayerData(playerUUID).getData(TeleportationMain.JUMP_PROFILE_DATA_ID).get(0)];
+        return TeleportationPlayerData.EnumJumpProfile.values()[OxygenHelperClient.getSharedPlayerData(playerUUID).getByte(TeleportationMain.JUMP_PROFILE_SHARED_DATA_ID)];
     }
 
     public void changeJumpProfileSynced(TeleportationPlayerData.EnumJumpProfile profile) {
         TeleportationMain.network().sendToServer(new SPChangeJumpProfile(profile));
     }
 
-    public void moveToPlayerSynced(UUID targetUUID) {
-        TeleportationMain.network().sendToServer(new SPMoveToPlayer(targetUUID));
+    public void moveToPlayerSynced(int index) {
+        TeleportationMain.network().sendToServer(new SPMoveToPlayer(index));
         TeleportationManagerClient.instance().setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.PLAYER_TELEPORTATION_DELAY.toString(), TeleportationConfig.PLAYERS_TELEPORT_DELAY.getIntValue()));
     }
 }

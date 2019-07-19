@@ -1,5 +1,6 @@
 package austeretony.oxygen_teleportation.client;
 
+import austeretony.oxygen.client.api.OxygenHelperClient;
 import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen_teleportation.client.gui.menu.TeleportationMenuGUIScreen;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
@@ -12,7 +13,7 @@ public class TeleportationManagerClient {
     private static TeleportationManagerClient instance;
 
     //Data      
-    private final TeleportationPlayerData playerData;
+    private TeleportationPlayerData playerData;
 
     private final TeleportationWorldData worldData;
 
@@ -26,7 +27,7 @@ public class TeleportationManagerClient {
 
     //Players
     private final PlayersManagerClient playersManager;
-    
+
     //Preview Images
     private final ImagesManagerClient imagesManager;
 
@@ -35,7 +36,6 @@ public class TeleportationManagerClient {
     private long time, delay;
 
     private TeleportationManagerClient() {
-        this.playerData = new TeleportationPlayerData();
         this.worldData = new TeleportationWorldData();
         this.campsManager = new CampsManagerClient(this);
         this.sharedCampsManager = new SharedCampsManagerClient(this);
@@ -52,6 +52,10 @@ public class TeleportationManagerClient {
 
     public static TeleportationManagerClient instance() {
         return instance;
+    }
+
+    public void initPlayerData() {
+        this.playerData = new TeleportationPlayerData(OxygenHelperClient.getPlayerUUID());
     }
 
     public TeleportationPlayerData getPlayerData() {
@@ -119,7 +123,8 @@ public class TeleportationManagerClient {
     }
 
     public void reset() {
-        this.playerData.reset();
+        if (this.playerData != null)
+            this.playerData.reset();
         this.worldData.reset();
         this.sharedCampsManager.reset();
     }

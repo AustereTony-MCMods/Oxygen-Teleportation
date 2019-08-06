@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.IPersistentData;
 import austeretony.oxygen.util.StreamUtils;
-import austeretony.oxygen_teleportation.common.world.WorldPoint;
 
 public class TeleportationWorldData implements IPersistentData {
 

@@ -96,3 +96,5 @@ teleportation.dim.overworld=Верхний Мир
 teleportation.dim.nether=Нижний Мир
 teleportation.dim.end=Край
 teleportation.dim.twilightForest=Сумеречный Лес
+
+oxygen_teleportation.command.dataReset=Данные <oxygen: teleportation> сброшены для клиента.

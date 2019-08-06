@@ -16,7 +16,7 @@ import austeretony.oxygen_teleportation.common.util.ImageTransferingClientBuffer
 import austeretony.oxygen_teleportation.common.util.ImageTransferingServerBuffer;
 
 public class ImagesManagerClient {
-    
+
     private final TeleportationManagerClient manager;
 
     private final Map<Long, ImageTransferingClientBuffer> transfers = new ConcurrentHashMap<Long, ImageTransferingClientBuffer>();
@@ -65,7 +65,7 @@ public class ImagesManagerClient {
     }
 
     public void uploadCampPreviewToServerDelegated(long pointId) {
-        OxygenHelperClient.addRoutineTask(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -85,7 +85,7 @@ public class ImagesManagerClient {
     }
 
     public void uploadLocationPreviewToServerDelegated(long pointId) {
-        OxygenHelperClient.addRoutineTask(new IOxygenTask() {
+        OxygenHelperClient.addIOTask(new IOxygenTask() {
 
             @Override
             public void execute() {

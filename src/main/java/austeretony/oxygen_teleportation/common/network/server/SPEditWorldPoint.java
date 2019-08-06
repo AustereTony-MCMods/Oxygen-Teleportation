@@ -3,13 +3,13 @@ package austeretony.oxygen_teleportation.common.network.server;
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.oxygen.util.PacketBufferUtils;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
-import austeretony.oxygen_teleportation.common.world.WorldPoint;
+import austeretony.oxygen_teleportation.common.main.WorldPoint;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
 public class SPEditWorldPoint extends ProxyPacket {
 
-    private WorldPoint.EnumPointType type;
+    private WorldPoint.EnumWorldPoint type;
 
     private long oldPointId;
 
@@ -19,7 +19,7 @@ public class SPEditWorldPoint extends ProxyPacket {
 
     public SPEditWorldPoint() {}
 
-    public SPEditWorldPoint(WorldPoint.EnumPointType type, long oldPointId, String name, String description, boolean updateName, 
+    public SPEditWorldPoint(WorldPoint.EnumWorldPoint type, long oldPointId, String name, String description, boolean updateName, 
             boolean updateDescription, boolean updateImage, boolean updatePosition) {
         this.type = type;
         this.oldPointId = oldPointId;
@@ -45,7 +45,7 @@ public class SPEditWorldPoint extends ProxyPacket {
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
-        this.type = WorldPoint.EnumPointType.values()[buffer.readByte()];
+        this.type = WorldPoint.EnumWorldPoint.values()[buffer.readByte()];
         this.updateName = buffer.readBoolean();
         this.updateDescription = buffer.readBoolean();
         this.updateImage = buffer.readBoolean();

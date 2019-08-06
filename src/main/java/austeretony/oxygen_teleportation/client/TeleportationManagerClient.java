@@ -1,12 +1,12 @@
 package austeretony.oxygen_teleportation.client;
 
 import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.client.core.api.ClientReference;
-import austeretony.oxygen_teleportation.client.gui.menu.TeleportationMenuGUIScreen;
-import austeretony.oxygen_teleportation.common.main.TeleportationMain;
+import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
+import austeretony.oxygen.common.main.EnumOxygenPrivilege;
+import austeretony.oxygen.common.main.OxygenPlayerData;
+import austeretony.oxygen.common.main.SharedPlayerData;
 import austeretony.oxygen_teleportation.common.main.TeleportationPlayerData;
 import austeretony.oxygen_teleportation.common.main.TeleportationWorldData;
-import austeretony.oxygen_teleportation.common.network.server.SPRequest;
 
 public class TeleportationManagerClient {
 
@@ -54,8 +54,20 @@ public class TeleportationManagerClient {
         return instance;
     }
 
-    public void initPlayerData() {
+    public void init() {
+        this.reset();
         this.playerData = new TeleportationPlayerData(OxygenHelperClient.getPlayerUUID());
+
+        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getPlayerData());
+        this.getImagesLoader().loadCampPreviewImagesDelegated();
+
+        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getSharedCampsManager());
+
+        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getWorldData());
+        this.getImagesLoader().loadLocationPreviewImagesDelegated();   
+
+        this.getImagesLoader().removeUnusedCampPreviewImagesDelegated();
+        this.getImagesLoader().removeUnusedLocationPreviewImagesDelegated();
     }
 
     public TeleportationPlayerData getPlayerData() {
@@ -90,13 +102,6 @@ public class TeleportationManagerClient {
         return this.imagesLoader;
     }
 
-    public void openMenuSynced() {
-        if (!this.teleporting()) {
-            ClientReference.getMinecraft().gameSettings.hideGUI = true;
-            TeleportationMain.network().sendToServer(new SPRequest(SPRequest.EnumRequest.OPEN_MENU));
-        }
-    }
-
     public boolean teleporting() {
         return System.currentTimeMillis() < this.time + this.delay;
     }
@@ -106,20 +111,15 @@ public class TeleportationManagerClient {
         this.time = System.currentTimeMillis();
     }
 
-    public void openMenuDelegated() {
-        ClientReference.getMinecraft().addScheduledTask(new Runnable() {
-
-            @Override
-            public void run() {
-                openMenu();
-            }
-        });
-    }
-
-    public void openMenu() {
-        this.getImagesManager().preparePreviewImage();
-        ClientReference.getMinecraft().gameSettings.hideGUI = false;
-        ClientReference.displayGuiScreen(new TeleportationMenuGUIScreen());
+    public static boolean isPlayerAvailable(String username) {
+        if (username.equals(OxygenHelperClient.getSharedClientPlayerData().getUsername()))
+            return false;
+        SharedPlayerData sharedData = OxygenHelperClient.getSharedPlayerData(username);
+        if (sharedData != null) {
+            if ((OxygenHelperClient.getPlayerStatus(sharedData) != OxygenPlayerData.EnumActivityStatus.OFFLINE || PrivilegeProviderClient.getPrivilegeValue(EnumOxygenPrivilege.EXPOSE_PLAYERS_OFFLINE.toString(), false)))
+                return true;
+        }
+        return false;
     }
 
     public void reset() {

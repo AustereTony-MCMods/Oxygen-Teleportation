@@ -2,19 +2,19 @@ package austeretony.oxygen_teleportation.common.network.server;
 
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
-import austeretony.oxygen_teleportation.common.world.WorldPoint;
+import austeretony.oxygen_teleportation.common.main.WorldPoint;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
 public class SPMoveToPoint extends ProxyPacket {
 
-    private WorldPoint.EnumPointType point;
+    private WorldPoint.EnumWorldPoint point;
 
     private long pointId;
 
     public SPMoveToPoint() {}
 
-    public SPMoveToPoint(WorldPoint.EnumPointType point, long pointId) {
+    public SPMoveToPoint(WorldPoint.EnumWorldPoint point, long pointId) {
         this.point = point;
         this.pointId = pointId;
     }   
@@ -27,7 +27,7 @@ public class SPMoveToPoint extends ProxyPacket {
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
-        this.point = WorldPoint.EnumPointType.values()[buffer.readByte()];
+        this.point = WorldPoint.EnumWorldPoint.values()[buffer.readByte()];
         switch (this.point) {
         case CAMP:
             TeleportationManagerServer.instance().getCampsManager().moveToCamp(getEntityPlayerMP(netHandler), buffer.readLong());

@@ -7,8 +7,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.core.api.CommonReference;
+import austeretony.oxygen.common.delegate.OxygenThread;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.main.TeleportationPlayerData;
 import austeretony.oxygen_teleportation.common.main.TeleportationWorldData;
@@ -17,6 +19,8 @@ import net.minecraft.entity.player.EntityPlayer;
 public class TeleportationManagerServer {
 
     private static TeleportationManagerServer instance;
+
+    private final OxygenThread ioThread;
 
     //Data
     private final Map<UUID, TeleportationPlayerData> playersData = new ConcurrentHashMap<UUID, TeleportationPlayerData>();
@@ -42,6 +46,8 @@ public class TeleportationManagerServer {
     private final Set<UUID> teleportations = new HashSet<UUID>();
 
     private TeleportationManagerServer() {
+        this.ioThread = new OxygenThread("Teleportation IO Thread");
+        this.ioThread.start();
         this.worldData = new TeleportationWorldData();
         this.campsManager = new CampsManagerServer(this);
         this.sharedCampsManager = new SharedCampsManagerServer(this);
@@ -60,6 +66,10 @@ public class TeleportationManagerServer {
         return instance;
     }
 
+    public OxygenThread getIOThread() {
+        return this.ioThread;
+    }
+
     public Collection<TeleportationPlayerData> getPlayersData() {
         return this.playersData.values();
     }
@@ -68,8 +78,10 @@ public class TeleportationManagerServer {
         return this.playersData.containsKey(playerUUID);
     }
 
-    public void createPlayerData(UUID playerUUID) {
-        this.playersData.put(playerUUID, new TeleportationPlayerData(playerUUID));
+    public TeleportationPlayerData createPlayerData(UUID playerUUID) {
+        TeleportationPlayerData playerData = new TeleportationPlayerData(playerUUID);
+        this.playersData.put(playerUUID, playerData);
+        return playerData;
     }    
 
     public TeleportationPlayerData getPlayerData(UUID playerUUID) {
@@ -112,14 +124,27 @@ public class TeleportationManagerServer {
     public void onPlayerLoaded(EntityPlayer player) {
         UUID playerUUID = CommonReference.getPersistentUUID(player);
         if (!this.dataExist(playerUUID)) {
-            this.createPlayerData(playerUUID);
-            OxygenHelperServer.loadPersistentDataDelegated(this.getPlayerData(playerUUID));
+            TeleportationPlayerData playerData = this.createPlayerData(playerUUID);
+            this.ioThread.addTask(new IOxygenTask() {
+
+                @Override
+                public void execute() {
+                    OxygenHelperServer.loadPersistentData(playerData);
+                    updateJumpProfile(playerUUID);
+                }
+            });
         }
-        this.updateSharedPlayerData(playerUUID);
     }
 
-    public void updateSharedPlayerData(UUID playerUUID) {
-        OxygenHelperServer.getSharedPlayerData(playerUUID).setByte(TeleportationMain.JUMP_PROFILE_SHARED_DATA_ID, this.getPlayerData(playerUUID).getJumpProfile().ordinal());
+    //TODO onPlayerUnloaded()
+    public void onPlayerUnloaded(EntityPlayer player) {
+        UUID playerUUID = CommonReference.getPersistentUUID(player);
+        if (this.dataExist(playerUUID))
+            this.playersData.remove(playerUUID);
+    }
+
+    public void updateJumpProfile(UUID playerUUID) {
+        OxygenHelperServer.getSharedPlayerData(playerUUID).setByte(TeleportationMain.JUMP_PROFILE_SHARED_DATA_ID, getPlayerData(playerUUID).getJumpProfile().ordinal());
     }
 
     public void reset() {

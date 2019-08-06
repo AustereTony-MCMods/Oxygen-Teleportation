@@ -5,7 +5,7 @@ import java.util.UUID;
 import austeretony.oxygen.client.api.OxygenHelperClient;
 import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
-import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivileges;
+import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.main.TeleportationPlayerData;
 import austeretony.oxygen_teleportation.common.network.server.SPChangeJumpProfile;
@@ -29,6 +29,6 @@ public class PlayersManagerClient {
 
     public void moveToPlayerSynced(int index) {
         TeleportationMain.network().sendToServer(new SPMoveToPlayer(index));
-        TeleportationManagerClient.instance().setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivileges.PLAYER_TELEPORTATION_DELAY.toString(), TeleportationConfig.PLAYERS_TELEPORT_DELAY.getIntValue()));
+        TeleportationManagerClient.instance().setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.PLAYER_TELEPORTATION_DELAY.toString(), TeleportationConfig.PLAYERS_TELEPORT_DELAY.getIntValue()));
     }
 }

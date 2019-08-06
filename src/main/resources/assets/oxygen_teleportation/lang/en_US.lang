@@ -99,3 +99,5 @@ teleportation.dim.overworld=Overworld
 teleportation.dim.nether=Nether
 teleportation.dim.end=The End
 teleportation.dim.twilightForest=Twilight Forest
+
+oxygen_teleportation.command.dataReset=<oxygen: teleportation> client data reset.

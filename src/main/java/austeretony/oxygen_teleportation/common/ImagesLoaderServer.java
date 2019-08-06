@@ -32,7 +32,7 @@ public class ImagesLoaderServer {
     }
 
     public void loadAndSendCampPreviewImagesDelegated(EntityPlayerMP playerMP, long[] campIds) {
-        OxygenHelperServer.addIOTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -71,7 +71,7 @@ public class ImagesLoaderServer {
     }
 
     public void saveCampPreviewImageDelegated(UUID playerUUID, long pointId, BufferedImage image) {
-        OxygenHelperServer.addIOTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -99,7 +99,7 @@ public class ImagesLoaderServer {
     }
 
     public void removeCampPreviewImageDelegated(UUID playerUUID, long pointId) {
-        OxygenHelperServer.addIOTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -122,7 +122,7 @@ public class ImagesLoaderServer {
     }
 
     public void renameCampPreviewImageDelegated(UUID playerUUID, long oldPointId, long newPointId) {
-        OxygenHelperServer.addIOTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -145,7 +145,7 @@ public class ImagesLoaderServer {
     }
 
     public void loadLocationPreviewImagesDelegated() {
-        OxygenHelperServer.addIOTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -190,7 +190,7 @@ public class ImagesLoaderServer {
     }
 
     public void saveAndLoadBytesLocationPreviewDelegated(long pointId, BufferedImage image) {        
-        OxygenHelperServer.addIOTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -247,7 +247,7 @@ public class ImagesLoaderServer {
     }
 
     public void removeLocationPreviewImageDelegated(long pointId) {
-        OxygenHelperServer.addIOTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -270,7 +270,7 @@ public class ImagesLoaderServer {
     }
 
     public void renameLocationPreviewImageDelegated(long oldPointId, long newPointId) {
-        OxygenHelperServer.addIOTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {

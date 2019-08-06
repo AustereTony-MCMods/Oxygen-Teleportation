@@ -3,13 +3,13 @@ package austeretony.oxygen_teleportation.common.network.server;
 import austeretony.oxygen.common.network.ProxyPacket;
 import austeretony.oxygen.util.PacketBufferUtils;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
-import austeretony.oxygen_teleportation.common.world.WorldPoint;
+import austeretony.oxygen_teleportation.common.main.WorldPoint;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
 public class SPCreateWorldPoint extends ProxyPacket {
 
-    private WorldPoint.EnumPointType type;
+    private WorldPoint.EnumWorldPoint type;
 
     private long pointId;
 
@@ -17,7 +17,7 @@ public class SPCreateWorldPoint extends ProxyPacket {
 
     public SPCreateWorldPoint() {}
 
-    public SPCreateWorldPoint(WorldPoint.EnumPointType type, WorldPoint worldPoint) {
+    public SPCreateWorldPoint(WorldPoint.EnumWorldPoint type, WorldPoint worldPoint) {
         this.type = type;
         this.pointId = worldPoint.getId();
         this.name = worldPoint.getName();
@@ -34,7 +34,7 @@ public class SPCreateWorldPoint extends ProxyPacket {
 
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
-        this.type = WorldPoint.EnumPointType.values()[buffer.readByte()];
+        this.type = WorldPoint.EnumWorldPoint.values()[buffer.readByte()];
         switch (type) {
         case CAMP:            
             TeleportationManagerServer.instance().getCampsManager().createCamp(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), PacketBufferUtils.readString(buffer));

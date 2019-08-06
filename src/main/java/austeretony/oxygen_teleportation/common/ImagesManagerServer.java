@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.IOxygenTask;
-import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.ImagesLoaderServer.SplittedByteArray;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.network.client.CPDownloadImagePart;
@@ -44,7 +43,7 @@ public class ImagesManagerServer {
     }
 
     public void downloadCampPreviewToClientDelegated(EntityPlayerMP playerMP, long pointId, BufferedImage bufferedImage) {
-        OxygenHelperServer.addRoutineTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {
@@ -64,7 +63,7 @@ public class ImagesManagerServer {
     }
 
     public void downloadLocationPreviewsToClientDelegated(EntityPlayerMP playerMP, long[] locationIds) {
-        OxygenHelperServer.addRoutineTask(new IOxygenTask() {
+        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
 
             @Override
             public void execute() {

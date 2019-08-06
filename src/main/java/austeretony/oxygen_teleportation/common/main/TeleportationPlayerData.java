@@ -9,11 +9,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen.common.api.IPersistentData;
 import austeretony.oxygen.util.StreamUtils;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
-import austeretony.oxygen_teleportation.common.world.WorldPoint;
-import net.minecraft.client.resources.I18n;
 
 public class TeleportationPlayerData implements IPersistentData {
 
@@ -47,6 +46,11 @@ public class TeleportationPlayerData implements IPersistentData {
 
     public Collection<WorldPoint> getCamps() {
         return this.camps.values();
+    }
+
+    public void clearCamps() {
+        this.owned = 0;
+        this.camps.clear();
     }
 
     public int getCampsAmount() {
@@ -165,7 +169,7 @@ public class TeleportationPlayerData implements IPersistentData {
         DISABLED;     
 
         public String localizedName() {
-            return I18n.format("teleportation.jumpProfile." + this.toString().toLowerCase());
+            return ClientReference.localize("teleportation.jumpProfile." + this.toString().toLowerCase());
         }
     }
 }

@@ -1,6 +1,6 @@
 package austeretony.oxygen_teleportation.common.config;
 
-import java.util.Queue;
+import java.util.List;
 
 import austeretony.oxygen.common.api.config.AbstractConfigHolder;
 import austeretony.oxygen.common.api.config.ConfigValue;
@@ -57,7 +57,7 @@ public class TeleportationConfig extends AbstractConfigHolder {
     }
 
     @Override
-    public void getValues(Queue<ConfigValue> values) {
+    public void getValues(List<ConfigValue> values) {
         values.add(IMAGE_WIDTH);
         values.add(IMAGE_HEIGHT);
         values.add(PROCESS_TELEPORTATION_ON_MOVE);

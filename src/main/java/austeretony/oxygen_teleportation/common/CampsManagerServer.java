@@ -4,17 +4,17 @@ import java.util.UUID;
 
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.core.api.CommonReference;
-import austeretony.oxygen.common.main.EnumOxygenChatMessages;
+import austeretony.oxygen.common.main.EnumOxygenChatMessage;
 import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.CampInvitationRequest;
-import austeretony.oxygen_teleportation.common.main.EnumTeleportationChatMessages;
-import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivileges;
+import austeretony.oxygen_teleportation.common.main.EnumTeleportationChatMessage;
+import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.main.TeleportationPlayerData;
 import austeretony.oxygen_teleportation.common.main.TeleportationProcess;
-import austeretony.oxygen_teleportation.common.world.WorldPoint;
+import austeretony.oxygen_teleportation.common.main.WorldPoint;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class CampsManagerServer {
@@ -50,17 +50,17 @@ public class CampsManagerServer {
         if (this.campAvailable(worldPoint, playerUUID) 
                 && !this.teleporting(playerUUID) 
                 && this.readyMoveToCamp(playerUUID)) {
-            if (!PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.ENABLE_CROSS_DIM_TELEPORTATION.toString(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.getBooleanValue())
+            if (!PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivilege.ENABLE_CROSS_DIM_TELEPORTATION.toString(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.getBooleanValue())
                     && playerMP.dimension != worldPoint.getDimensionId()) {
-                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.CROSS_DIM_TELEPORTSTION_DISABLED.ordinal());
+                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.CROSS_DIM_TELEPORTSTION_DISABLED.ordinal());
                 return;
             }
-            int delay = PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.CAMP_TELEPORTATION_DELAY.toString(), TeleportationConfig.CAMPS_TELEPORT_DELAY.getIntValue());
+            int delay = PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivilege.CAMP_TELEPORTATION_DELAY.toString(), TeleportationConfig.CAMPS_TELEPORT_DELAY.getIntValue());
             if (delay < 1)
                 delay = 1;
             if (delay > 1)
-                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.PREPARE_FOR_TELEPORTATION.ordinal(), String.valueOf(delay));
-            TeleportationProcess.create(TeleportationProcess.EnumTeleportations.CAMP, playerMP, worldPoint.getId(), delay);    
+                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.PREPARE_FOR_TELEPORTATION.ordinal(), String.valueOf(delay));
+            TeleportationProcess.create(TeleportationProcess.EnumTeleportation.CAMP, playerMP, worldPoint.getId(), delay);    
         }
     }
 
@@ -69,8 +69,9 @@ public class CampsManagerServer {
             UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
             TeleportationPlayerData playerData = this.manager.getPlayerData(playerUUID);
             if (playerData.getCampsAmount() 
-                    < PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue())) {
+                    < PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivilege.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue())) {
                 WorldPoint worldPoint = new WorldPoint(
+                        System.currentTimeMillis(),
                         playerUUID,
                         CommonReference.getName(playerMP), 
                         name, 
@@ -82,10 +83,9 @@ public class CampsManagerServer {
                         playerMP.rotationYawHead, 
                         playerMP.rotationPitch);
                 worldPoint.setId(pointId);
-                worldPoint.createDate();
                 playerData.addCamp(worldPoint);
-                OxygenHelperServer.savePersistentDataDelegated(playerData);
-                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.CAMP_CREATED.ordinal(), worldPoint.getName());
+                TeleportationLoaderServer.savePersistentDataDelegated(playerData);
+                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.CAMP_CREATED.ordinal(), worldPoint.getName());
             }
         }
     }
@@ -97,7 +97,7 @@ public class CampsManagerServer {
             WorldPoint worldPoint = this.getCamp(playerUUID, pointId);
             if (this.isOwner(playerUUID, worldPoint)) {
                 TeleportationPlayerData playerData = this.manager.getPlayerData(playerUUID);
-                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.CAMP_REMOVED.ordinal(), worldPoint.getName());
+                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.CAMP_REMOVED.ordinal(), worldPoint.getName());
                 playerData.removeCamp(pointId);
                 if (pointId == playerData.getFavoriteCampId())
                     playerData.setFavoriteCampId(0L);
@@ -105,10 +105,10 @@ public class CampsManagerServer {
 
                 if (this.manager.getSharedCampsManager().haveInvitedPlayers(playerUUID, pointId)) {
                     this.manager.getSharedCampsManager().removeCamp(playerUUID, pointId);
-                    OxygenHelperServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
+                    TeleportationLoaderServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
                 }
 
-                OxygenHelperServer.savePersistentDataDelegated(playerData);
+                TeleportationLoaderServer.savePersistentDataDelegated(playerData);
             }
         }
     }
@@ -120,7 +120,7 @@ public class CampsManagerServer {
                 && (this.campExist(playerUUID, pointId) || this.manager.getSharedCampsManager().haveInvitation(playerUUID, pointId))
                 && pointId != playerData.getFavoriteCampId()) {
             playerData.setFavoriteCampId(pointId);
-            OxygenHelperServer.savePersistentDataDelegated(playerData);
+            TeleportationLoaderServer.savePersistentDataDelegated(playerData);
         }
     }
 
@@ -141,14 +141,14 @@ public class CampsManagerServer {
 
                 if (this.manager.getSharedCampsManager().haveInvitedPlayers(playerUUID, oldPointId)) {
                     this.manager.getSharedCampsManager().replaceCamp(playerUUID, oldPointId, worldPoint);
-                    OxygenHelperServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
+                    TeleportationLoaderServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
                 }
 
-                OxygenHelperServer.savePersistentDataDelegated(playerData);
+                TeleportationLoaderServer.savePersistentDataDelegated(playerData);
                 if (flag)
-                    OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.CAMP_LOCKED.ordinal(), worldPoint.getName());
+                    OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.CAMP_LOCKED.ordinal(), worldPoint.getName());
                 else
-                    OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.CAMP_UNLOCKED.ordinal(), worldPoint.getName());
+                    OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.CAMP_UNLOCKED.ordinal(), worldPoint.getName());
             }
         }
     }
@@ -183,10 +183,10 @@ public class CampsManagerServer {
 
                     if (this.manager.getSharedCampsManager().haveInvitedPlayers(playerUUID, oldPointId)) {
                         this.manager.getSharedCampsManager().replaceCamp(playerUUID, oldPointId, worldPoint);
-                        OxygenHelperServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
+                        TeleportationLoaderServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
                     }
 
-                    OxygenHelperServer.savePersistentDataDelegated(playerData);
+                    TeleportationLoaderServer.savePersistentDataDelegated(playerData);
                 }
             }
         }
@@ -211,7 +211,7 @@ public class CampsManagerServer {
                                     pointId, 
                                     worldPoint.getName()), true);
                 } else
-                    OxygenHelperServer.sendMessage(playerMP, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessages.REQUEST_RESET.ordinal());
+                    OxygenHelperServer.sendMessage(playerMP, OxygenMain.OXYGEN_MOD_INDEX, EnumOxygenChatMessage.REQUEST_RESET.ordinal());
             }
         }
     }
@@ -224,11 +224,11 @@ public class CampsManagerServer {
             if (this.isOwner(ownerUUID, worldPoint)
                     && this.manager.getSharedCampsManager().haveInvitation(playerUUID, pointId)) {
                 this.manager.getSharedCampsManager().uninvite(ownerUUID, pointId, playerUUID);
-                OxygenHelperServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
+                TeleportationLoaderServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
 
                 OxygenHelperServer.removeObservedPlayer(ownerUUID, playerUUID, true);
 
-                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.UNINVITED.ordinal());
+                OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.UNINVITED.ordinal());
             }
         }
     }
@@ -240,15 +240,15 @@ public class CampsManagerServer {
         if (this.manager.getSharedCampsManager().haveInvitation(playerUUID, pointId)) {
             ownerUUID = this.manager.getSharedCampsManager().getCampOwner(pointId);            
             this.manager.getSharedCampsManager().uninvite(ownerUUID, pointId, playerUUID);
-            OxygenHelperServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
+            TeleportationLoaderServer.savePersistentDataDelegated(this.manager.getSharedCampsManager());
 
             OxygenHelperServer.removeObservedPlayer(ownerUUID, playerUUID, true);
 
             TeleportationPlayerData playerData =  this.manager.getPlayerData(playerUUID);
             if (playerData.getFavoriteCampId() == pointId)
                 playerData.setFavoriteCampId(0L);
-            OxygenHelperServer.savePersistentDataDelegated(playerData);                
-            OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessages.CAMP_LEFT.ordinal(), this.manager.getSharedCampsManager().getCamp(pointId).getName());
+            TeleportationLoaderServer.savePersistentDataDelegated(playerData);                
+            OxygenHelperServer.sendMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.CAMP_LEFT.ordinal(), this.manager.getSharedCampsManager().getCamp(pointId).getName());
         }
     }
 
@@ -279,6 +279,6 @@ public class CampsManagerServer {
 
     private boolean readyMoveToCamp(UUID playerUUID) {
         return System.currentTimeMillis() - this.manager.getPlayerData(playerUUID).getCooldownInfo().getLastCampTime() 
-                > PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivileges.CAMP_TELEPORTATION_COOLDOWN.toString(), TeleportationConfig.CAMPS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
+                > PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivilege.CAMP_TELEPORTATION_COOLDOWN.toString(), TeleportationConfig.CAMPS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
     }
 }

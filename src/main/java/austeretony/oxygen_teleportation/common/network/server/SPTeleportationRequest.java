@@ -1,7 +1,10 @@
 package austeretony.oxygen_teleportation.common.network.server;
 
+import java.util.UUID;
+
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.network.client.CPSyncInvitedPlayers;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -26,10 +29,12 @@ public class SPTeleportationRequest extends ProxyPacket {
     @Override
     public void read(PacketBuffer buffer, INetHandler netHandler) {
         EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
         this.request = EnumRequest.values()[buffer.readByte()];
         switch (this.request) {
         case SYNC_INVITED_PLAYERS:
-            TeleportationMain.network().sendTo(new CPSyncInvitedPlayers(CommonReference.getPersistentUUID(playerMP)), playerMP);
+            if (TeleportationManagerServer.instance().getSharedCampsManager().haveInvitations(playerUUID))
+                TeleportationMain.network().sendTo(new CPSyncInvitedPlayers(playerUUID), playerMP);
             break;
         }
     }

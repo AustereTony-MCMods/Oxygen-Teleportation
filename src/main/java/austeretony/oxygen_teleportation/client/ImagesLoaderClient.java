@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 
@@ -27,13 +26,7 @@ public class ImagesLoaderClient {
     }
 
     public void loadCampPreviewImagesDelegated() {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                loadCampPreviewImages();
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.loadCampPreviewImages());
     }
 
     public void loadCampPreviewImages() {
@@ -70,23 +63,11 @@ public class ImagesLoaderClient {
     }
 
     public void saveLatestCampPreviewImageDelegated(long pointId) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                saveCampPreviewImage(pointId, manager.getImagesManager().getLatestImage());
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.saveCampPreviewImage(pointId, manager.getImagesManager().getLatestImage()));
     }
 
     public void saveCampPreviewImageDelegated(long pointId, BufferedImage image) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                saveCampPreviewImage(pointId, image);
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.saveCampPreviewImage(pointId, image));
     }
 
     public void saveCampPreviewImage(long pointId, BufferedImage image) {
@@ -108,13 +89,7 @@ public class ImagesLoaderClient {
     }
 
     public void removeUnusedCampPreviewImagesDelegated() {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                removeUnusedCampPreviewImages();
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.removeUnusedCampPreviewImages());
     }
 
     public void removeUnusedCampPreviewImages() {
@@ -157,13 +132,7 @@ public class ImagesLoaderClient {
     }
 
     public void renameCampPreviewImageDelegated(long oldPointId, long newPointId) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                renameCampPreviewImage(oldPointId, newPointId);
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.renameCampPreviewImage(oldPointId, newPointId));
     }
 
     public void renameCampPreviewImage(long oldPointId, long newPointId) {
@@ -181,13 +150,7 @@ public class ImagesLoaderClient {
     }
 
     public void loadLocationPreviewImagesDelegated() {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                loadLocationPreviewImages();
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.loadLocationPreviewImages());
     }
 
     public void loadLocationPreviewImages() {
@@ -224,23 +187,11 @@ public class ImagesLoaderClient {
     }
 
     public void saveLatestLocationPreviewImageDelegated(long pointId) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                saveLocationPreviewImage(pointId, manager.getImagesManager().getLatestImage());
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.saveLocationPreviewImage(pointId, manager.getImagesManager().getLatestImage()));
     }
 
     public void saveLocationPreviewImageDelegated(long pointId, BufferedImage image) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                saveLocationPreviewImage(pointId, image);
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.saveLocationPreviewImage(pointId, image));
     }
 
     public void saveLocationPreviewImage(long pointId, BufferedImage image) {
@@ -262,13 +213,7 @@ public class ImagesLoaderClient {
     }
 
     public void removeUnusedLocationPreviewImagesDelegated() {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                removeUnusedLocationPreviewImages();
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.removeUnusedLocationPreviewImages());
     }
 
     public void removeUnusedLocationPreviewImages() {
@@ -298,13 +243,7 @@ public class ImagesLoaderClient {
     }
 
     public void removeLocationPreviewImageDelegated(long pointId) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                removeLocationPreviewImage(pointId);
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.removeLocationPreviewImage(pointId));
     }
 
     public void removeLocationPreviewImage(long pointId) {
@@ -321,13 +260,7 @@ public class ImagesLoaderClient {
     }
 
     public void renameLocationPreviewImageDelegated(long oldPointId, long newPointId) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                renameLocationPreviewImage(oldPointId, newPointId);
-            }     
-        });
+        OxygenHelperClient.addIOTask(()->this.renameLocationPreviewImage(oldPointId, newPointId));
     }
 
     public void renameLocationPreviewImage(long oldPointId, long newPointId) {

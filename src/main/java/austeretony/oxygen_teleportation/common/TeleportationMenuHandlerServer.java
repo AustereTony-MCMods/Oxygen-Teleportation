@@ -40,11 +40,20 @@ public class TeleportationMenuHandlerServer implements IComplexGUIHandlerServer 
 
     @Override
     public void writeEntries(UUID playerUUID, PacketBuffer buffer, long[] firstIds, long[] secondIds) {
-        if (firstIds != null)
-            for (long id : firstIds)
-                TeleportationManagerServer.instance().getPlayerData(playerUUID).getCamp(id).write(buffer);
-        if (secondIds != null)
+        if (firstIds != null) {
+            TeleportationPlayerData playerData = TeleportationManagerServer.instance().getPlayerData(playerUUID);
+            for (long id : firstIds) {
+                if (TeleportationManagerServer.instance().getSharedCampsManager().haveInvitation(playerUUID, id))
+                    TeleportationManagerServer.instance().getSharedCampsManager().getCamp(id).write(buffer);
+                else
+                    playerData.getCamp(id).write(buffer);
+            }
+            TeleportationManagerServer.instance().getImagesLoader().loadAndSendCampPreviewImagesDelegated(CommonReference.playerByUUID(playerUUID), firstIds);
+        }
+        if (secondIds != null) {
             for (long id : secondIds)
                 TeleportationManagerServer.instance().getWorldData().getLocation(id).write(buffer);
+            TeleportationManagerServer.instance().getImagesManager().downloadLocationPreviewsToClientDelegated(CommonReference.playerByUUID(playerUUID), secondIds);
+        }
     }
 }

@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import austeretony.alternateui.screen.core.GUIAdvancedElement;
+import austeretony.oxygen.client.api.OxygenHelperClient;
 import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.common.api.EnumDimension;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.common.main.WorldPoint;
+import austeretony.oxygen_teleportation.common.main.WorldPoint.EnumWorldPoint;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
@@ -48,7 +50,7 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
                 GlStateManager.pushMatrix();           
                 GlStateManager.translate(0.0F, 0.0F, 0.0F);           
                 GlStateManager.scale(1.3F, 1.3F, 0.0F);  
-                this.mc.fontRenderer.drawString(this.noImage, 240 / 2 - this.textWidth(this.noImage, 1.3F) + 5, 48, GUISettings.instance().getEnabledTextColor());
+                this.mc.fontRenderer.drawString(this.noImage, (240 - this.textWidth(this.noImage, 1.3F)) / 2, 48, GUISettings.instance().getEnabledTextColor());
                 GlStateManager.popMatrix();
             }
             drawGradientRect(0, 0, 241, 70, 0x00000000, 0xC8000000);
@@ -98,12 +100,15 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
         }
     }
 
-    public void show(WorldPoint worldPoint, boolean forceLoad) {
+    public void show(WorldPoint worldPoint, EnumWorldPoint type, boolean forceLoad) {
         ResourceLocation imageLocation = this.getPreviewImage(worldPoint.getId(), forceLoad);
         if (imageLocation != null)
             this.setTexture(imageLocation, 241, 135);
-        this.favorite = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerData().getFavoriteCampId();
-        this.shared = TeleportationManagerClient.instance().getSharedCampsManager().invitedPlayersExist(worldPoint.getId());
+        if (type == EnumWorldPoint.CAMP) {
+            this.favorite = worldPoint.getId() == TeleportationManagerClient.instance().getPlayerData().getFavoriteCampId();
+            this.shared = TeleportationManagerClient.instance().getSharedCampsManager().invitedPlayersExist(worldPoint.getId());
+            this.downloaded = !worldPoint.isOwner(OxygenHelperClient.getPlayerUUID());
+        }
         this.name = worldPoint.getName();
         this.owner = ClientReference.localize("teleportation.gui.menu.info.owner") + " " + worldPoint.ownerName;
         this.creationDate = worldPoint.getCreationDate();
@@ -111,10 +116,6 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
         this.dimension = EnumDimension.getLocalizedNameFromId(worldPoint.getDimensionId());
         this.processDescription(worldPoint.getDescription());
         this.setVisible(true);
-    }
-
-    public void setDownloaded() {
-        this.downloaded = true;
     }
 
     private void processDescription(String description) {     

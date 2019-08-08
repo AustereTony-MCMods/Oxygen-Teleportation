@@ -41,6 +41,7 @@ import austeretony.oxygen_teleportation.client.input.TeleportationKeyHandler;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 import austeretony.oxygen_teleportation.common.main.WorldPoint;
+import austeretony.oxygen_teleportation.common.main.WorldPoint.EnumWorldPoint;
 
 public class CampsGUISection extends AbstractGUISection {
 
@@ -248,9 +249,7 @@ public class CampsGUISection extends AbstractGUISection {
     }
 
     public void showPointInfo(boolean forceLoad) {
-        this.previewImageLabel.show(this.currentPoint, forceLoad);
-        if (!this.currentPoint.isOwner(OxygenHelperClient.getPlayerUUID()))
-            this.previewImageLabel.setDownloaded();
+        this.previewImageLabel.show(this.currentPoint, EnumWorldPoint.CAMP, forceLoad);
         this.moveButton.enableFull();
 
         if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown) {
@@ -263,7 +262,7 @@ public class CampsGUISection extends AbstractGUISection {
     }
 
     public void showFavoriteMark() {
-        this.previewImageLabel.show(this.currentPoint, false);
+        this.previewImageLabel.show(this.currentPoint, EnumWorldPoint.CAMP, false);
     }
 
     public void resetPointInfo() {

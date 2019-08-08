@@ -33,7 +33,9 @@ public class CPSyncAdditionalData extends ProxyPacket {
     public void read(PacketBuffer buffer, INetHandler netHandler) {
         TeleportationManagerClient.instance().getPlayerData().getCooldownInfo().read(buffer);
         TeleportationManagerClient.instance().getPlayerData().setFavoriteCampId(buffer.readLong());
-        if (TeleportationManagerClient.instance().getSharedCampsManager().getInvitationsContainer().getId() !=  buffer.readLong())
+        this.invitationsId = buffer.readLong();
+        if (this.invitationsId != 0L &&
+                TeleportationManagerClient.instance().getSharedCampsManager().getInvitationsContainer().getId() != this.invitationsId)
             TeleportationMain.network().sendToServer(new SPTeleportationRequest(SPTeleportationRequest.EnumRequest.SYNC_INVITED_PLAYERS));
     }
 }

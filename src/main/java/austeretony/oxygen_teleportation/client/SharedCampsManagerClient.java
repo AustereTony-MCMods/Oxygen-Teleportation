@@ -46,6 +46,10 @@ public class SharedCampsManagerClient implements IPersistentData {
         return this.invitations.invitedPlayers.get(pointId).set;
     }
 
+    public void uninvite(long pointId, UUID invitedUUID) {
+        this.invitations.invitedPlayers.get(pointId).remove(invitedUUID);
+    }
+
     @Override
     public String getName() {
         return "shared_camps";

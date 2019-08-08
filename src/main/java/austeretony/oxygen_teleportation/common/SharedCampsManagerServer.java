@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.common.api.IPersistentData;
 import austeretony.oxygen.util.ConcurrentSetWrapper;
-import austeretony.oxygen.util.OxygenUtils;
 import austeretony.oxygen.util.PacketBufferUtils;
 import austeretony.oxygen.util.StreamUtils;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
@@ -313,7 +312,7 @@ public class SharedCampsManagerServer implements IPersistentData {
         public final Map<Long, ConcurrentSetWrapper<UUID>> access = new ConcurrentHashMap<Long, ConcurrentSetWrapper<UUID>>();
 
         public void updateId() {
-            this.id = OxygenUtils.createDataStampedId();
+            this.id = System.currentTimeMillis();
         }
 
         public void setId(long id) {    

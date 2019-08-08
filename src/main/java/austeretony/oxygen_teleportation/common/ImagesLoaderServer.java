@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
@@ -32,13 +31,7 @@ public class ImagesLoaderServer {
     }
 
     public void loadAndSendCampPreviewImagesDelegated(EntityPlayerMP playerMP, long[] campIds) {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                loadAndSendCampPreviewImages(playerMP, campIds);
-            }     
-        });
+        TeleportationManagerServer.instance().getIOThread().addTask(()->this.loadAndSendCampPreviewImages(playerMP, campIds));
     }
 
     public void loadAndSendCampPreviewImages(EntityPlayerMP playerMP, long[] campIds) {
@@ -71,13 +64,7 @@ public class ImagesLoaderServer {
     }
 
     public void saveCampPreviewImageDelegated(UUID playerUUID, long pointId, BufferedImage image) {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                saveCampPreviewImage(playerUUID, pointId, image);
-            }     
-        });
+        TeleportationManagerServer.instance().getIOThread().addTask(()->this.saveCampPreviewImage(playerUUID, pointId, image));
     }
 
     public void saveCampPreviewImage(UUID playerUUID, long pointId, BufferedImage image) {
@@ -99,13 +86,7 @@ public class ImagesLoaderServer {
     }
 
     public void removeCampPreviewImageDelegated(UUID playerUUID, long pointId) {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                removeCampPreviewImage(playerUUID, pointId);
-            }     
-        });
+        TeleportationManagerServer.instance().getIOThread().addTask(()->this.removeCampPreviewImage(playerUUID, pointId));
     }
 
     public void removeCampPreviewImage(UUID playerUUID, long pointId) {
@@ -122,13 +103,7 @@ public class ImagesLoaderServer {
     }
 
     public void renameCampPreviewImageDelegated(UUID playerUUID, long oldPointId, long newPointId) {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                renameCampPreviewImage(playerUUID, oldPointId, newPointId);
-            }     
-        });
+        TeleportationManagerServer.instance().getIOThread().addTask(()->this.renameCampPreviewImage(playerUUID, oldPointId, newPointId));
     }
 
     public void renameCampPreviewImage(UUID playerUUID, long oldPointId, long newPointId) {
@@ -145,13 +120,7 @@ public class ImagesLoaderServer {
     }
 
     public void loadLocationPreviewImagesDelegated() {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                loadLocationPreviewImages();
-            }     
-        });
+        TeleportationManagerServer.instance().getIOThread().addTask(()->this.loadLocationPreviewImages());
     }
 
     public void loadLocationPreviewImages() {
@@ -190,13 +159,9 @@ public class ImagesLoaderServer {
     }
 
     public void saveAndLoadBytesLocationPreviewDelegated(long pointId, BufferedImage image) {        
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                saveLocationPreview(pointId, image);
-                loadLocationPreviewBytes(pointId);
-            }     
+        TeleportationManagerServer.instance().getIOThread().addTask(()->{
+            this.saveLocationPreview(pointId, image);
+            this.loadLocationPreviewBytes(pointId);   
         });
     }
 
@@ -247,13 +212,7 @@ public class ImagesLoaderServer {
     }
 
     public void removeLocationPreviewImageDelegated(long pointId) {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                removeLocationPreviewImage(pointId);
-            }     
-        });
+        TeleportationManagerServer.instance().getIOThread().addTask(()->this.removeLocationPreviewImage(pointId));
     }
 
     public void removeLocationPreviewImage(long pointId) {
@@ -270,13 +229,7 @@ public class ImagesLoaderServer {
     }
 
     public void renameLocationPreviewImageDelegated(long oldPointId, long newPointId) {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                renameLocationPreviewImage(oldPointId, newPointId);
-            }     
-        });
+        TeleportationManagerServer.instance().getIOThread().addTask(()->this.renameLocationPreviewImage(oldPointId, newPointId));
     }
 
     public void renameLocationPreviewImage(long oldPointId, long newPointId) {

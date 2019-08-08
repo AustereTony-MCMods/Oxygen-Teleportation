@@ -63,7 +63,7 @@ public class TeleportationMain {
     public static final String 
     MODID = "oxygen_teleportation",    
     NAME = "Oxygen: Teleportation",
-    VERSION = "0.8.0",
+    VERSION = "0.8.1",
     VERSION_CUSTOM = VERSION + ":beta:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Teleportation/info/mod_versions_forge.json";

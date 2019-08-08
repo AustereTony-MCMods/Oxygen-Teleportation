@@ -35,6 +35,7 @@ import austeretony.oxygen_teleportation.client.input.TeleportationKeyHandler;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 import austeretony.oxygen_teleportation.common.main.WorldPoint;
+import austeretony.oxygen_teleportation.common.main.WorldPoint.EnumWorldPoint;
 
 public class LocationsGUISection extends AbstractGUISection {
 
@@ -222,7 +223,7 @@ public class LocationsGUISection extends AbstractGUISection {
     }
 
     public void showPointInfo(boolean forceLoad) {
-        this.previewImageLabel.show(this.currentPoint, forceLoad);
+        this.previewImageLabel.show(this.currentPoint, EnumWorldPoint.LOCATION, forceLoad);
         this.moveButton.enableFull();
 
         if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown) {

@@ -41,7 +41,8 @@ public class InvitedPlayerGUIButton extends IndexedGUIButton<UUID> {
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {       
         if (this.uninviteButton.mouseClicked(mouseX, mouseY, mouseButton)) {
             TeleportationManagerClient.instance().getCampsManager().uninvitePlayerSynced(this.pointId, this.index);
-            this.setEnabled(false);
+            this.uninviteButton.disable();
+            this.disable();
             return true;
         }
         return false;

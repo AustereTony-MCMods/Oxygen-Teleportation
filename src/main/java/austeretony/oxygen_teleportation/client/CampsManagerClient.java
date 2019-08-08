@@ -164,6 +164,7 @@ public class CampsManagerClient {
     }
 
     public void uninvitePlayerSynced(long pointId, UUID playerUUID) {
+        this.manager.getSharedCampsManager().uninvite(pointId, playerUUID);
         TeleportationMain.network().sendToServer(new SPManageInvitation(SPManageInvitation.EnumOperation.UNINVITE, pointId, playerUUID));
         OxygenHelperClient.savePersistentDataDelegated(this.manager.getPlayerData());
     }

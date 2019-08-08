@@ -43,13 +43,7 @@ public class ImagesManagerServer {
     }
 
     public void downloadCampPreviewToClientDelegated(EntityPlayerMP playerMP, long pointId, BufferedImage bufferedImage) {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                downloadCampPreviewToClient(playerMP, pointId, bufferedImage);
-            }  
-        });
+        TeleportationManagerServer.instance().getIOThread().addTask(()->this.downloadCampPreviewToClient(playerMP, pointId, bufferedImage));
     }
 
     public void downloadCampPreviewToClient(EntityPlayerMP playerMP, long pointId, BufferedImage bufferedImage) {
@@ -63,13 +57,9 @@ public class ImagesManagerServer {
     }
 
     public void downloadLocationPreviewsToClientDelegated(EntityPlayerMP playerMP, long[] locationIds) {
-        TeleportationManagerServer.instance().getIOThread().addTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                for (long id : locationIds)
-                    downloadLocationPreviewToClient(playerMP, id);
-            }  
+        TeleportationManagerServer.instance().getIOThread().addTask(()->{
+            for (long id : locationIds)
+                this.downloadLocationPreviewToClient(playerMP, id);
         });
     }
 

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen_teleportation.client.util.ScreenshotHelper;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.network.server.SPStartImageUpload;
@@ -65,13 +64,7 @@ public class ImagesManagerClient {
     }
 
     public void uploadCampPreviewToServerDelegated(long pointId) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                uploadCampPreviewToServer(pointId);
-            }  
-        });
+        OxygenHelperClient.addIOTask(()->this.uploadCampPreviewToServer(pointId));
     }
 
     public void uploadCampPreviewToServer(long pointId) {
@@ -85,13 +78,7 @@ public class ImagesManagerClient {
     }
 
     public void uploadLocationPreviewToServerDelegated(long pointId) {
-        OxygenHelperClient.addIOTask(new IOxygenTask() {
-
-            @Override
-            public void execute() {
-                uploadLocationPreviewToServer(pointId);
-            }  
-        });
+        OxygenHelperClient.addIOTask(()->this.uploadLocationPreviewToServer(pointId));
     }
 
     public void uploadLocationPreviewToServer(long pointId) {

@@ -1,3 +1,9 @@
+0.8.1b [2019-08-08]
++Fixed images synchronization for unknown points.
++Fixed camp invitations synchrinization.
++Fixed interface desync when uninviting an player from camp.
++Fixed minor bugs for point information displaying.
+
 0.8.0b
 +Performance improvements.
 

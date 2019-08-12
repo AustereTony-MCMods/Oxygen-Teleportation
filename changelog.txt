@@ -1,3 +1,6 @@
+0.8.2b [2019-08-12]
++Added Oxygen Menu support.
+
 0.8.1b [2019-08-08]
 +Fixed images synchronization for unknown points.
 +Fixed camp invitations synchrinization.

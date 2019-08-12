@@ -1,10 +1,10 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/oxygen-teleportation",
   "1.12.2": {
-    "0.8.1": "Synchronization fixes."
+    "0.8.2": "Synchronization fixes."
   },
   "promos": {
-    "1.12.2-latest": "0.8.1",
-    "1.12.2-recommended": "0.8.1"
+    "1.12.2-latest": "0.8.2",
+    "1.12.2-recommended": "0.8.2"
   }
 }

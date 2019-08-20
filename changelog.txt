@@ -1,3 +1,10 @@
+0.8.3b [2019-08-20]
++Added teleportation fees setup. The fee can be set separately for 
+teleportation to camp, location and player. Currency or item can be used.
++Description for camps can now be multi-line. The maximum number of characters in the 
+description is increased to 400.
++Added 'privilege' to use your favorite camp keybind.
+
 0.8.2b [2019-08-12]
 +Added Oxygen Menu support.
 

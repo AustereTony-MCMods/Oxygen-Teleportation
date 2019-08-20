@@ -17,7 +17,9 @@ import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.alternateui.util.EnumGUIAlignment;
 import austeretony.alternateui.util.EnumGUIOrientation;
 import austeretony.oxygen.client.OxygenManagerClient;
+import austeretony.oxygen.client.api.OxygenGUIHelper;
 import austeretony.oxygen.client.api.OxygenHelperClient;
+import austeretony.oxygen.client.api.WatcherHelperClient;
 import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen.client.gui.IndexedGUIDropDownElement;
 import austeretony.oxygen.client.gui.OxygenGUITextures;
@@ -25,6 +27,7 @@ import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
 import austeretony.oxygen.common.api.EnumDimension;
 import austeretony.oxygen.common.main.EnumOxygenPrivilege;
+import austeretony.oxygen.common.main.OxygenPlayerData;
 import austeretony.oxygen.common.main.OxygenPlayerData.EnumActivityStatus;
 import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.oxygen.common.main.SharedPlayerData;
@@ -32,7 +35,7 @@ import austeretony.oxygen.util.MathUtils;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.client.gui.teleportation.players.PlayerGUIButton;
 import austeretony.oxygen_teleportation.client.gui.teleportation.players.PlayersBackgroundGUIFiller;
-import austeretony.oxygen_teleportation.client.input.TeleportationKeyHandler;
+import austeretony.oxygen_teleportation.client.input.TeleportationMenuKeyHandler;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
@@ -53,7 +56,7 @@ public class PlayersGUISection extends AbstractGUISection {
 
     private GUIButtonPanel playersListPanel;
 
-    private GUITextField searchTextField;
+    private GUITextField searchField;
 
     private GUIDropDownList statusDropDownList, jumpProfileDropDownList;
 
@@ -64,6 +67,8 @@ public class PlayersGUISection extends AbstractGUISection {
     private EnumActivityStatus clientStatus;
 
     private EnumJumpProfile currentJumpProfile;
+
+    private AdvancedBalanceGUIElement feeElement, balanceElement;
 
     private final String 
     moveToStr = ClientReference.localize("teleportation.gui.menu.moveButton"), 
@@ -107,19 +112,19 @@ public class PlayersGUISection extends AbstractGUISection {
 
         this.playersListPanel = new GUIButtonPanel(EnumGUIOrientation.VERTICAL, 87, 39, 237, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getPanelTextScale());
         this.addElement(this.playersListPanel);
-        this.addElement(this.searchTextField = new GUITextField(87, 14, 85, 9, WorldPoint.MAX_POINT_NAME_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
+        this.addElement(this.searchField = new GUITextField(87, 14, 85, 9, WorldPoint.MAX_NAME_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
                 .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
                 .setLineOffset(3).setDisplayText("...").cancelDraggedElementLogic().disableFull());
-        this.playersListPanel.initSearchField(this.searchTextField);
+        this.playersListPanel.initSearchField(this.searchField);
         GUIScroller scroller = new GUIScroller(MathUtils.clamp(OxygenHelperClient.getMaxPlayers(), 10, 1000), 10);
         this.playersListPanel.initScroller(scroller);
         GUISlider slider = new GUISlider(325, 39, 2, 110);
         slider.setDynamicBackgroundColor(GUISettings.instance().getEnabledSliderColor(), GUISettings.instance().getDisabledSliderColor(), GUISettings.instance().getHoveredSliderColor());
         scroller.initSlider(slider);
 
-        this.addElement(this.targetUsernameTextLabel = new GUITextLabel(3, 101).setTextScale(GUISettings.instance().getTextScale()));  
-        this.addElement(this.targetDimensionTextLabel = new GUITextLabel(3, 109).setTextScale(GUISettings.instance().getSubTextScale()));    
-        this.addElement(this.moveButton = new GUIButton(22, 137,  40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
+        this.addElement(this.targetUsernameTextLabel = new GUITextLabel(3, 83).setTextScale(GUISettings.instance().getTextScale()));  
+        this.addElement(this.targetDimensionTextLabel = new GUITextLabel(3, 91).setTextScale(GUISettings.instance().getSubTextScale()));    
+        this.addElement(this.moveButton = new GUIButton(3, 116, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
                 .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor())
                 .setTextScale(GUISettings.instance().getButtonTextScale()).enableTextShadow().disableFull());
 
@@ -159,8 +164,13 @@ public class PlayersGUISection extends AbstractGUISection {
         }
         this.addElement(this.statusDropDownList); 
 
+        this.addElement(this.feeElement = new AdvancedBalanceGUIElement(76, 118).disableFull());   
+        this.addElement(this.balanceElement = new AdvancedBalanceGUIElement(76, 139).disableFull()); 
+        this.feeElement.setItemStack(this.screen.feeStack);
+        this.balanceElement.setItemStack(this.screen.feeStack);
+
         if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown) {
-            this.addElement(this.cooldownTextLabel = new GUITextLabel(64, 138).setTextScale(GUISettings.instance().getTextScale()).disableFull());  
+            this.addElement(this.cooldownTextLabel = new GUITextLabel(3, 129).setTextScale(GUISettings.instance().getTextScale()).disableFull());  
             this.cooldown = true;
         }      
     }
@@ -201,7 +211,7 @@ public class PlayersGUISection extends AbstractGUISection {
         this.playersAmountTextLabel.setDisplayText(String.valueOf(players.size()) + " / " + String.valueOf(OxygenHelperClient.getMaxPlayers()));   
         this.playersAmountTextLabel.setX(325 - this.textWidth(this.playersAmountTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale()));
 
-        this.searchTextField.reset();
+        this.searchField.reset();
 
         this.playersListPanel.getScroller().resetPosition();
         this.playersListPanel.getScroller().getSlider().reset();
@@ -218,9 +228,9 @@ public class PlayersGUISection extends AbstractGUISection {
 
     @Override
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (this.searchTextField.isEnabled() && !this.searchTextField.isHovered()) {
+        if (this.searchField.isEnabled() && !this.searchField.isHovered()) {
             this.searchButton.enableFull();
-            this.searchTextField.disableFull();
+            this.searchField.disableFull();
         }
         return super.mouseClicked(mouseX, mouseY, mouseButton);              
     }
@@ -233,7 +243,7 @@ public class PlayersGUISection extends AbstractGUISection {
             else if (element == this.locationsPageButton)
                 this.screen.getLocationsSection().open();
             else if (element == this.searchButton) {
-                this.searchTextField.enableFull();
+                this.searchField.enableFull();
                 this.searchButton.disableFull();
             } else if (element == this.sortDownStatusButton) {
                 if (!this.sortDownStatusButton.isToggled()) {
@@ -272,7 +282,7 @@ public class PlayersGUISection extends AbstractGUISection {
                     this.sortUpStatusButton.setToggled(false);
                 }
             } else if (element == this.refreshButton) {
-                this.searchTextField.reset();
+                this.searchField.reset();
                 this.sortPlayers(0);
                 this.resetPlayerInfo();
             } else if (element == this.moveButton) {
@@ -336,6 +346,22 @@ public class PlayersGUISection extends AbstractGUISection {
             this.cooldownTextLabel.enableFull();
             this.moveButton.disable();
         }
+
+        int fee = PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.JUMP_TO_PLAYER_FEE.toString(), TeleportationConfig.JUMP_TO_PLAYER_FEE.getIntValue());
+        if (fee > 0) {
+            this.feeElement.setBalance(fee);
+            if (this.screen.feeStack == null)
+                this.balanceElement.setBalance(WatcherHelperClient.getInt(OxygenPlayerData.CURRENCY_COINS_WATCHER_ID));
+            else
+                this.balanceElement.setBalance(this.screen.feeStackBalance);
+            this.feeElement.enableFull();
+            this.balanceElement.enableFull();
+
+            if (fee > this.balanceElement.getBalance()) {
+                this.moveButton.disable();
+                this.feeElement.setRed(true);
+            }
+        }
     }
 
     private void resetPlayerInfo() {
@@ -345,12 +371,19 @@ public class PlayersGUISection extends AbstractGUISection {
 
         if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown)
             this.cooldownTextLabel.disableFull();
+
+        this.feeElement.disableFull();
+        this.balanceElement.disableFull();
     }
 
     @Override
     public boolean keyTyped(char typedChar, int keyCode) {   
-        if (keyCode == TeleportationKeyHandler.OPEN_MENU.getKeyCode() && !this.hasCurrentCallback() && !this.searchTextField.isDragged())
-            this.screen.close();
+        if (!this.searchField.isDragged() && !this.hasCurrentCallback())
+            if (OxygenGUIHelper.isOxygenMenuEnabled()) {
+                if (keyCode == TeleportationMenuGUIScreen.TELEPORTATIOIN_MENU_ENTRY.index + 2)
+                    this.screen.close();
+            } else if (keyCode == TeleportationMenuKeyHandler.TELEPORTATION_MENU.getKeyCode())
+                this.screen.close();
         return super.keyTyped(typedChar, keyCode); 
     }
 

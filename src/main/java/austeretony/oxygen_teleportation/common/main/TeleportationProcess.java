@@ -3,8 +3,14 @@ package austeretony.oxygen_teleportation.common.main;
 import java.util.UUID;
 
 import austeretony.oxygen.common.api.OxygenHelperServer;
+import austeretony.oxygen.common.api.SoundEventHelperServer;
+import austeretony.oxygen.common.api.WatcherHelperServer;
 import austeretony.oxygen.common.api.process.AbstractTemporaryProcess;
 import austeretony.oxygen.common.core.api.CommonReference;
+import austeretony.oxygen.common.currency.CurrencyHelperServer;
+import austeretony.oxygen.common.itemstack.InventoryHelper;
+import austeretony.oxygen.common.main.OxygenPlayerData;
+import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.oxygen.common.privilege.api.PrivilegeProviderServer;
 import austeretony.oxygen_teleportation.common.TeleportationLoaderServer;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
@@ -26,6 +32,8 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
 
     private final boolean processOnMove;
 
+    private final int fee;
+
     private TeleportationProcess(EnumTeleportation type, EntityPlayerMP player, int delay) {
         super();
         this.type = type;
@@ -36,6 +44,22 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
         this.processOnMove = PrivilegeProviderServer.getPrivilegeValue(CommonReference.getPersistentUUID(player), EnumTeleportationPrivilege.PROCESS_TELEPORTATION_ON_MOVE.toString(), 
                 TeleportationConfig.PROCESS_TELEPORTATION_ON_MOVE.getBooleanValue());
         this.counter = delay * 20;
+        switch (type) {
+        case CAMP:
+            this.fee = PrivilegeProviderServer.getPrivilegeValue(CommonReference.getPersistentUUID(player), EnumTeleportationPrivilege.CAMP_TELEPORTATION_FEE.toString(), 
+                    TeleportationConfig.CAMP_TELEPORTATION_FEE.getIntValue());
+            break;
+        case LOCATION:
+            this.fee = PrivilegeProviderServer.getPrivilegeValue(CommonReference.getPersistentUUID(player), EnumTeleportationPrivilege.LOCATION_TELEPORTATION_FEE.toString(), 
+                    TeleportationConfig.LOCATION_TELEPORTATION_FEE.getIntValue());
+            break;
+        case JUMP:
+            this.fee = PrivilegeProviderServer.getPrivilegeValue(CommonReference.getPersistentUUID(player), EnumTeleportationPrivilege.JUMP_TO_PLAYER_FEE.toString(), 
+                    TeleportationConfig.JUMP_TO_PLAYER_FEE.getIntValue());
+            break;
+        default:
+            this.fee = 0;
+        }
     }
 
     private TeleportationProcess(EnumTeleportation type, EntityPlayerMP player, long pointId, int delay) {
@@ -79,6 +103,21 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
                 return true;
             if (this.type == EnumTeleportation.JUMP && !OxygenHelperServer.isOnline(CommonReference.getPersistentUUID(this.target)))
                 return true;
+            if (this.fee > 0) {
+                if (TeleportationConfig.FEE_MODE.getIntValue() == 1) {
+                    if (InventoryHelper.getEqualStackAmount(this.player, TeleportationManagerServer.instance().getFeeStackWrapper()) < this.fee)
+                        return true;
+                    InventoryHelper.removeEqualStack(this.player, TeleportationManagerServer.instance().getFeeStackWrapper(), this.fee);
+                    SoundEventHelperServer.playSoundClient(this.player, OxygenSoundEffects.INVENTORY.id);
+                } else {
+                    UUID playerUUID = CommonReference.getPersistentUUID(this.player);
+                    if (!CurrencyHelperServer.enoughCurrency(playerUUID, this.fee))
+                        return true;
+                    CurrencyHelperServer.removeCurrency(playerUUID, this.fee);
+                    WatcherHelperServer.setValue(playerUUID, OxygenPlayerData.CURRENCY_COINS_WATCHER_ID, (int) CurrencyHelperServer.getCurrency(playerUUID));
+                    SoundEventHelperServer.playSoundClient(this.player, OxygenSoundEffects.SELL.id);
+                }
+            }
             this.expired();
             return true;
         }
@@ -93,10 +132,10 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
     @Override
     public void expired() {
         UUID playerUUID = CommonReference.getPersistentUUID(this.player);
+        TeleportationPlayerData playerData = TeleportationManagerServer.instance().getPlayerData(playerUUID);
         WorldPoint point;
         switch (this.type) {
         case CAMP:
-            TeleportationPlayerData playerData = TeleportationManagerServer.instance().getPlayerData(playerUUID);
             if (TeleportationManagerServer.instance().getSharedCampsManager().haveInvitation(playerUUID, this.pointId))
                 point = TeleportationManagerServer.instance().getSharedCampsManager().getCamp(this.pointId);
             else
@@ -114,8 +153,8 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
             CommonReference.teleportPlayer(this.player, point.getDimensionId(), point.getXPos(), point.getYPos(), point.getZPos(), point.getYaw(), point.getPitch());
             if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivilege.LOCATION_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.LOCATIONS_TELEPORT_COOLDOWN.getIntValue()) > 0) {
-                TeleportationManagerServer.instance().getPlayerData(playerUUID).getCooldownInfo().movedToLocation();
-                TeleportationMain.network().sendTo(new CPSyncCooldown(), this.player);
+                playerData.getCooldownInfo().movedToLocation();
+                TeleportationMain.network().sendTo(new CPSyncCooldown(playerData.getCooldownInfo()), this.player);
             }
             OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.MOVED_TO_LOCATION.ordinal(), point.getName());
             break;
@@ -123,8 +162,8 @@ public class TeleportationProcess extends AbstractTemporaryProcess {
             CommonReference.teleportPlayer(this.player, this.target.dimension, (float) this.target.posX, (float) this.target.posY, (float) this.target.posZ, this.target.rotationYawHead, this.target.rotationPitch);
             if (PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivilege.PLAYER_TELEPORTATION_COOLDOWN.toString(), 
                     TeleportationConfig.PLAYERS_TELEPORT_COOLDOWN.getIntValue()) > 0) {
-                TeleportationManagerServer.instance().getPlayerData(playerUUID).getCooldownInfo().jumped();
-                TeleportationMain.network().sendTo(new CPSyncCooldown(), this.player);
+                playerData.getCooldownInfo().jumped();
+                TeleportationMain.network().sendTo(new CPSyncCooldown(playerData.getCooldownInfo()), this.player);
             }
             OxygenHelperServer.sendMessage(this.player, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationChatMessage.MOVED_TO_PLAYER.ordinal(), CommonReference.getName(this.target));
             break;

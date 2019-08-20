@@ -3,30 +3,22 @@ package austeretony.oxygen_teleportation.client.input;
 import org.lwjgl.input.Keyboard;
 
 import austeretony.oxygen.client.core.api.ClientReference;
-import austeretony.oxygen.client.sync.gui.api.ComplexGUIHandlerClient;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
-import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 
 public class TeleportationKeyHandler {
 
-    public static final KeyBinding 
-    OPEN_MENU = new KeyBinding("key.teleportation.openMenu", Keyboard.KEY_Y, "Oxygen"),
-    MOVE_TO_CAMP = new KeyBinding("key.teleportation.moveToCamp", Keyboard.KEY_H, "Oxygen");
+    public static final KeyBinding MOVE_TO_CAMP = new KeyBinding("key.teleportation.moveToCamp", Keyboard.KEY_H, "Oxygen");
 
     public TeleportationKeyHandler() {
-        ClientReference.registerKeyBinding(OPEN_MENU);
         ClientReference.registerKeyBinding(MOVE_TO_CAMP);
     }
 
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
-        if (OPEN_MENU.isPressed()) {
-            ClientReference.getGameSettings().hideGUI = true;
-            ComplexGUIHandlerClient.openScreen(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
-        } else if (MOVE_TO_CAMP.isPressed()) 
+        if (MOVE_TO_CAMP.isPressed()) 
             TeleportationManagerClient.instance().getCampsManager().moveToFavoriteCampSynced();       
     }   
 }

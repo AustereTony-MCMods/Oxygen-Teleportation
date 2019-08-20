@@ -6,6 +6,7 @@ import austeretony.oxygen.common.api.event.OxygenPrivilegesLoadedEvent;
 import austeretony.oxygen.common.api.event.OxygenWorldLoadedEvent;
 import austeretony.oxygen_teleportation.common.TeleportationLoaderServer;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
+import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -17,6 +18,8 @@ public class TeleportationEventsServer {
         TeleportationLoaderServer.loadPersistentDataDelegated(TeleportationManagerServer.instance().getWorldData());
         TeleportationManagerServer.instance().getImagesLoader().loadLocationPreviewImagesDelegated();
         TeleportationLoaderServer.loadPersistentDataDelegated(TeleportationManagerServer.instance().getSharedCampsManager());
+        if (TeleportationConfig.FEE_MODE.getIntValue() == 1)
+            TeleportationLoaderServer.loadFeeItemStackDelegated();
     }
 
     @SubscribeEvent

@@ -16,8 +16,8 @@ import net.minecraft.network.PacketBuffer;
 public class WorldPoint {
 
     public static final int 
-    MAX_POINT_NAME_LENGTH = 20,
-    MAX_POINT_DESCRIPTION_LENGTH = 80;
+    MAX_NAME_LENGTH = 20,
+    MAX_DESCRIPTION_LENGTH = 400;
 
     public static final DateFormat CREATED_DATE_FORMAT = new SimpleDateFormat("d MM yyyy");
 
@@ -41,8 +41,8 @@ public class WorldPoint {
         this.creationTime = creationTime;
         this.ownerUUID = ownerUUID;
         this.ownerName = ownerName;	
-        this.name = name.length() > MAX_POINT_NAME_LENGTH ? name.substring(0, MAX_POINT_NAME_LENGTH) : name;		
-        this.desc = description.length() > MAX_POINT_DESCRIPTION_LENGTH ? description.substring(0, MAX_POINT_DESCRIPTION_LENGTH) : description;
+        this.name = name.length() > MAX_NAME_LENGTH ? name.substring(0, MAX_NAME_LENGTH) : name;		
+        this.desc = description.length() > MAX_DESCRIPTION_LENGTH ? description.substring(0, MAX_DESCRIPTION_LENGTH) : description;
         this.dimension = dimension;
         this.xPos = xPos;
         this.yPos = yPos;

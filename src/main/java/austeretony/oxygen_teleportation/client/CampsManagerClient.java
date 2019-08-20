@@ -3,9 +3,12 @@ package austeretony.oxygen_teleportation.client;
 import java.util.UUID;
 
 import austeretony.oxygen.client.api.OxygenHelperClient;
+import austeretony.oxygen.client.api.WatcherHelperClient;
 import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
 import austeretony.oxygen.client.sync.gui.api.ComplexGUIHandlerClient;
+import austeretony.oxygen.common.itemstack.InventoryHelper;
+import austeretony.oxygen.common.main.OxygenPlayerData;
 import austeretony.oxygen.util.ConcurrentSetWrapper;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
@@ -45,7 +48,18 @@ public class CampsManagerClient {
     }
 
     public void moveToFavoriteCampSynced() {        
-        if (this.manager.getPlayerData().getFavoriteCampId() != 0L) {
+        if (this.manager.getPlayerData().isFavoriteCampExist() 
+                && PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.ENABLE_FAVORITE_CAMP.toString(), TeleportationConfig.ENABLE_FAVORITE_CAMP.getBooleanValue())) {
+            int fee = PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.CAMP_TELEPORTATION_FEE.toString(), TeleportationConfig.CAMP_TELEPORTATION_FEE.getIntValue());
+            if (fee > 0) {
+                if (TeleportationConfig.FEE_MODE.getIntValue() == 1) {
+                    if (InventoryHelper.getEqualStackAmount(ClientReference.getClientPlayer(), this.manager.getFeeStackWrapper()) < fee)
+                        return;
+                } else {
+                    if (WatcherHelperClient.getInt(OxygenPlayerData.CURRENCY_COINS_WATCHER_ID) < fee)
+                        return;
+                }
+            }
             TeleportationMain.network().sendToServer(new SPMoveToFavoriteCamp(this.manager.getPlayerData().getFavoriteCampId()));
             this.manager.setTeleportationDelay(PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.CAMP_TELEPORTATION_DELAY.toString(), TeleportationConfig.CAMPS_TELEPORT_DELAY.getIntValue()));
         }

@@ -4,6 +4,7 @@ import austeretony.alternateui.screen.button.GUIButton;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
+import austeretony.alternateui.screen.text.GUITextBoxField;
 import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.oxygen.client.core.api.ClientReference;
@@ -20,7 +21,9 @@ public class CampCreationGUICallback extends AbstractGUICallback {
 
     private final CampsGUISection section;
 
-    private GUITextField nameField, descriptionField;
+    private GUITextField nameField;
+
+    private GUITextBoxField descriptionField;
 
     private GUIButton confirmButton, cancelButton;
 
@@ -37,12 +40,11 @@ public class CampCreationGUICallback extends AbstractGUICallback {
         this.addElement(new GUITextLabel(2, 16).setDisplayText(ClientReference.localize("oxygen.gui.name"), false, GUISettings.instance().getSubTextScale()));    
         this.addElement(new GUITextLabel(2, 36).setDisplayText(ClientReference.localize("oxygen.gui.description"), false, GUISettings.instance().getSubTextScale()));    
 
-        this.addElement(this.nameField = new GUITextField(2, 25, 136, 9, WorldPoint.MAX_POINT_NAME_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
+        this.addElement(this.nameField = new GUITextField(2, 25, 136, 9, WorldPoint.MAX_NAME_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
                 .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
                 .setLineOffset(3).cancelDraggedElementLogic());
-        this.addElement(this.descriptionField = new GUITextField(2, 45, 136, 9, WorldPoint.MAX_POINT_DESCRIPTION_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
-                .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
-                .setLineOffset(3).cancelDraggedElementLogic());
+
+        this.addElement(this.descriptionField = new GUITextBoxField(2, 45, 136, 50, WorldPoint.MAX_DESCRIPTION_LENGTH).setLineOffset(2).setTextScale(GUISettings.instance().getSubTextScale()).enableDynamicBackground().cancelDraggedElementLogic());
 
         this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
         this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));

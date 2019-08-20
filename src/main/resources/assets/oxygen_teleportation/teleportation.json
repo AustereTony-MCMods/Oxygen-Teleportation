@@ -28,5 +28,11 @@
     "cooldown_seconds": 0,
     "default_jump_profile": 1,
     "jump_request_expire_seconds": 20
+  },
+  "fees": {
+    "fee_mode": 0,
+    "camp_teleportation_fee": 0,
+    "location_teleportation_fee": 0,
+    "jump_to_player_fee":  0
   }
 }

@@ -3,9 +3,15 @@ package austeretony.oxygen_teleportation.client.gui.teleportation;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.core.GUIWorkspace;
+import austeretony.oxygen.client.core.api.ClientReference;
+import austeretony.oxygen.client.gui.AbstractMenuEntry;
 import austeretony.oxygen.client.gui.SynchronizedGUIScreen;
+import austeretony.oxygen.common.itemstack.InventoryHelper;
+import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
+import austeretony.oxygen_teleportation.client.gui.TeleportationMenuEntry;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 public class TeleportationMenuGUIScreen extends SynchronizedGUIScreen {
@@ -21,14 +27,27 @@ public class TeleportationMenuGUIScreen extends SynchronizedGUIScreen {
     LEAVE_CAMP_CALLBACK_BACKGROUND = new ResourceLocation(TeleportationMain.MODID, "textures/gui/teleportation/leave_camp_callback.png"),
     INVITATIONS_CALLBACK_BACKGROUND = new ResourceLocation(TeleportationMain.MODID, "textures/gui/teleportation/invitations_callback.png");
 
+    public static final AbstractMenuEntry TELEPORTATIOIN_MENU_ENTRY = new TeleportationMenuEntry();
+
     private CampsGUISection campsSection;
 
     private LocationsGUISection locationsSection;
 
     private PlayersGUISection playersSection;
 
+    public final ItemStack feeStack;
+
+    public final int feeStackBalance;
+
     public TeleportationMenuGUIScreen() {
         super(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
+        if (TeleportationConfig.FEE_MODE.getIntValue() == 1) {
+            this.feeStack = TeleportationManagerClient.instance().getFeeStackWrapper().getItemStack();
+            this.feeStackBalance = InventoryHelper.getEqualStackAmount(ClientReference.getClientPlayer(), this.feeStack);
+        } else {
+            this.feeStack = null;
+            this.feeStackBalance = - 1;
+        }
     }
 
     @Override

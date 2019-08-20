@@ -34,7 +34,12 @@ public class TeleportationConfig extends AbstractConfigHolder {
     PLAYERS_TELEPORT_DELAY = new ConfigValue(ConfigValue.EnumValueType.INT, "players", "teleport_delay_seconds"),
     PLAYERS_TELEPORT_COOLDOWN = new ConfigValue(ConfigValue.EnumValueType.INT, "players", "cooldown_seconds"),
     DEFAULT_JUMP_PROFILE = new ConfigValue(ConfigValue.EnumValueType.INT, "players", "default_jump_profile"),
-    JUMP_REQUEST_EXPIRE_TIME = new ConfigValue(ConfigValue.EnumValueType.INT, "players", "jump_request_expire_seconds");
+    JUMP_REQUEST_EXPIRE_TIME = new ConfigValue(ConfigValue.EnumValueType.INT, "players", "jump_request_expire_seconds"),
+
+    FEE_MODE = new ConfigValue(ConfigValue.EnumValueType.INT, "fees", "fee_mode"),
+    CAMP_TELEPORTATION_FEE = new ConfigValue(ConfigValue.EnumValueType.INT, "fees", "camp_teleportation_fee"),
+    LOCATION_TELEPORTATION_FEE = new ConfigValue(ConfigValue.EnumValueType.INT, "fees", "location_teleportation_fee"),
+    JUMP_TO_PLAYER_FEE = new ConfigValue(ConfigValue.EnumValueType.INT, "fees", "jump_to_player_fee");
 
     @Override
     public String getModId() {
@@ -83,6 +88,11 @@ public class TeleportationConfig extends AbstractConfigHolder {
         values.add(PLAYERS_TELEPORT_COOLDOWN);
         values.add(DEFAULT_JUMP_PROFILE);
         values.add(JUMP_REQUEST_EXPIRE_TIME);
+
+        values.add(FEE_MODE);
+        values.add(CAMP_TELEPORTATION_FEE);
+        values.add(LOCATION_TELEPORTATION_FEE);
+        values.add(JUMP_TO_PLAYER_FEE);
     }
 
     @Override

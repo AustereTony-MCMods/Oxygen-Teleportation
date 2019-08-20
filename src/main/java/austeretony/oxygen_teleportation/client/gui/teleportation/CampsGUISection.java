@@ -16,11 +16,14 @@ import austeretony.alternateui.screen.text.GUITextField;
 import austeretony.alternateui.screen.text.GUITextLabel;
 import austeretony.alternateui.util.EnumGUIAlignment;
 import austeretony.alternateui.util.EnumGUIOrientation;
+import austeretony.oxygen.client.api.OxygenGUIHelper;
 import austeretony.oxygen.client.api.OxygenHelperClient;
+import austeretony.oxygen.client.api.WatcherHelperClient;
 import austeretony.oxygen.client.core.api.ClientReference;
 import austeretony.oxygen.client.gui.OxygenGUITextures;
 import austeretony.oxygen.client.gui.settings.GUISettings;
 import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
+import austeretony.oxygen.common.main.OxygenPlayerData;
 import austeretony.oxygen.common.main.OxygenSoundEffects;
 import austeretony.oxygen.util.MathUtils;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
@@ -37,7 +40,7 @@ import austeretony.oxygen_teleportation.client.gui.teleportation.camps.context.I
 import austeretony.oxygen_teleportation.client.gui.teleportation.camps.context.LockContextAction;
 import austeretony.oxygen_teleportation.client.gui.teleportation.camps.context.MakeFavoriteContextAction;
 import austeretony.oxygen_teleportation.client.gui.teleportation.camps.context.RemoveContextAction;
-import austeretony.oxygen_teleportation.client.input.TeleportationKeyHandler;
+import austeretony.oxygen_teleportation.client.input.TeleportationMenuKeyHandler;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 import austeretony.oxygen_teleportation.common.main.WorldPoint;
@@ -60,7 +63,9 @@ public class CampsGUISection extends AbstractGUISection {
 
     private WorldPoint currentPoint;
 
-    private GUITextField searchTextField;
+    private GUITextField searchField;
+
+    private AdvancedBalanceGUIElement feeElement, balanceElement;
 
     private AbstractGUICallback creationCallback, inviteCallback, invitationsCallback, pointEditingCallback, 
     removePointCallback, leavePointCallback;
@@ -98,14 +103,14 @@ public class CampsGUISection extends AbstractGUISection {
         this.addElement(this.sortDownButton = new GUIButton(2, 19, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
         this.addElement(this.sortUpButton = new GUIButton(2, 15, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SORT_UP_ICONS, 3, 3).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
         this.addElement(this.refreshButton = new GUIButton(0, 14, 10, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.REFRESH_ICONS, 9, 9).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.refresh"), GUISettings.instance().getTooltipScale()));
-        this.addElement(this.pointsAmountTextLabel = new GUITextLabel(0, 15).setTextScale(GUISettings.instance().getSubTextScale()));	
+        this.addElement(this.pointsAmountTextLabel = new GUITextLabel(0, 15).setTextScale(GUISettings.instance().getSubTextScale()));	  
 
         this.pointsListPanel = new GUIButtonPanel(EnumGUIOrientation.VERTICAL, 0, 24, 82, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getTextScale());
         this.addElement(this.pointsListPanel);
-        this.addElement(this.searchTextField = new GUITextField(0, 14, 85, 9, WorldPoint.MAX_POINT_NAME_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
+        this.addElement(this.searchField = new GUITextField(0, 14, 85, 9, WorldPoint.MAX_NAME_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
                 .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
                 .setLineOffset(3).setDisplayText("...").cancelDraggedElementLogic().disableFull());
-        this.pointsListPanel.initSearchField(this.searchTextField);
+        this.pointsListPanel.initSearchField(this.searchField);
         GUIScroller scroller = new GUIScroller(MathUtils.clamp(maxCamps, 10, 100), 10);
         this.pointsListPanel.initScroller(scroller);
         GUISlider slider = new GUISlider(83, 24, 2, 109);
@@ -130,11 +135,11 @@ public class CampsGUISection extends AbstractGUISection {
         menu.addElement(new EditContextAction(this));
         menu.addElement(new RemoveContextAction(this));
 
-        this.creationCallback = new CampCreationGUICallback(this.screen, this, 140, 71).enableDefaultBackground();
+        this.creationCallback = new CampCreationGUICallback(this.screen, this, 140, 112).enableDefaultBackground();
         this.inviteCallback = new InviteGUICallback(this.screen, this, 140, 68).enableDefaultBackground();
         this.invitationsCallback = new InvitationsGUICallback(this.screen, this, 140, 81).enableDefaultBackground();
 
-        this.pointEditingCallback = new EditCampGUICallback(this.screen, this, 140, 92).enableDefaultBackground();
+        this.pointEditingCallback = new EditCampGUICallback(this.screen, this, 140, 133).enableDefaultBackground();
         this.removePointCallback = new CampRemoveGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
         this.leavePointCallback = new LeaveCampGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
 
@@ -143,8 +148,13 @@ public class CampsGUISection extends AbstractGUISection {
                 .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor())
                 .setDisplayText(ClientReference.localize("teleportation.gui.menu.moveButton"), true, GUISettings.instance().getButtonTextScale()).disableFull());
 
+        this.addElement(this.feeElement = new AdvancedBalanceGUIElement(156, 139).disableFull());   
+        this.addElement(this.balanceElement = new AdvancedBalanceGUIElement(this.getWidth() - 12, 139).disableFull()); 
+        this.feeElement.setItemStack(this.screen.feeStack);
+        this.balanceElement.setItemStack(this.screen.feeStack);
+
         if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown) {
-            this.addElement(this.cooldownTextLabel = new GUITextLabel(134, 138).setTextScale(GUISettings.instance().getTextScale()).disableFull());  
+            this.addElement(this.cooldownTextLabel = new GUITextLabel(166, 139).setTextScale(GUISettings.instance().getTextScale()).disableFull());  
             this.cooldown = true;
         }
     }
@@ -181,7 +191,7 @@ public class CampsGUISection extends AbstractGUISection {
         this.pointsAmountTextLabel.setX(83 - this.textWidth(this.pointsAmountTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale()));
         this.refreshButton.setX(this.pointsAmountTextLabel.getX() - 11);
 
-        this.searchTextField.reset();
+        this.searchField.reset();
 
         this.pointsListPanel.getScroller().resetPosition();
         this.pointsListPanel.getScroller().getSlider().reset();
@@ -192,12 +202,12 @@ public class CampsGUISection extends AbstractGUISection {
 
     @Override
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (this.searchTextField.isEnabled() && !this.searchTextField.isHovered()) {
+        if (this.searchField.isEnabled() && !this.searchField.isHovered()) {
             this.sortUpButton.enableFull();
             this.sortDownButton.enableFull();
             this.searchButton.enableFull();
             this.refreshButton.enableFull();
-            this.searchTextField.disableFull();
+            this.searchField.disableFull();
         }
         return super.mouseClicked(mouseX, mouseY, mouseButton);  	    	
     }
@@ -211,7 +221,7 @@ public class CampsGUISection extends AbstractGUISection {
         else if (element == this.createButton)
             this.creationCallback.open();
         else if (element == this.searchButton) {
-            this.searchTextField.enableFull();
+            this.searchField.enableFull();
             this.sortUpButton.disableFull();
             this.sortDownButton.disableFull();
             this.searchButton.disableFull();
@@ -229,7 +239,7 @@ public class CampsGUISection extends AbstractGUISection {
                 this.sortUpButton.toggle();
             }
         } else if (element == this.refreshButton) {
-            this.searchTextField.reset();
+            this.searchField.reset();
             this.sortPoints(0);
             this.resetPointInfo();
         } else if (element == this.moveButton) {
@@ -259,6 +269,22 @@ public class CampsGUISection extends AbstractGUISection {
 
         if (this.currentPoint.isLocked() && !this.currentPoint.isOwner(OxygenHelperClient.getPlayerUUID()))
             this.moveButton.disable();
+
+        int fee = PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.CAMP_TELEPORTATION_FEE.toString(), TeleportationConfig.CAMP_TELEPORTATION_FEE.getIntValue());
+        if (fee > 0) {
+            this.feeElement.setBalance(fee);
+            if (this.screen.feeStack == null)
+                this.balanceElement.setBalance(WatcherHelperClient.getInt(OxygenPlayerData.CURRENCY_COINS_WATCHER_ID));
+            else
+                this.balanceElement.setBalance(this.screen.feeStackBalance);
+            this.feeElement.enableFull();
+            this.balanceElement.enableFull();
+
+            if (fee > this.balanceElement.getBalance()) {
+                this.moveButton.disable();
+                this.feeElement.setRed(true);
+            }
+        }
     }
 
     public void showFavoriteMark() {
@@ -271,12 +297,19 @@ public class CampsGUISection extends AbstractGUISection {
 
         if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown)
             this.cooldownTextLabel.disableFull();
+
+        this.feeElement.disableFull();
+        this.balanceElement.disableFull();
     }
 
     @Override
     public boolean keyTyped(char typedChar, int keyCode) {   
-        if (keyCode == TeleportationKeyHandler.OPEN_MENU.getKeyCode() && !this.hasCurrentCallback() && !this.searchTextField.isDragged())
-            this.screen.close();
+        if (!this.searchField.isDragged() && !this.hasCurrentCallback())
+            if (OxygenGUIHelper.isOxygenMenuEnabled()) {
+                if (keyCode == TeleportationMenuGUIScreen.TELEPORTATIOIN_MENU_ENTRY.index + 2)
+                    this.screen.close();
+            } else if (keyCode == TeleportationMenuKeyHandler.TELEPORTATION_MENU.getKeyCode())
+                this.screen.close();
         return super.keyTyped(typedChar, keyCode); 
     }
 

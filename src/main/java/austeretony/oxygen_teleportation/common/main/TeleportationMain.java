@@ -10,6 +10,7 @@ import austeretony.oxygen.client.gui.OxygenGUITextures;
 import austeretony.oxygen.client.sync.gui.api.ComplexGUIHandlerClient;
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.api.network.OxygenNetwork;
+import austeretony.oxygen.common.command.CommandOxygenServer;
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.main.OxygenMain;
 import austeretony.oxygen.common.privilege.api.Privilege;
@@ -21,15 +22,19 @@ import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.client.TeleportationMenuHandlerClient;
 import austeretony.oxygen_teleportation.client.command.TeleportationArgumentExecutorClient;
 import austeretony.oxygen_teleportation.client.event.TeleportationEventsClient;
+import austeretony.oxygen_teleportation.client.gui.teleportation.TeleportationMenuGUIScreen;
 import austeretony.oxygen_teleportation.client.input.TeleportationKeyHandler;
+import austeretony.oxygen_teleportation.client.input.TeleportationMenuKeyHandler;
 import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
 import austeretony.oxygen_teleportation.common.TeleportationMenuHandlerServer;
+import austeretony.oxygen_teleportation.common.command.TeleportationArgumentExecutorServer;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.event.TeleportationEventsServer;
 import austeretony.oxygen_teleportation.common.network.client.CPDownloadImagePart;
 import austeretony.oxygen_teleportation.common.network.client.CPStartImageDownload;
 import austeretony.oxygen_teleportation.common.network.client.CPSyncAdditionalData;
 import austeretony.oxygen_teleportation.common.network.client.CPSyncCooldown;
+import austeretony.oxygen_teleportation.common.network.client.CPSyncFeeItemStack;
 import austeretony.oxygen_teleportation.common.network.client.CPSyncInvitedPlayers;
 import austeretony.oxygen_teleportation.common.network.server.SPChangeJumpProfile;
 import austeretony.oxygen_teleportation.common.network.server.SPCreateWorldPoint;
@@ -55,7 +60,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = TeleportationMain.MODID, 
         name = TeleportationMain.NAME, 
         version = TeleportationMain.VERSION,
-        dependencies = "required-after:oxygen@[0.8.0,);",//TODO Always check required Oxygen version before build
+        dependencies = "required-after:oxygen@[0.8.2,);",//TODO Always check required Oxygen version before build
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = TeleportationMain.VERSIONS_FORGE_URL)
 public class TeleportationMain {
@@ -63,7 +68,7 @@ public class TeleportationMain {
     public static final String 
     MODID = "oxygen_teleportation",    
     NAME = "Oxygen: Teleportation",
-    VERSION = "0.8.1",
+    VERSION = "0.8.3",
     VERSION_CUSTOM = VERSION + ":beta:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Teleportation/info/mod_versions_forge.json";
@@ -101,10 +106,13 @@ public class TeleportationMain {
         OxygenHelperServer.registerSharedDataIdentifierForScreen(50, JUMP_PROFILE_SHARED_DATA_ID);//50 - players list menu id
         OxygenHelperServer.registerSharedDataIdentifierForScreen(60, JUMP_PROFILE_SHARED_DATA_ID);//60 - friends list menu id
         ComplexGUIHandlerServer.registerScreen(TELEPORTATION_MENU_SCREEN_ID, new TeleportationMenuHandlerServer());
+        CommandOxygenServer.registerArgumentExecutor(new TeleportationArgumentExecutorServer("teleportation", true));
         if (event.getSide() == Side.CLIENT) {
             TeleportationManagerClient.create();
             CommonReference.registerEvent(new TeleportationEventsClient());
             CommonReference.registerEvent(new TeleportationKeyHandler());
+            if (!OxygenGUIHelper.isOxygenMenuEnabled())
+                CommonReference.registerEvent(new TeleportationMenuKeyHandler());
             OxygenHelperClient.registerSharedDataValue(JUMP_PROFILE_SHARED_DATA_ID, Byte.BYTES);
             OxygenGUIHelper.registerScreenId(TELEPORTATION_MENU_SCREEN_ID);
             ComplexGUIHandlerClient.registerScreen(TELEPORTATION_MENU_SCREEN_ID, new TeleportationMenuHandlerClient());
@@ -113,6 +121,7 @@ public class TeleportationMain {
             OxygenGUIHelper.registerContextAction(20, new TeleportToPlayerContextAction());//20 - group menu id
             OxygenHelperClient.registerNotificationIcon(TELEPORTATION_REQUEST_ID, OxygenGUITextures.MAP_PIN_ICONS);
             OxygenHelperClient.registerNotificationIcon(INVITATION_TO_CAMP_ID, OxygenGUITextures.REQUEST_ICONS);
+            OxygenGUIHelper.registerOxygenMenuEntry(TeleportationMenuGUIScreen.TELEPORTATIOIN_MENU_ENTRY);
         }
     }
 
@@ -145,6 +154,7 @@ public class TeleportationMain {
         network.registerPacket(CPSyncCooldown.class);
         network.registerPacket(CPSyncInvitedPlayers.class);
         network.registerPacket(CPSyncAdditionalData.class);
+        network.registerPacket(CPSyncFeeItemStack.class);
 
         network.registerPacket(SPTeleportationRequest.class);
         network.registerPacket(SPCreateWorldPoint.class);

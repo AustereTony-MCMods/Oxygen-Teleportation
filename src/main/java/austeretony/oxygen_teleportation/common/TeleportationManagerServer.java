@@ -11,10 +11,14 @@ import austeretony.oxygen.common.api.IOxygenTask;
 import austeretony.oxygen.common.api.OxygenHelperServer;
 import austeretony.oxygen.common.core.api.CommonReference;
 import austeretony.oxygen.common.delegate.OxygenThread;
+import austeretony.oxygen.common.itemstack.ItemStackWrapper;
+import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.main.TeleportationPlayerData;
 import austeretony.oxygen_teleportation.common.main.TeleportationWorldData;
+import austeretony.oxygen_teleportation.common.network.client.CPSyncFeeItemStack;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 
 public class TeleportationManagerServer {
 
@@ -44,6 +48,8 @@ public class TeleportationManagerServer {
     private final ImagesLoaderServer imagesLoader;
 
     private final Set<UUID> teleportations = new HashSet<UUID>();
+
+    private ItemStackWrapper feeStackWrapper;
 
     private TeleportationManagerServer() {
         this.ioThread = new OxygenThread("Teleportation IO Thread");
@@ -124,6 +130,8 @@ public class TeleportationManagerServer {
     public void onPlayerLoaded(EntityPlayer player) {
         UUID playerUUID = CommonReference.getPersistentUUID(player);
         if (!this.dataExist(playerUUID)) {
+            if (TeleportationConfig.FEE_MODE.getIntValue() == 1)
+                TeleportationMain.network().sendTo(new CPSyncFeeItemStack(), (EntityPlayerMP) player);
             TeleportationPlayerData playerData = this.createPlayerData(playerUUID);
             this.ioThread.addTask(new IOxygenTask() {
 
@@ -145,6 +153,14 @@ public class TeleportationManagerServer {
 
     public void updateJumpProfile(UUID playerUUID) {
         OxygenHelperServer.getSharedPlayerData(playerUUID).setByte(TeleportationMain.JUMP_PROFILE_SHARED_DATA_ID, getPlayerData(playerUUID).getJumpProfile().ordinal());
+    }
+
+    public void setFeeStack(ItemStackWrapper stackWrapper) {
+        this.feeStackWrapper = stackWrapper;
+    }
+
+    public ItemStackWrapper getFeeStackWrapper() {
+        return this.feeStackWrapper;
     }
 
     public void reset() {

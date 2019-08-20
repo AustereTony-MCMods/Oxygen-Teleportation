@@ -25,8 +25,7 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
 
     private final Map<Long, ResourceLocation> cache = new HashMap<Long, ResourceLocation>();
 
-    //TODO Replace this with GUITextBoxLabel
-    private final List<String> description = new ArrayList<String>(2);
+    private final List<String> lines = new ArrayList<String>(5);
 
     public WorldPointDataGUIElement(int xPosition, int yPosition) {
         this.setPosition(xPosition, yPosition);
@@ -90,11 +89,13 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
             this.mc.fontRenderer.drawString(this.dimension, 8, 66, GUISettings.instance().getEnabledTextColor(), true);
             GlStateManager.popMatrix();
             GlStateManager.pushMatrix();           
-            GlStateManager.translate(0.0F, 0.0F, 0.0F);           
-            GlStateManager.scale(0.8F, 0.8F, 0.0F);  
-            if (!this.description.isEmpty())                      
-                for (String line : this.description)                  
-                    this.mc.fontRenderer.drawString(line, 20, 74 + 10 * this.description.indexOf(line), GUISettings.instance().getEnabledTextColor(), true); 
+            GlStateManager.translate(15.0F, 60.0F, 0.0F);           
+            GlStateManager.scale(GUISettings.instance().getTextScale(), GUISettings.instance().getTextScale(), 0.0F);  
+            int index = 0;
+            for (String line : this.lines) {
+                this.mc.fontRenderer.drawString(line, 0.0F, (this.mc.fontRenderer.FONT_HEIGHT + 2.0F) * index, this.getEnabledTextColor(), true);
+                index++;
+            }
             GlStateManager.popMatrix();
             GlStateManager.popMatrix();
         }
@@ -119,24 +120,56 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
     }
 
     private void processDescription(String description) {     
-        this.description.clear();     
-        StringBuilder stringBuilder = new StringBuilder();      
-        String[] words = description.split("[ ]");        
-        if (words.length > 0) {                 
-            for (int i = 0; i < words.length; i++) {            
-                if (this.textWidth(stringBuilder.toString() + words[i], 1.0F) < 220)                          
-                    stringBuilder.append(words[i]).append(" ");
-                else {                          
-                    if (this.description.size() * 10 <= 20)                                      
-                        this.description.add(stringBuilder.toString());                       
-                    stringBuilder = new StringBuilder();                                
-                    stringBuilder.append(words[i]).append(" ");
-                }                       
-                if (i == words.length - 1)                              
-                    if (this.description.size() * 10 <= 20)                            
-                        this.description.add(stringBuilder.toString());
+        this.lines.clear(); 
+        int width = 300;
+        StringBuilder builder = new StringBuilder();    
+        int 
+        index = 0, 
+        wordStartIndex = 0;
+        boolean
+        rechedLimit = false,
+        wordProcessing = false;
+        char prevSymbol = '0';
+        String line;
+        for (char symbol : description.toCharArray()) {
+            if ((this.textHeight(this.getTextScale()) + 2) * this.lines.size() >= 80)
+                break;
+            if (symbol != ' ') {
+                wordProcessing = true;
+                if (prevSymbol == ' ')
+                    wordStartIndex = index;
             }
-        }       
+            if (symbol == '\n') {
+                this.lines.add(builder.toString());
+                builder.delete(0, builder.length());
+                index = 0;
+                continue;
+            }
+            if (this.textWidth(builder.toString() + String.valueOf(symbol), this.getTextScale()) <= width)
+                builder.append(symbol);
+            else {
+                if (symbol == '.' 
+                        || symbol == ',' 
+                        || symbol == '!'
+                        || symbol == '?')
+                    builder.append(symbol);
+                if (wordProcessing) {
+                    this.lines.add(builder.toString().substring(0, wordStartIndex));
+                    builder.delete(0, wordStartIndex);
+                } else {
+                    this.lines.add(builder.toString());
+                    builder.delete(0, builder.length());
+                }
+                if (symbol != ' ')
+                    builder.append(symbol);
+                index = builder.length() - 1;
+            }
+            wordProcessing = false;
+            prevSymbol = symbol;
+            index++;
+        }
+        if (builder.length() != 0)
+            this.lines.add(builder.toString());
     }
 
     public void hide() {

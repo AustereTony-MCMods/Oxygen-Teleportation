@@ -103,6 +103,10 @@ public class TeleportationPlayerData implements IPersistentData {
         return this.favoriteCampId;
     }
 
+    public WorldPoint getFavoriteCamp() {
+        return this.camps.get(this.favoriteCampId);
+    }
+
     public void setFavoriteCampId(long pointId) {
         this.favoriteCampId = pointId;
     }

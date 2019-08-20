@@ -2,6 +2,7 @@ package austeretony.oxygen_teleportation.client;
 
 import austeretony.oxygen.client.api.OxygenHelperClient;
 import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
+import austeretony.oxygen.common.itemstack.ItemStackWrapper;
 import austeretony.oxygen.common.main.EnumOxygenPrivilege;
 import austeretony.oxygen.common.main.OxygenPlayerData;
 import austeretony.oxygen.common.main.SharedPlayerData;
@@ -34,6 +35,8 @@ public class TeleportationManagerClient {
     private final ImagesLoaderClient imagesLoader;
 
     private long time, delay;
+
+    private ItemStackWrapper feeStackWrapper;
 
     private TeleportationManagerClient() {
         this.worldData = new TeleportationWorldData();
@@ -109,6 +112,14 @@ public class TeleportationManagerClient {
     public void setTeleportationDelay(long delay) {
         this.delay = delay * 1000;
         this.time = System.currentTimeMillis();
+    }
+
+    public void setFeeStack(ItemStackWrapper stackWrapper) {
+        this.feeStackWrapper = stackWrapper;
+    }
+
+    public ItemStackWrapper getFeeStackWrapper() {
+        return this.feeStackWrapper;
     }
 
     public static boolean isPlayerAvailable(String username) {

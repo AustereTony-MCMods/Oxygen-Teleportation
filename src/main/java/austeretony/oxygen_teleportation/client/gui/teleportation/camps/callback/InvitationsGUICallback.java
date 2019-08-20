@@ -61,7 +61,7 @@ public class InvitationsGUICallback extends AbstractGUICallback {
             button = new InvitedPlayerGUIButton(playerUUID, this.section.getCurrentPoint().getId());
             button.enableDynamicBackground(GUISettings.instance().getEnabledElementColor(), GUISettings.instance().getEnabledElementColor(), GUISettings.instance().getHoveredElementColor());
             button.setTextDynamicColor(GUISettings.instance().getEnabledTextColor(), GUISettings.instance().getDisabledTextColor(), GUISettings.instance().getHoveredTextColor());
-            button.setDisplayText(OxygenHelperClient.getObservedSharedData(playerUUID).getUsername());
+            button.setDisplayText(OxygenHelperClient.getSharedPlayerData(playerUUID).getUsername());
             button.setTextAlignment(EnumGUIAlignment.LEFT, 2);
             this.invitedPlayersPanel.addButton(button);
         }

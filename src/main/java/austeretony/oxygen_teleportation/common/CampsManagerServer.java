@@ -36,9 +36,9 @@ public class CampsManagerServer {
     }
 
     public void moveToFavoriteCamp(EntityPlayerMP playerMP, long pointId) {
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
         if (TeleportationConfig.ENABLE_CAMPS.getBooleanValue() 
-                && TeleportationConfig.ENABLE_FAVORITE_CAMP.getBooleanValue()) {
-            UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
+                && PrivilegeProviderServer.getPrivilegeValue(playerUUID, EnumTeleportationPrivilege.ENABLE_FAVORITE_CAMP.toString(), TeleportationConfig.ENABLE_FAVORITE_CAMP.getBooleanValue())) {
             if (this.campExist(playerUUID, pointId)) 
                 this.move(this.getCamp(playerUUID, pointId), playerUUID, playerMP);
             else if (this.haveInvitation(playerUUID, pointId))

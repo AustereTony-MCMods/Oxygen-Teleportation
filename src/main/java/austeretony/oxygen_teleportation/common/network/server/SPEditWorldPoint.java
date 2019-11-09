@@ -1,64 +1,71 @@
 package austeretony.oxygen_teleportation.common.network.server;
 
-import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.oxygen.util.PacketBufferUtils;
-import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
-import austeretony.oxygen_teleportation.common.main.WorldPoint;
+import austeretony.oxygen_core.common.api.CommonReference;
+import austeretony.oxygen_core.common.network.Packet;
+import austeretony.oxygen_core.common.util.ByteBufUtils;
+import austeretony.oxygen_core.server.api.OxygenHelperServer;
+import austeretony.oxygen_core.server.api.RequestsFilterHelper;
+import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
+import austeretony.oxygen_teleportation.common.main.TeleportationMain;
+import austeretony.oxygen_teleportation.server.TeleportationManagerServer;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.PacketBuffer;
 
-public class SPEditWorldPoint extends ProxyPacket {
+public class SPEditWorldPoint extends Packet {
 
-    private WorldPoint.EnumWorldPoint type;
+    private int ordinal;
 
-    private long oldPointId;
+    private long pointId;
 
     private String name, description;
 
-    private boolean updateName, updateDescription, updateImage, updatePosition;
+    private boolean updatePosition, updateImage;
 
     public SPEditWorldPoint() {}
 
-    public SPEditWorldPoint(WorldPoint.EnumWorldPoint type, long oldPointId, String name, String description, boolean updateName, 
-            boolean updateDescription, boolean updateImage, boolean updatePosition) {
-        this.type = type;
-        this.oldPointId = oldPointId;
+    public SPEditWorldPoint(EnumWorldPoint point, long pointId, String name, String description, boolean updatePosition, boolean updateImage) {
+        this.ordinal = point.ordinal();
+        this.pointId = pointId;
         this.name = name;
         this.description = description;
-        this.updateName = updateName;
-        this.updateDescription = updateDescription;
-        this.updateImage = updateImage;
         this.updatePosition = updatePosition;
+        this.updateImage = updateImage;
     }
 
     @Override
-    public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeByte(this.type.ordinal());
-        buffer.writeBoolean(this.updateName);
-        buffer.writeBoolean(this.updateDescription);
-        buffer.writeBoolean(this.updateImage);
+    public void write(ByteBuf buffer, INetHandler netHandler) {
+        buffer.writeByte(this.ordinal);
+        buffer.writeLong(this.pointId);
+        ByteBufUtils.writeString(this.name, buffer);
+        ByteBufUtils.writeString(this.description, buffer);
         buffer.writeBoolean(this.updatePosition);
-        buffer.writeLong(this.oldPointId);
-        PacketBufferUtils.writeString(this.updateName ? this.name : "", buffer);
-        PacketBufferUtils.writeString(this.updateDescription ? this.description : "", buffer);
+        buffer.writeBoolean(this.updateImage);
     }
 
     @Override
-    public void read(PacketBuffer buffer, INetHandler netHandler) {
-        this.type = WorldPoint.EnumWorldPoint.values()[buffer.readByte()];
-        this.updateName = buffer.readBoolean();
-        this.updateDescription = buffer.readBoolean();
-        this.updateImage = buffer.readBoolean();
-        this.updatePosition = buffer.readBoolean();
-        switch (this.type) {
-        case CAMP:            
-            TeleportationManagerServer.instance().getCampsManager().editCamp(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), 
-                    PacketBufferUtils.readString(buffer), this.updateName, this.updateDescription, this.updateImage, this.updatePosition);
-            break;
-        case LOCATION:
-            TeleportationManagerServer.instance().getLocationsManager().editLocation(getEntityPlayerMP(netHandler), buffer.readLong(), PacketBufferUtils.readString(buffer), 
-                    PacketBufferUtils.readString(buffer), this.updateName, this.updateDescription, this.updateImage, this.updatePosition);
-            break;
+    public void read(ByteBuf buffer, INetHandler netHandler) {
+        final EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
+        if (RequestsFilterHelper.getLock(CommonReference.getPersistentUUID(playerMP), TeleportationMain.MANAGE_POINT_REQUEST_ID)) {
+            final int ordinal = buffer.readByte();
+            if (ordinal >= 0 && ordinal < EnumWorldPoint.values().length) {
+                final EnumWorldPoint point = EnumWorldPoint.values()[ordinal];
+                final long pointId = buffer.readLong();
+                final String 
+                name = ByteBufUtils.readString(buffer),
+                description = ByteBufUtils.readString(buffer);
+                final boolean 
+                updatePosition = buffer.readBoolean(),
+                updateImage = buffer.readBoolean();
+                switch (point) {
+                case CAMP:            
+                    OxygenHelperServer.addRoutineTask(()->TeleportationManagerServer.instance().getPlayersDataManager().editCamp(playerMP, pointId, name, description, updatePosition, updateImage));
+                    break;
+                case LOCATION:
+                    OxygenHelperServer.addRoutineTask(()->TeleportationManagerServer.instance().getLocationsManager().editLocation(playerMP, pointId, name, description, updatePosition, updateImage));
+                    break;
+                }
+            }
         }
     }
 }

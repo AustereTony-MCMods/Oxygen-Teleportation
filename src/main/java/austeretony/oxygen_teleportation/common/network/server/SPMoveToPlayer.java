@@ -1,11 +1,16 @@
 package austeretony.oxygen_teleportation.common.network.server;
 
-import austeretony.oxygen.common.network.ProxyPacket;
-import austeretony.oxygen_teleportation.common.TeleportationManagerServer;
+import austeretony.oxygen_core.common.api.CommonReference;
+import austeretony.oxygen_core.common.network.Packet;
+import austeretony.oxygen_core.server.api.OxygenHelperServer;
+import austeretony.oxygen_core.server.api.RequestsFilterHelper;
+import austeretony.oxygen_teleportation.common.main.TeleportationMain;
+import austeretony.oxygen_teleportation.server.TeleportationManagerServer;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.PacketBuffer;
 
-public class SPMoveToPlayer extends ProxyPacket {
+public class SPMoveToPlayer extends Packet {
 
     private int index;
 
@@ -16,12 +21,16 @@ public class SPMoveToPlayer extends ProxyPacket {
     }
 
     @Override
-    public void write(PacketBuffer buffer, INetHandler netHandler) {
+    public void write(ByteBuf buffer, INetHandler netHandler) {
         buffer.writeInt(this.index);
     }
 
     @Override
-    public void read(PacketBuffer buffer, INetHandler netHandler) {
-        TeleportationManagerServer.instance().getPlayersManager().moveToPlayer(getEntityPlayerMP(netHandler), buffer.readInt());
+    public void read(ByteBuf buffer, INetHandler netHandler) {
+        final EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
+        if (RequestsFilterHelper.getLock(CommonReference.getPersistentUUID(playerMP), TeleportationMain.TELEPORT_REQUEST_ID)) {
+            final int index = buffer.readInt();
+            OxygenHelperServer.addRoutineTask(()->TeleportationManagerServer.instance().getPlayersDataManager().moveToPlayer(playerMP, index));
+        }
     }
 }

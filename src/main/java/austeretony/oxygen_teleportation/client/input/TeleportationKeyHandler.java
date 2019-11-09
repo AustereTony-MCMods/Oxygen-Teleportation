@@ -2,7 +2,7 @@ package austeretony.oxygen_teleportation.client.input;
 
 import org.lwjgl.input.Keyboard;
 
-import austeretony.oxygen.client.core.api.ClientReference;
+import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -19,6 +19,6 @@ public class TeleportationKeyHandler {
     @SubscribeEvent
     public void onKeyInput(KeyInputEvent event) {
         if (MOVE_TO_CAMP.isPressed()) 
-            TeleportationManagerClient.instance().getCampsManager().moveToFavoriteCampSynced();       
+            TeleportationManagerClient.instance().getPlayerDataManager().moveToFavoriteCampSynced();       
     }   
 }

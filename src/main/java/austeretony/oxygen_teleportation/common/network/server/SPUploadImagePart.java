@@ -1,60 +1,58 @@
 package austeretony.oxygen_teleportation.common.network.server;
 
-import austeretony.oxygen.common.core.api.CommonReference;
-import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.oxygen_core.common.api.CommonReference;
+import austeretony.oxygen_core.common.network.Packet;
+import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.util.ImageTransferingServerBuffer;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.PacketBuffer;
 
-public class SPUploadImagePart extends ProxyPacket {
+public class SPUploadImagePart extends Packet {
 
-    private ImageTransferingServerBuffer.EnumImageTransfer operation;
-
-    private int index, partsAmount;
+    private int ordinal, index, fragmentsAmount;
 
     private long pointId;
 
-    private int[] part;
+    private int[] fragment;
 
     public SPUploadImagePart() {}
 
-    public SPUploadImagePart(ImageTransferingServerBuffer.EnumImageTransfer operation, long pointId, int index, int[] part, int partsAmount) {
-        this.operation = operation;
+    public SPUploadImagePart(ImageTransferingServerBuffer.EnumImageTransfer operation, long pointId, int index, int[] fragment, int fragmentsAmount) {
+        this.ordinal = operation.ordinal();
         this.pointId = pointId;
         this.index = index;
-        this.part = part;
-        this.partsAmount = partsAmount;
+        this.fragment = fragment;
+        this.fragmentsAmount = fragmentsAmount;
     }
 
     @Override
-    public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeByte(this.operation.ordinal());
+    public void write(ByteBuf buffer, INetHandler netHandler) {
+        buffer.writeByte(this.ordinal);
         buffer.writeLong(this.pointId);
         buffer.writeShort(this.index);
-        buffer.writeShort(this.partsAmount);
-        buffer.writeShort(this.part.length);
-        for (int i = 0; i < this.part.length; i++)
-            buffer.writeInt(this.part[i]);
+        buffer.writeShort(this.fragmentsAmount);
+        buffer.writeShort(this.fragment.length);
+        for (int i : this.fragment)
+            buffer.writeInt(i);
     }
 
     @Override
-    public void read(PacketBuffer buffer, INetHandler netHandler) {
-        this.operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[buffer.readByte()];
-        this.pointId = buffer.readLong();
-        this.index = buffer.readShort();
-        this.partsAmount = buffer.readShort();
-        int[] recieved = new int[buffer.readShort()];
-        for (int i = 0; i < recieved.length; i++) 
-            recieved[i] = buffer.readInt();
-        if (ImageTransferingServerBuffer.exist(this.pointId))
-            ImageTransferingServerBuffer.get(this.pointId).addPart(this.index, recieved);
-        else {
-            ImageTransferingServerBuffer.create(
-                    operation, 
-                    CommonReference.getPersistentUUID(getEntityPlayerMP(netHandler)), 
-                    this.pointId, 
-                    this.partsAmount);
-            ImageTransferingServerBuffer.get(this.pointId).addPart(this.index, recieved);
+    public void read(ByteBuf buffer, INetHandler netHandler) {
+        final EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
+        //if (RequestsFilterHelper.getLock(CommonReference.getPersistentUUID(playerMP), TeleportationMain.IMAGE_UPLOAD_REQUEST_ID)) {
+        final int ordinal = buffer.readByte();
+        if (ordinal >= 0 && ordinal < ImageTransferingServerBuffer.EnumImageTransfer.values().length) {
+            final ImageTransferingServerBuffer.EnumImageTransfer operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[ordinal];
+            final long pointId = buffer.readLong();
+            final int 
+            index = buffer.readShort(),
+            fragmentsAmount = buffer.readShort();
+            final int[] fragment = new int[buffer.readShort()];
+            for (int i = 0; i < fragment.length; i++) 
+                fragment[i] = buffer.readInt();
+            OxygenHelperServer.addRoutineTask(()->ImageTransferingServerBuffer.processFragment(operation, CommonReference.getPersistentUUID(playerMP), pointId, fragmentsAmount, index, fragment));
         }
+        //}
     }
 }

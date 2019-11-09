@@ -1,28 +1,36 @@
 package austeretony.oxygen_teleportation.common.network.client;
 
-import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.common.network.Packet;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
-import austeretony.oxygen_teleportation.common.main.CooldownInfo;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.PacketBuffer;
 
-public class CPSyncCooldown extends ProxyPacket {
+public class CPSyncCooldown extends Packet {
 
-    private CooldownInfo cooldownInfo;
+    private long campTime, locationTime, jumpTime;
 
     public CPSyncCooldown() {}
 
-    public CPSyncCooldown(CooldownInfo cooldownInfo) {
-        this.cooldownInfo = cooldownInfo;
+    public CPSyncCooldown(long campTime, long locationTime, long jumpTime) {
+        this.campTime = campTime;
+        this.locationTime = locationTime;
+        this.jumpTime = jumpTime;
     }
 
     @Override
-    public void write(PacketBuffer buffer, INetHandler netHandler) {
-        this.cooldownInfo.write(buffer);
+    public void write(ByteBuf buffer, INetHandler netHandler) {
+        buffer.writeLong(this.campTime);
+        buffer.writeLong(this.locationTime);
+        buffer.writeLong(this.jumpTime);
     }
 
     @Override
-    public void read(PacketBuffer buffer, INetHandler netHandler) {
-        TeleportationManagerClient.instance().getPlayerData().getCooldownInfo().read(buffer);
+    public void read(ByteBuf buffer, INetHandler netHandler) {
+        final long 
+        campTime = buffer.readLong(),
+        locationTime = buffer.readLong(), 
+        jumpTime = buffer.readLong();   
+        OxygenHelperClient.addRoutineTask(()->TeleportationManagerClient.instance().getPlayerDataManager().updateCooldown(campTime, locationTime, jumpTime));
     }
 }

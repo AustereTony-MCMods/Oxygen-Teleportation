@@ -1,20 +1,20 @@
 package austeretony.oxygen_teleportation.client.gui.teleportation.camps.callback;
 
-import austeretony.alternateui.screen.button.GUIButton;
-import austeretony.alternateui.screen.button.GUICheckBoxButton;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
-import austeretony.alternateui.screen.text.GUITextBoxField;
-import austeretony.alternateui.screen.text.GUITextField;
-import austeretony.alternateui.screen.text.GUITextLabel;
-import austeretony.oxygen.client.core.api.ClientReference;
-import austeretony.oxygen.client.gui.settings.GUISettings;
-import austeretony.oxygen.common.main.OxygenSoundEffects;
+import austeretony.oxygen_core.client.api.ClientReference;
+import austeretony.oxygen_core.client.gui.elements.OxygenCallbackGUIFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenCheckBoxGUIButton;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIButton;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIText;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUITextBoxField;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUITextField;
+import austeretony.oxygen_core.client.gui.settings.GUISettings;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.client.gui.teleportation.CampsGUISection;
 import austeretony.oxygen_teleportation.client.gui.teleportation.TeleportationMenuGUIScreen;
-import austeretony.oxygen_teleportation.common.main.WorldPoint;
+import austeretony.oxygen_teleportation.common.WorldPoint;
 
 public class EditCampGUICallback extends AbstractGUICallback {
 
@@ -22,15 +22,13 @@ public class EditCampGUICallback extends AbstractGUICallback {
 
     private final CampsGUISection section;
 
-    private GUITextField nameField;
-    
-    private GUITextBoxField descriptionField;
+    private OxygenGUITextField nameField;
 
-    private GUICheckBoxButton updateImageButton, updatePositionButton;
+    private OxygenGUITextBoxField descriptionField;
 
-    private GUITextLabel updateImageTextLabel, updatePositionTextLabel;
+    private OxygenCheckBoxGUIButton updateImageButton, updatePositionButton;
 
-    private GUIButton confirmButton, cancelButton;
+    private OxygenGUIButton confirmButton, cancelButton;
 
     public EditCampGUICallback(TeleportationMenuGUIScreen screen, CampsGUISection section, int width, int height) {
         super(screen, section, width, height);
@@ -40,26 +38,21 @@ public class EditCampGUICallback extends AbstractGUICallback {
 
     @Override   
     public void init() {
-        this.addElement(new EditCampCallbackGUIFiller(0, 0, this.getWidth(), this.getHeight()));
-        this.addElement(new GUITextLabel(2, 2).setDisplayText(ClientReference.localize("teleportation.gui.menu.editCampCallback"), true, GUISettings.instance().getTitleScale()));       
-        this.addElement(new GUITextLabel(2, 16).setDisplayText(ClientReference.localize("oxygen.gui.username"), false, GUISettings.instance().getSubTextScale()));    
-        this.addElement(new GUITextLabel(2, 36).setDisplayText(ClientReference.localize("oxygen.gui.note"), false, GUISettings.instance().getSubTextScale()));    
+        this.addElement(new OxygenCallbackGUIFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addElement(new OxygenGUIText(4, 5, ClientReference.localize("oxygen_teleportation.gui.menu.callback.editCamp"), GUISettings.get().getTextScale(), GUISettings.get().getEnabledTextColor()));
+        this.addElement(new OxygenGUIText(6, 18, ClientReference.localize("oxygen.gui.name"), GUISettings.get().getSubTextScale(), GUISettings.get().getEnabledTextColor()));
+        this.addElement(new OxygenGUIText(6, 38, ClientReference.localize("oxygen.gui.description"), GUISettings.get().getSubTextScale(), GUISettings.get().getEnabledTextColor()));
 
-        this.addElement(this.nameField = new GUITextField(2, 25, 136, 9, WorldPoint.MAX_NAME_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
-                .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
-                .setLineOffset(3).cancelDraggedElementLogic());
-        
-        this.addElement(this.descriptionField = new GUITextBoxField(2, 45, 136, 50, WorldPoint.MAX_DESCRIPTION_LENGTH).setLineOffset(2).setTextScale(GUISettings.instance().getSubTextScale()).enableDynamicBackground().cancelDraggedElementLogic());
+        this.addElement(this.nameField = new OxygenGUITextField(6, 25, this.getWidth() - 12, 9, WorldPoint.MAX_NAME_LENGTH, "", 3, false, - 1L));
+        this.addElement(this.descriptionField = new OxygenGUITextBoxField(6, 45, this.getWidth() - 12, 50, WorldPoint.MAX_DESCRIPTION_LENGTH));
 
-        this.addElement(this.updateImageButton = new GUICheckBoxButton(2, 99, 6).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
-                .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor()));
-        this.addElement(this.updatePositionButton = new GUICheckBoxButton(2, 109, 6).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
-                .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor()));
-        this.addElement(this.updateImageTextLabel = new GUITextLabel(10, 98).setDisplayText(ClientReference.localize("teleportation.gui.menu.updateImage"), false, GUISettings.instance().getSubTextScale())); 
-        this.addElement(this.updatePositionTextLabel = new GUITextLabel(10, 108).setDisplayText(ClientReference.localize("teleportation.gui.menu.updatePosition"), false, GUISettings.instance().getSubTextScale()));    
+        this.addElement(this.updateImageButton = new OxygenCheckBoxGUIButton(6, 99));    
+        this.addElement(this.updatePositionButton = new OxygenCheckBoxGUIButton(6, 109));    
+        this.addElement(new OxygenGUIText(14, 100, ClientReference.localize("oxygen_teleportation.gui.menu.updateImage"), GUISettings.get().getSubTextScale(), GUISettings.get().getEnabledTextColor()));
+        this.addElement(new OxygenGUIText(14, 110, ClientReference.localize("oxygen_teleportation.gui.menu.updatePosition"), GUISettings.get().getSubTextScale(), GUISettings.get().getEnabledTextColor()));
 
-        this.addElement(this.confirmButton = new GUIButton(15, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.confirmButton"), true, GUISettings.instance().getButtonTextScale()));
-        this.addElement(this.cancelButton = new GUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).enableDynamicBackground().setDisplayText(ClientReference.localize("oxygen.gui.cancelButton"), true, GUISettings.instance().getButtonTextScale()));
+        this.addElement(this.confirmButton = new OxygenGUIButton(15, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen.gui.confirmButton")));
+        this.addElement(this.cancelButton = new OxygenGUIButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen.gui.cancelButton")));
     }
 
     @Override
@@ -78,14 +71,14 @@ public class EditCampGUICallback extends AbstractGUICallback {
 
     @Override
     public void handleElementClick(AbstractGUISection section, GUIBaseElement element, int mouseButton) {
-        if (element == this.cancelButton)
-            this.close();
-        else if (element == this.confirmButton) {
-            this.section.resetPointInfo();
-            TeleportationManagerClient.instance().getCampsManager().editCampPointSynced(this.section.getCurrentPoint(), this.nameField.getTypedText(), this.descriptionField.getTypedText(), 
-                    this.updateImageButton.isToggled(), this.updatePositionButton.isToggled());
-            this.section.sortPoints(0);
-            this.close();
+        if (mouseButton == 0) { 
+            if (element == this.cancelButton)
+                this.close();
+            else if (element == this.confirmButton) {
+                TeleportationManagerClient.instance().getPlayerDataManager().editCampPointSynced(this.section.getCurrentPoint().getId(), this.nameField.getTypedText(), this.descriptionField.getTypedText(), 
+                        this.updatePositionButton.isToggled(), this.updateImageButton.isToggled());
+                this.close();
+            }
         }
     }
 }

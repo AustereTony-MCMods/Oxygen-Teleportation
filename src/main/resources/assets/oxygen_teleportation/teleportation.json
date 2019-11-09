@@ -1,4 +1,8 @@
 {
+  "setup": {
+    "camps_save_delay_minutes": 2,
+    "locations_save_delay_minutes": 2
+  },
   "main": {
     "image_width": 800,
     "image_height": 450,

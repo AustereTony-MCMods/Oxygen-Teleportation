@@ -7,7 +7,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import austeretony.oxygen.client.core.api.ClientReference;
+import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.shader.Framebuffer;

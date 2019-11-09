@@ -1,14 +1,14 @@
 package austeretony.oxygen_teleportation.client.gui.teleportation.camps.context;
 
-import austeretony.alternateui.screen.contextmenu.AbstractContextAction;
 import austeretony.alternateui.screen.core.GUIBaseElement;
-import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.client.core.api.ClientReference;
+import austeretony.oxygen_core.client.api.ClientReference;
+import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIContextMenuElement.ContextMenuAction;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.client.gui.teleportation.CampsGUISection;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 
-public class InvitationsContextAction extends AbstractContextAction {
+public class InvitationsContextAction implements ContextMenuAction {
 
     private CampsGUISection section;
 
@@ -17,19 +17,19 @@ public class InvitationsContextAction extends AbstractContextAction {
     }
 
     @Override
-    protected String getName(GUIBaseElement currElement) {
-        return ClientReference.localize("teleportation.gui.menu.invitations");
+    public String getName(GUIBaseElement currElement) {
+        return ClientReference.localize("oxygen_teleportation.gui.menu.invitations");
     }
 
     @Override
-    protected boolean isValid(GUIBaseElement currElement) {
+    public boolean isValid(GUIBaseElement currElement) {
         return TeleportationConfig.ENABLE_CAMP_INVITATIONS.getBooleanValue() 
                 && this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID())
-                && TeleportationManagerClient.instance().getSharedCampsManager().invitedPlayersExist(this.section.getCurrentPoint().getId());
+                && TeleportationManagerClient.instance().getSharedCampsContainer().invitedPlayersExist(this.section.getCurrentPoint().getId());
     }
 
     @Override
-    protected void execute(GUIBaseElement currElement) {
+    public void execute(GUIBaseElement currElement) {
         this.section.openInvitationsCallback();
     }
 }

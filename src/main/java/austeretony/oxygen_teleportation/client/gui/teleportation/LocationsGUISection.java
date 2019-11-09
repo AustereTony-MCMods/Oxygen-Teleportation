@@ -4,69 +4,71 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import austeretony.alternateui.screen.browsing.GUIScroller;
 import austeretony.alternateui.screen.button.GUIButton;
-import austeretony.alternateui.screen.button.GUISlider;
 import austeretony.alternateui.screen.callback.AbstractGUICallback;
-import austeretony.alternateui.screen.contextmenu.GUIContextMenu;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
-import austeretony.alternateui.screen.panel.GUIButtonPanel;
-import austeretony.alternateui.screen.text.GUITextField;
-import austeretony.alternateui.screen.text.GUITextLabel;
-import austeretony.alternateui.util.EnumGUIAlignment;
-import austeretony.alternateui.util.EnumGUIOrientation;
-import austeretony.oxygen.client.api.OxygenGUIHelper;
-import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.client.api.WatcherHelperClient;
-import austeretony.oxygen.client.core.api.ClientReference;
-import austeretony.oxygen.client.gui.OxygenGUITextures;
-import austeretony.oxygen.client.gui.settings.GUISettings;
-import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
-import austeretony.oxygen.common.main.OxygenPlayerData;
-import austeretony.oxygen.common.main.OxygenSoundEffects;
-import austeretony.oxygen.util.MathUtils;
+import austeretony.oxygen_core.client.api.ClientReference;
+import austeretony.oxygen_core.client.api.OxygenGUIHelper;
+import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.client.api.PrivilegeProviderClient;
+import austeretony.oxygen_core.client.gui.elements.CurrencyItemValueGUIElement;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIButton;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIButtonPanel;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIContextMenu;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUIText;
+import austeretony.oxygen_core.client.gui.elements.OxygenGUITextField;
+import austeretony.oxygen_core.client.gui.elements.OxygenSorterGUIElement;
+import austeretony.oxygen_core.client.gui.elements.OxygenSorterGUIElement.EnumSorting;
+import austeretony.oxygen_core.client.gui.elements.SectionsGUIDDList;
+import austeretony.oxygen_core.client.gui.settings.GUISettings;
+import austeretony.oxygen_core.common.util.MathUtils;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
-import austeretony.oxygen_teleportation.client.gui.teleportation.camps.CampsBackgroundGUIFiller;
-import austeretony.oxygen_teleportation.client.gui.teleportation.locations.EditContextAction;
+import austeretony.oxygen_teleportation.client.gui.teleportation.camps.PointsBackgroundGUIFiller;
+import austeretony.oxygen_teleportation.client.gui.teleportation.camps.WorldPointDataGUIElement;
+import austeretony.oxygen_teleportation.client.gui.teleportation.camps.WorldPointGUIButton;
 import austeretony.oxygen_teleportation.client.gui.teleportation.locations.callback.EditLocationGUICallback;
 import austeretony.oxygen_teleportation.client.gui.teleportation.locations.callback.LocationCreationGUICallback;
 import austeretony.oxygen_teleportation.client.gui.teleportation.locations.callback.LocationRemoveGUICallback;
+import austeretony.oxygen_teleportation.client.gui.teleportation.locations.context.EditContextAction;
 import austeretony.oxygen_teleportation.client.gui.teleportation.locations.context.LockContextAction;
 import austeretony.oxygen_teleportation.client.gui.teleportation.locations.context.RemoveContextAction;
 import austeretony.oxygen_teleportation.client.input.TeleportationMenuKeyHandler;
+import austeretony.oxygen_teleportation.common.WorldPoint;
+import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
-import austeretony.oxygen_teleportation.common.main.WorldPoint;
-import austeretony.oxygen_teleportation.common.main.WorldPoint.EnumWorldPoint;
 
 public class LocationsGUISection extends AbstractGUISection {
 
     private final TeleportationMenuGUIScreen screen;
 
-    private GUITextLabel pointsAmountTextLabel, cooldownTextLabel;
+    private OxygenGUIText pointsAmountTextLabel, cooldownTextLabel;
 
-    private GUIButton campsPageButton, playersPageButton, searchButton, refreshButton, createButton, moveButton,
-    sortUpButton, sortDownButton;
+    private OxygenGUIButton createButton, moveButton;
 
-    private GUIButtonPanel pointsListPanel;
+    private OxygenSorterGUIElement timeSorter, nameSorter;
 
-    private WorldPointGUIButton currentButton;  
+    private OxygenGUIButtonPanel pointsPanel;
 
-    private WorldPointDataGUIElement previewImageLabel;
+    private OxygenGUITextField searchField;
+
+    private WorldPointDataGUIElement pointDataElement;
+
+    private CurrencyItemValueGUIElement feeElement, balanceElement;
+
+    private AbstractGUICallback creationCallback, pointEditingCallback, removePointCallback;
+
+    private final int cooldownTime = PrivilegeProviderClient.getValue(EnumTeleportationPrivilege.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.toString(), 
+            TeleportationConfig.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()) * 1000;
+
+    //cache
+
+    private WorldPointGUIButton currentButton; 
 
     private WorldPoint currentPoint;
 
-    private GUITextField searchField;
-
-    private AdvancedBalanceGUIElement feeElement, balanceElement;
-
-    private AbstractGUICallback downloadCallback, createCallback, pointEditingCallback, removePointCallback;
-
-    private final int teleportationCooldown = PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.LOCATION_TELEPORTATION_COOLDOWN.toString(), 
-            TeleportationConfig.LOCATIONS_TELEPORT_COOLDOWN.getIntValue()) * 1000;
-
-    private boolean cooldown;
+    private boolean cooldownActive;
 
     public LocationsGUISection(TeleportationMenuGUIScreen screen) {
         super(screen);
@@ -75,186 +77,163 @@ public class LocationsGUISection extends AbstractGUISection {
 
     @Override
     public void init() {     
-        this.addElement(new CampsBackgroundGUIFiller(0, 0, this.getWidth(), this.getHeight()));
-        String title = ClientReference.localize("teleportation.gui.menu.locationsTitle");
-        this.addElement(new GUITextLabel(2, 4).setDisplayText(title, false, GUISettings.instance().getTitleScale()));   
+        this.addElement(new PointsBackgroundGUIFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addElement(new OxygenGUIText(4, 5, ClientReference.localize("oxygen_teleportation.gui.menu.locations"), GUISettings.get().getTitleScale(), GUISettings.get().getEnabledTextColor()));
 
-        this.addElement(this.campsPageButton = new GUIButton(this.getWidth() - 44, 0,  12, 12).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(TeleportationGUITextures.CAMP_ICONS, 12, 12).initSimpleTooltip(ClientReference.localize("teleportation.gui.menu.tooltip.camps"), GUISettings.instance().getTooltipScale()));       
-        this.addElement(new GUIButton(this.getWidth() - 30, 0, 12, 12).setTexture(TeleportationGUITextures.LOCATION_ICONS, 14, 14).initSimpleTooltip(ClientReference.localize("teleportation.gui.menu.tooltip.locations"), GUISettings.instance().getTooltipScale()).toggle());    
-        this.addElement(this.playersPageButton = new GUIButton(this.getWidth() - 15, 0, 12, 12).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(TeleportationGUITextures.PLAYERS_ICONS, 14, 14).initSimpleTooltip(ClientReference.localize("teleportation.gui.menu.tooltip.players"), GUISettings.instance().getTooltipScale()));
-        if (!TeleportationConfig.ENABLE_CAMPS.getBooleanValue())
-            this.campsPageButton.disable();
-        if (!TeleportationConfig.ENABLE_PLAYERS.getBooleanValue())
-            this.playersPageButton.disable();
+        this.addElement(this.pointsAmountTextLabel = new OxygenGUIText(0, 18, "", GUISettings.get().getSubTextScale() - 0.05F, GUISettings.get().getEnabledTextColor()));
 
-        this.addElement(this.searchButton = new GUIButton(7, 15, 7, 7).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SEARCH_ICONS, 7, 7).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.search"), GUISettings.instance().getTooltipScale()));
-        this.addElement(this.sortDownButton = new GUIButton(2, 19, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SORT_DOWN_ICONS, 3, 3).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
-        this.addElement(this.sortUpButton = new GUIButton(2, 15, 3, 3).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.SORT_UP_ICONS, 3, 3).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.sort"), GUISettings.instance().getTooltipScale())); 
-        this.addElement(this.refreshButton = new GUIButton(0, 14, 10, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent).setTexture(OxygenGUITextures.REFRESH_ICONS, 9, 9).initSimpleTooltip(ClientReference.localize("oxygen.tooltip.refresh"), GUISettings.instance().getTooltipScale()));
-        this.addElement(this.pointsAmountTextLabel = new GUITextLabel(0, 15).setTextScale(GUISettings.instance().getSubTextScale()));  
+        this.addElement(this.timeSorter = new OxygenSorterGUIElement(6, 29, EnumSorting.DOWN, ClientReference.localize("oxygen.sorting.time")));   
+        this.timeSorter.setClickListener((sorting)->{
+            this.nameSorter.reset();
+            this.sortPoints(sorting == EnumSorting.DOWN ? 0 : 1);
+        });
 
-        this.pointsListPanel = new GUIButtonPanel(EnumGUIOrientation.VERTICAL, 0, 24, 82, 10).setButtonsOffset(1).setTextScale(GUISettings.instance().getTextScale());
-        this.addElement(this.pointsListPanel);
-        this.addElement(this.searchField = new GUITextField(0, 14, 85, 9, WorldPoint.MAX_NAME_LENGTH).setTextScale(GUISettings.instance().getSubTextScale())
-                .enableDynamicBackground(GUISettings.instance().getEnabledTextFieldColor(), GUISettings.instance().getDisabledTextFieldColor(), GUISettings.instance().getHoveredTextFieldColor())
-                .setLineOffset(3).setDisplayText("...").cancelDraggedElementLogic().disableFull());
-        this.pointsListPanel.initSearchField(this.searchField);
-        GUIScroller scroller = new GUIScroller(MathUtils.clamp(TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue(), 10, 500), 10);
-        this.pointsListPanel.initScroller(scroller);
-        GUISlider slider = new GUISlider(83, 24, 2, 109);
-        slider.setDynamicBackgroundColor(GUISettings.instance().getEnabledSliderColor(), GUISettings.instance().getDisabledSliderColor(), GUISettings.instance().getHoveredSliderColor());
-        scroller.initSlider(slider);
+        this.addElement(this.nameSorter = new OxygenSorterGUIElement(12, 29, EnumSorting.INACTIVE, ClientReference.localize("oxygen.sorting.name")));  
+        this.nameSorter.setClickListener((sorting)->{
+            this.timeSorter.reset();
+            this.sortPoints(sorting == EnumSorting.DOWN ? 2 : 3);
+        });
 
-        this.addElement(this.createButton = new GUIButton(22, 137,  40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
-                .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor())
-                .setDisplayText(ClientReference.localize("teleportation.gui.menu.createButton"), true, GUISettings.instance().getButtonTextScale()));  
-        this.lockCreateButton();     
+        this.addElement(this.pointsPanel = new OxygenGUIButtonPanel(this.screen, 6, 36, 80, 10, 1, 100, 9, GUISettings.get().getPanelTextScale(), true));   
+        this.addElement(this.searchField = new OxygenGUITextField(6, 16, 60, 8, WorldPoint.MAX_NAME_LENGTH, "...", 3, false, - 1L));
+        this.pointsPanel.initSearchField(this.searchField);
 
-        GUIContextMenu menu = new GUIContextMenu(GUISettings.instance().getContextMenuWidth(), 10).setScale(GUISettings.instance().getContextMenuScale()).setTextScale(GUISettings.instance().getTextScale()).setTextAlignment(EnumGUIAlignment.LEFT, 2);
-        menu.setOpenSound(OxygenSoundEffects.CONTEXT_OPEN.soundEvent);
-        menu.setCloseSound(OxygenSoundEffects.CONTEXT_CLOSE.soundEvent);
-        this.pointsListPanel.initContextMenu(menu);
-        menu.enableDynamicBackground(GUISettings.instance().getEnabledContextActionColor(), GUISettings.instance().getDisabledContextActionColor(), GUISettings.instance().getHoveredContextActionColor());
-        menu.setTextDynamicColor(GUISettings.instance().getEnabledTextColor(), GUISettings.instance().getDisabledTextColor(), GUISettings.instance().getHoveredTextColor());
-        menu.addElement(new LockContextAction(this));
-        menu.addElement(new EditContextAction(this));
-        menu.addElement(new RemoveContextAction(this));
+        this.pointsPanel.<WorldPointGUIButton>setClickListener((previous, clicked, mouseX, mouseY, mouseButton)->{
+            if (this.currentButton != clicked) {
+                if (this.currentButton != null)
+                    this.currentButton.setToggled(false);
+                this.currentButton = clicked;
+                this.currentPoint = TeleportationManagerClient.instance().getLocationsContainer().getLocation(clicked.index);
+                clicked.toggle();                    
+                this.showPointInfo(clicked.index, false);
+            }
+        });
 
-        this.createCallback = new LocationCreationGUICallback(this.screen, this, 140, 112).enableDefaultBackground();
-        this.pointEditingCallback = new EditLocationGUICallback(this.screen, this, 140, 133).enableDefaultBackground();
-        this.removePointCallback = new LocationRemoveGUICallback(this.screen, this, 140, 42).enableDefaultBackground();
+        this.pointsPanel.initContextMenu(new OxygenGUIContextMenu(GUISettings.get().getContextMenuWidth(), 9, 
+                new LockContextAction(this),
+                new EditContextAction(this),
+                new RemoveContextAction(this)));
 
-        this.addElement(this.previewImageLabel = new WorldPointDataGUIElement(86, 14));
-        this.addElement(this.moveButton = new GUIButton(92, 137,  40, 10).setSound(OxygenSoundEffects.BUTTON_CLICK.soundEvent)
-                .enableDynamicBackground(GUISettings.instance().getEnabledButtonColor(), GUISettings.instance().getDisabledButtonColor(), GUISettings.instance().getHoveredButtonColor())
-                .setDisplayText(ClientReference.localize("teleportation.gui.menu.moveButton"), true, GUISettings.instance().getButtonTextScale()).disableFull());
+        this.addElement(this.createButton = new OxygenGUIButton(25, 138, 40, 10, ClientReference.localize("oxygen_teleportation.gui.menu.createButton")));     
 
-        this.addElement(this.feeElement = new AdvancedBalanceGUIElement(156, 139).disableFull());   
-        this.addElement(this.balanceElement = new AdvancedBalanceGUIElement(this.getWidth() - 12, 139).disableFull()); 
-        this.feeElement.setItemStack(this.screen.feeStack);
-        this.balanceElement.setItemStack(this.screen.feeStack);
+        this.addElement(this.pointDataElement = new WorldPointDataGUIElement(91, 15));
+        this.addElement(this.cooldownTextLabel = new OxygenGUIText(162, this.getHeight() - 10, "", GUISettings.get().getSubTextScale() - 0.05F, GUISettings.get().getEnabledTextColor()).setVisible(false));  
+        this.addElement(this.moveButton = new OxygenGUIButton(94, 138,  40, 10, ClientReference.localize("oxygen_teleportation.gui.menu.moveButton")).disableFull());  
 
-        if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown) {
-            this.addElement(this.cooldownTextLabel = new GUITextLabel(166, 139).setTextScale(GUISettings.instance().getTextScale()).disableFull());  
-            this.cooldown = true;
+        this.addElement(new SectionsGUIDDList(this.getWidth() - 4, 5, this, this.screen.getCampsSection(), this.screen.getPlayersSection()));
+
+        this.addElement(this.feeElement = new CurrencyItemValueGUIElement(152, this.getHeight() - 10).disableFull());  
+        this.addElement(this.balanceElement = new CurrencyItemValueGUIElement(this.getWidth() - 10, this.getHeight() - 10).disableFull());  
+        this.balanceElement.setValue(this.screen.balance);
+        if (TeleportationConfig.FEE_MODE.getIntValue() == 1) {
+            this.feeElement.setItemStack(TeleportationManagerClient.instance().getFeeStackWrapper().getCachedItemStack());
+            this.balanceElement.setItemStack(TeleportationManagerClient.instance().getFeeStackWrapper().getCachedItemStack());
         }
+
+        this.creationCallback = new LocationCreationGUICallback(this.screen, this, 140, 110).enableDefaultBackground();
+        this.pointEditingCallback = new EditLocationGUICallback(this.screen, this, 140, 130).enableDefaultBackground();
+        this.removePointCallback = new LocationRemoveGUICallback(this.screen, this, 140, 38).enableDefaultBackground();
     }
 
-    public void sortPoints(int mode) {
-        List<WorldPoint> points = new ArrayList<WorldPoint>(TeleportationManagerClient.instance().getWorldData().getLocations());
+    public void sortPoints(int mode) { 
+        List<WorldPoint> points = new ArrayList<>(TeleportationManagerClient.instance().getLocationsContainer().getLocations());
 
         if (mode == 0)
             Collections.sort(points, (p1, p2)-> (int) ((p1.getId() - p2.getId()) / 5000L));
         else if (mode == 1)
             Collections.sort(points, (p1, p2)-> (int) ((p2.getId() - p1.getId()) / 5000L));
+        else if (mode == 2)
+            Collections.sort(points, (p1, p2)->p1.getName().compareTo(p2.getName()));
+        else if (mode == 3)
+            Collections.sort(points, (p1, p2)->p2.getName().compareTo(p1.getName()));
 
-        this.pointsListPanel.reset();
-        WorldPointGUIButton button;
-        for (WorldPoint worldPoint : points) {
-            worldPoint = TeleportationManagerClient.instance().getWorldData().getLocation(worldPoint.getId());
-            button = new WorldPointGUIButton(worldPoint);
-            button.enableDynamicBackground(GUISettings.instance().getEnabledElementColor(), GUISettings.instance().getEnabledElementColor(), GUISettings.instance().getHoveredElementColor());
-            button.setTextDynamicColor(GUISettings.instance().getEnabledTextColor(), GUISettings.instance().getDisabledTextColor(), GUISettings.instance().getHoveredTextColor());
-            if (worldPoint.isLocked())
-                button.setTextDynamicColor(GUISettings.instance().getEnabledTextColorDark(), GUISettings.instance().getDisabledTextColorDark(), GUISettings.instance().getHoveredTextColorDark());
-            this.pointsListPanel.addButton(button);
-        }
+        this.pointsPanel.reset();
+        for (WorldPoint worldPoint : points)
+            this.pointsPanel.addButton(new WorldPointGUIButton(EnumWorldPoint.LOCATION, worldPoint));
 
-        this.pointsAmountTextLabel.setDisplayText(String.valueOf(TeleportationManagerClient.instance().getWorldData().getLocationsAmount()) + 
-                " / " + TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue());    
-        this.pointsAmountTextLabel.setX(83 - this.textWidth(this.pointsAmountTextLabel.getDisplayText(), GUISettings.instance().getSubTextScale()));
-        this.refreshButton.setX(this.pointsAmountTextLabel.getX() - 11);
+        int maxAmount = TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue();
+        this.pointsAmountTextLabel.setDisplayText(String.valueOf(TeleportationManagerClient.instance().getLocationsContainer().getLocationsAmount()) + "/" + String.valueOf(maxAmount));     
+        this.pointsAmountTextLabel.setX(89 - this.textWidth(this.pointsAmountTextLabel.getDisplayText(), GUISettings.get().getSubTextScale() - 0.05F));
 
         this.searchField.reset();
 
-        this.pointsListPanel.getScroller().resetPosition();
-        this.pointsListPanel.getScroller().getSlider().reset();
+        int maxRows = MathUtils.clamp(points.size(), 9, MathUtils.greaterOfTwo(points.size(), maxAmount));
+        this.pointsPanel.getScroller().updateRowsAmount(maxRows);
 
-        this.sortUpButton.toggle();
-        this.sortDownButton.setToggled(false);
-    }
-
-    @Override
-    public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (this.searchField.isEnabled() && !this.searchField.isHovered()) {
-            this.sortUpButton.enableFull();
-            this.sortDownButton.enableFull();
-            this.searchButton.enableFull();
-            this.refreshButton.enableFull();
-            this.searchField.disableFull();
-        }
-        return super.mouseClicked(mouseX, mouseY, mouseButton);              
+        this.pointsPanel.getScroller().resetPosition();
+        this.pointsPanel.getScroller().getSlider().reset();
     }
 
     @Override
     public void handleElementClick(AbstractGUISection section, GUIBaseElement element, int mouseButton) {
-        if (element == this.campsPageButton)                
-            this.screen.getCampsSection().open();
-        else if (element == this.playersPageButton)
-            this.screen.getPlayersSection().open();
-        else if (element == this.createButton)
-            this.createCallback.open();
-        else if (element == this.searchButton) {
-            this.searchField.enableFull();
-            this.sortUpButton.disableFull();
-            this.sortDownButton.disableFull();
-            this.searchButton.disableFull();
-            this.refreshButton.disableFull();
-        } else if (element == this.sortDownButton) {
-            if (!this.sortDownButton.isToggled()) {
-                this.sortPoints(1);
-                this.sortUpButton.setToggled(false);
-                this.sortDownButton.toggle(); 
-            }
-        } else if (element == this.sortUpButton) {
-            if (!this.sortUpButton.isToggled()) {
-                this.sortPoints(0);
-                this.sortDownButton.setToggled(false);
-                this.sortUpButton.toggle();
-            }
-        } else if (element == this.refreshButton) {
-            this.searchField.reset();
-            this.sortPoints(0);
-            this.resetPointInfo();
-        } else if (element == this.moveButton) {
-            TeleportationManagerClient.instance().getLocationsManager().moveToLocationSynced(this.currentPoint.getId());
-            this.screen.close();
-        } else if (element instanceof WorldPointGUIButton) {
-            WorldPointGUIButton button = (WorldPointGUIButton) element;
-            if (this.currentButton != button) {
-                if (this.currentButton != null)
-                    this.currentButton.setToggled(false);
-                this.currentButton = button;
-                this.currentPoint = TeleportationManagerClient.instance().getWorldData().getLocation(button.index);
-                button.toggle();                    
-                this.showPointInfo(false);
+        if (mouseButton == 0) {
+            if (element == this.createButton)
+                this.creationCallback.open();
+            else if (element == this.moveButton) {
+                TeleportationManagerClient.instance().getLocationsManager().moveToLocationSynced(this.currentButton.index);
+                this.screen.close();
             }
         }
     }
 
-    public void showPointInfo(boolean forceLoad) {
-        this.previewImageLabel.show(this.currentPoint, EnumWorldPoint.LOCATION, forceLoad);
-        this.moveButton.enableFull();
+    public void locationsSynchronized() {
+        this.sortPoints(0);
+        this.updateCreateButtonState();     
+    }
 
-        if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown) {
-            this.cooldownTextLabel.enableFull();
-            this.moveButton.disable();
+    public void cooldownSynchronized() {
+        this.cooldownActive = this.getCooldownElapsedTime() > 0;
+    }
+
+    public void locationCreated(WorldPoint worldPoint) {
+        this.resetPointInfo();
+        this.timeSorter.setSorting(EnumSorting.DOWN);
+        this.nameSorter.reset();
+        this.sortPoints(0);
+
+        this.updateCreateButtonState();
+    }
+
+    public void locationEdited(long oldPoiintId, WorldPoint worldPoint, boolean updateImage) {
+        this.resetPointInfo();
+        this.timeSorter.setSorting(EnumSorting.DOWN);
+        this.nameSorter.reset();
+        this.sortPoints(0);
+
+        WorldPointGUIButton pointButton;
+        for (GUIButton button : this.pointsPanel.buttonsBuffer) {
+            pointButton = (WorldPointGUIButton) button;
+            if (pointButton.index == worldPoint.getId()) {
+                pointButton.toggle();
+                this.currentButton = pointButton;
+                this.currentPoint = TeleportationManagerClient.instance().getLocationsContainer().getLocation(pointButton.index);
+            }
         }
+        this.showPointInfo(worldPoint.getId(), false);
+    }
 
-        if (this.currentPoint.isLocked() && !this.currentPoint.isOwner(OxygenHelperClient.getPlayerUUID()) && !PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.ENABLE_MOVE_TO_LOCKED_LOCATIONS.toString(), false))
-            this.moveButton.disable();
+    public void locationRemoved(long pointId) {
+        this.resetPointInfo();
+        this.timeSorter.setSorting(EnumSorting.DOWN);
+        this.nameSorter.reset();
+        this.sortPoints(0);
 
-        int fee = PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.LOCATION_TELEPORTATION_FEE.toString(), TeleportationConfig.LOCATION_TELEPORTATION_FEE.getIntValue());
-        if (fee > 0) {
-            this.feeElement.setBalance(fee);
-            if (this.screen.feeStack == null)
-                this.balanceElement.setBalance(WatcherHelperClient.getInt(OxygenPlayerData.CURRENCY_COINS_WATCHER_ID));
-            else
-                this.balanceElement.setBalance(this.screen.feeStackBalance);
+        this.updateCreateButtonState();
+    }
+
+    public void showPointInfo(long pointId, boolean reloadImage) {
+        this.pointDataElement.show(this.currentPoint, reloadImage);
+        this.moveButton.enableFull();
+        this.cooldownTextLabel.setVisible(this.cooldownActive);
+        this.moveButton.setEnabled(!this.cooldownActive && !(this.currentPoint.isLocked() && !this.currentPoint.isOwner(OxygenHelperClient.getPlayerUUID())));
+
+        long fee = PrivilegeProviderClient.getValue(EnumTeleportationPrivilege.LOCATION_TELEPORTATION_FEE.toString(), TeleportationConfig.LOCATION_TELEPORTATION_FEE.getLongValue());
+        if (fee > 0L) {
+            this.feeElement.setValue(fee);
             this.feeElement.enableFull();
             this.balanceElement.enableFull();
 
-            if (fee > this.balanceElement.getBalance()) {
+            if (fee > this.balanceElement.getValue()) {
                 this.moveButton.disable();
                 this.feeElement.setRed(true);
             }
@@ -262,11 +241,9 @@ public class LocationsGUISection extends AbstractGUISection {
     }
 
     public void resetPointInfo() {
-        this.previewImageLabel.hide();
+        this.pointDataElement.hide();
         this.moveButton.disableFull();
-
-        if (this.getCooldownElapsedTime() > 0 && this.getCooldownElapsedTime() != this.teleportationCooldown)
-            this.cooldownTextLabel.disableFull();
+        this.cooldownTextLabel.setVisible(false);
 
         this.feeElement.disableFull();
         this.balanceElement.disableFull();
@@ -276,7 +253,7 @@ public class LocationsGUISection extends AbstractGUISection {
     public boolean keyTyped(char typedChar, int keyCode) {   
         if (!this.searchField.isDragged() && !this.hasCurrentCallback())
             if (OxygenGUIHelper.isOxygenMenuEnabled()) {
-                if (keyCode == TeleportationMenuGUIScreen.TELEPORTATIOIN_MENU_ENTRY.index + 2)
+                if (keyCode == TeleportationMenuGUIScreen.TELEPORTATIOIN_MENU_ENTRY.getIndex() + 2)
                     this.screen.close();
             } else if (keyCode == TeleportationMenuKeyHandler.TELEPORTATION_MENU.getKeyCode())
                 this.screen.close();
@@ -285,32 +262,25 @@ public class LocationsGUISection extends AbstractGUISection {
 
     @Override
     public void update() {
-        if (this.cooldown) {
+        if (this.cooldownActive) {
             if (this.getCooldownElapsedTime() > 0)
                 this.cooldownTextLabel.setDisplayText("[" + (this.getCooldownElapsedTime() / 1000) + "]");
-            else if (this.cooldown) {
-                this.cooldown = false;
-                this.cooldownTextLabel.disableFull();
+            else if (this.cooldownActive) {
+                this.cooldownActive = false;
+                this.cooldownTextLabel.setVisible(false);
                 this.moveButton.enable();
             }
         }
     }
 
     private int getCooldownElapsedTime() {
-        return MathUtils.clamp((int) (this.teleportationCooldown - (System.currentTimeMillis() - TeleportationManagerClient.instance().getPlayerData().getCooldownInfo().getLastLocationTime())), 
-                0, this.teleportationCooldown);
+        return (int) (this.cooldownTime - (System.currentTimeMillis() - TeleportationManagerClient.instance().getPlayerData().getCooldownData().getLastLocationTime()));
     }
 
-    public void lockCreateButton() {
-        if (!(TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.getBooleanValue() || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.LOCATIONS_CREATION.toString(), false) || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.toString(), false))
-                || TeleportationManagerClient.instance().getWorldData().getLocationsAmount() >= TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue())
-            this.createButton.disable();
-    }
-
-    public void unlockCreateButton() {
-        if ((TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.getBooleanValue() || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.LOCATIONS_CREATION.toString(), false) || PrivilegeProviderClient.getPrivilegeValue(EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.toString(), false)) 
-                && TeleportationManagerClient.instance().getWorldData().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue())
-            this.createButton.enable();
+    public void updateCreateButtonState() {
+        this.createButton.setEnabled(TeleportationConfig.ENABLE_LOCATIONS.getBooleanValue()
+                && (TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.getBooleanValue() || PrivilegeProviderClient.getValue(EnumTeleportationPrivilege.LOCATIONS_CREATION.toString(), false) || PrivilegeProviderClient.getValue(EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.toString(), false))
+                && TeleportationManagerClient.instance().getLocationsContainer().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue());
     }
 
     public void openPointEditingCallback() {
@@ -321,11 +291,11 @@ public class LocationsGUISection extends AbstractGUISection {
         this.removePointCallback.open();
     }
 
-    public WorldPoint getCurrentPoint() {
-        return this.currentPoint;
-    }
-
     public WorldPointGUIButton getCurrentButton() {
         return this.currentButton;
+    }
+
+    public WorldPoint getCurrentPoint() {
+        return this.currentPoint;
     }
 }

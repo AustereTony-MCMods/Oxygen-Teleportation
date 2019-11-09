@@ -1,51 +1,48 @@
 package austeretony.oxygen_teleportation.client;
 
-import austeretony.oxygen.client.api.OxygenHelperClient;
-import austeretony.oxygen.client.privilege.api.PrivilegeProviderClient;
-import austeretony.oxygen.common.itemstack.ItemStackWrapper;
-import austeretony.oxygen.common.main.EnumOxygenPrivilege;
-import austeretony.oxygen.common.main.OxygenPlayerData;
-import austeretony.oxygen.common.main.SharedPlayerData;
-import austeretony.oxygen_teleportation.common.main.TeleportationPlayerData;
-import austeretony.oxygen_teleportation.common.main.TeleportationWorldData;
+import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.common.item.ItemStackWrapper;
+import austeretony.oxygen_teleportation.common.TeleportationPlayerData;
 
 public class TeleportationManagerClient {
 
     private static TeleportationManagerClient instance;
 
-    //Data      
-    private TeleportationPlayerData playerData;
+    //Players Data
+    private TeleportationPlayerData playerData = new TeleportationPlayerData();
 
-    private final TeleportationWorldData worldData;
+    private final PlayerDataManagerClient playerDataManager;
 
-    //Camps
-    private final CampsManagerClient campsManager;
-
-    private final SharedCampsManagerClient sharedCampsManager;
+    //Shared Camps
+    private final SharedCampsManagerContainer sharedCampsContainer;
 
     //Locations
-    private final LocationsManagerClient locationsManager;
+    private final LocationsContainerClient locationsContainer = new LocationsContainerClient();
 
-    //Players
-    private final PlayersManagerClient playersManager;
+    private final LocationsManagerClient locationsManager;
 
     //Preview Images
     private final ImagesManagerClient imagesManager;
 
     private final ImagesLoaderClient imagesLoader;
 
-    private long time, delay;
+    //Menu
+    private final TeleportationMenuManager menuManager;
 
+    //Fee
     private ItemStackWrapper feeStackWrapper;
 
     private TeleportationManagerClient() {
-        this.worldData = new TeleportationWorldData();
-        this.campsManager = new CampsManagerClient(this);
-        this.sharedCampsManager = new SharedCampsManagerClient(this);
+        this.playerDataManager = new PlayerDataManagerClient(this);
+        this.sharedCampsContainer = new SharedCampsManagerContainer(this);
         this.locationsManager = new LocationsManagerClient(this);
-        this.playersManager = new PlayersManagerClient(this);
         this.imagesManager = new ImagesManagerClient(this);
         this.imagesLoader = new ImagesLoaderClient(this);
+        this.menuManager = new TeleportationMenuManager(this);
+
+        OxygenHelperClient.registerPersistentData(this.playerData);
+        OxygenHelperClient.registerPersistentData(this.sharedCampsContainer);
+        OxygenHelperClient.registerPersistentData(this.locationsContainer);
     }
 
     public static void create() {
@@ -57,44 +54,24 @@ public class TeleportationManagerClient {
         return instance;
     }
 
-    public void init() {
-        this.reset();
-        this.playerData = new TeleportationPlayerData(OxygenHelperClient.getPlayerUUID());
-
-        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getPlayerData());
-        this.getImagesLoader().loadCampPreviewImagesDelegated();
-
-        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getSharedCampsManager());
-
-        OxygenHelperClient.loadPersistentDataDelegated(TeleportationManagerClient.instance().getWorldData());
-        this.getImagesLoader().loadLocationPreviewImagesDelegated();   
-
-        this.getImagesLoader().removeUnusedCampPreviewImagesDelegated();
-        this.getImagesLoader().removeUnusedLocationPreviewImagesDelegated();
-    }
-
     public TeleportationPlayerData getPlayerData() {
         return this.playerData;
     }
 
-    public TeleportationWorldData getWorldData() {
-        return this.worldData;
+    public PlayerDataManagerClient getPlayerDataManager() {
+        return this.playerDataManager;
     }
 
-    public CampsManagerClient getCampsManager() {
-        return this.campsManager;
+    public SharedCampsManagerContainer getSharedCampsContainer() {
+        return this.sharedCampsContainer;
     }
 
-    public SharedCampsManagerClient getSharedCampsManager() {
-        return this.sharedCampsManager;
+    public LocationsContainerClient getLocationsContainer() {
+        return this.locationsContainer;
     }
 
     public LocationsManagerClient getLocationsManager() {
         return this.locationsManager;
-    }
-
-    public PlayersManagerClient getPlayersManager() {
-        return this.playersManager;
     }
 
     public ImagesManagerClient getImagesManager() {
@@ -105,13 +82,23 @@ public class TeleportationManagerClient {
         return this.imagesLoader;
     }
 
-    public boolean teleporting() {
-        return System.currentTimeMillis() < this.time + this.delay;
+    public TeleportationMenuManager getTeleportationMenuManager() {
+        return this.menuManager;
     }
 
-    public void setTeleportationDelay(long delay) {
-        this.delay = delay * 1000;
-        this.time = System.currentTimeMillis();
+    public void init() {
+        this.playerData.setPlayerUUID(OxygenHelperClient.getPlayerUUID());
+        this.playerData.setPath(OxygenHelperClient.getDataFolder() + "/client/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/camps.dat");
+        OxygenHelperClient.loadPersistentDataAsync(this.playerData);
+
+        OxygenHelperClient.loadPersistentDataAsync(this.sharedCampsContainer);
+        OxygenHelperClient.loadPersistentDataAsync(this.locationsContainer);
+
+        this.getImagesLoader().loadCampPreviewImagesAsync();
+        this.getImagesLoader().loadLocationPreviewImagesAsync();   
+
+        this.getImagesLoader().removeUnusedCampPreviewImagesAsync();
+        this.getImagesLoader().removeUnusedLocationPreviewImagesAsync();
     }
 
     public void setFeeStack(ItemStackWrapper stackWrapper) {
@@ -120,23 +107,5 @@ public class TeleportationManagerClient {
 
     public ItemStackWrapper getFeeStackWrapper() {
         return this.feeStackWrapper;
-    }
-
-    public static boolean isPlayerAvailable(String username) {
-        if (username.equals(OxygenHelperClient.getSharedClientPlayerData().getUsername()))
-            return false;
-        SharedPlayerData sharedData = OxygenHelperClient.getSharedPlayerData(username);
-        if (sharedData != null) {
-            if ((OxygenHelperClient.getPlayerStatus(sharedData) != OxygenPlayerData.EnumActivityStatus.OFFLINE || PrivilegeProviderClient.getPrivilegeValue(EnumOxygenPrivilege.EXPOSE_PLAYERS_OFFLINE.toString(), false)))
-                return true;
-        }
-        return false;
-    }
-
-    public void reset() {
-        if (this.playerData != null)
-            this.playerData.reset();
-        this.worldData.reset();
-        this.sharedCampsManager.reset();
     }
 }

@@ -1,103 +1,95 @@
 key.teleportation.openMenu=Открыть Меню Перемещение
 key.teleportation.moveToCamp=Переместиться в Избранный Лагерь
 
-teleportation.gui.closeButton=Закрыть
+oxygen_teleportation.gui.closeButton=Закрыть
 
-teleportation.gui.menu.title=Перемещение
-teleportation.gui.menu.campsTitle=Лагеря
-teleportation.gui.menu.locationsTitle=Локации
-teleportation.gui.menu.playersTitle=Игроки
+oxygen_teleportation.gui.menu.title=Телепортация
+oxygen_teleportation.gui.menu.camps=Лагеря
+oxygen_teleportation.gui.menu.locations=Локации
+oxygen_teleportation.gui.menu.players=Игроки
 
-teleportation.gui.menu.makeFvorite=Сдел. Избранным
-teleportation.gui.menu.lock=Заблокировать
-teleportation.gui.menu.unlock=Разблокировать
-teleportation.gui.menu.invite=Пригласить
-teleportation.gui.menu.invitations=Приглашения
-teleportation.gui.menu.edit=Редактировать
-teleportation.gui.menu.remove=Удалить
-teleportation.gui.menu.leave=Покинуть
+oxygen_teleportation.gui.menu.makeFvorite=Сдел. Избранным
+oxygen_teleportation.gui.menu.lock=Заблокировать
+oxygen_teleportation.gui.menu.unlock=Разблокировать
+oxygen_teleportation.gui.menu.invite=Пригласить
+oxygen_teleportation.gui.menu.invitations=Приглашения
+oxygen_teleportation.gui.menu.edit=Редактировать
+oxygen_teleportation.gui.menu.remove=Удалить
+oxygen_teleportation.gui.menu.leave=Покинуть
+oxygen_teleportation.gui.menu.uninvite=Выгнать
+oxygen_teleportation.gui.menu.moveTo=Переместиться
 
-contextaction.moveToPlayer=Переместиться
+oxygen_teleportation.gui.menu.players.profile=Профиль
 
-teleportation.gui.menu.players.profile=Профиль
+oxygen_teleportation.gui.menu.callback.campCreation=Создание Лагеря
+oxygen_teleportation.gui.menu.callback.invitePlayer=Пригласить
+oxygen_teleportation.gui.menu.callback.invitePlayer.request=Отправить приглашение в лагерь.
+oxygen_teleportation.gui.menu.callback.invitations=Приглашения
+oxygen_teleportation.gui.menu.callback.removeCamp=Удаление Лагеря
+oxygen_teleportation.gui.menu.callback.removeCamp.request=Лагерь будет удалён.
+oxygen_teleportation.gui.menu.callback.leaveCamp=Покинуть Лагерь
+oxygen_teleportation.gui.menu.callback.leaveCamp.request=Лагерь будет удалён.
+oxygen_teleportation.gui.menu.callback.editCamp=Редактирование Лагеря
+oxygen_teleportation.gui.menu.callback.locationCreation=Создание Локации
+oxygen_teleportation.gui.menu.callback.removeLocation=Удаление Локации
+oxygen_teleportation.gui.menu.callback.removeLocation.request=Локация будет удалёна.
+oxygen_teleportation.gui.menu.callback.editLocation=Редактирование Локации
 
-teleportation.gui.menu.campCreationCallback=Создание Лагеря
-teleportation.gui.menu.inviteCallback=Пригласить
-teleportation.gui.menu.inviteCallback.request=Отправить приглашение в лагерь.
-teleportation.gui.menu.invitationsCallback=Приглашения
-teleportation.gui.menu.removeCampCallback=Удаление Лагеря
-teleportation.gui.menu.removeCallback.request=Позиция %s будет удалёна.
-teleportation.gui.menu.leaveCampCallback=Покинуть Лагерь
-teleportation.gui.menu.leaveCallback.request=Покинуть позицию %s?
-teleportation.gui.menu.editCampCallback=Редактирование Лагеря
-teleportation.gui.menu.locationCreationCallback=Создание Локации
-teleportation.gui.menu.removeLocationCallback=Удаление Локации
-teleportation.gui.menu.editLocationCallback=Редактирование Локации
+oxygen_teleportation.gui.menu.updateImage=Обновить Изображение
+oxygen_teleportation.gui.menu.updatePosition=Обновить Позицию
 
-teleportation.gui.menu.updateImage=Обновить Изображение
-teleportation.gui.menu.updatePosition=Обновить Позицию
+oxygen_teleportation.gui.menu.createButton=Создать
+oxygen_teleportation.gui.menu.moveButton=Посетить
+oxygen_teleportation.gui.menu.requestButton=Запрос
 
-teleportation.gui.menu.createButton=Создать
-teleportation.gui.menu.moveButton=Посетить
-teleportation.gui.menu.requestButton=Запрос
+oxygen_teleportation.gui.menu.campGenericName=Лагерь
+oxygen_teleportation.gui.menu.locationGenericName=Локация
 
-teleportation.gui.menu.campGenericName=Лагерь
-teleportation.gui.menu.locationGenericName=Локация
+oxygen_teleportation.gui.menu.info.owner=Владелец:
 
-teleportation.gui.menu.noImage=НЕТ ИЗОБРАЖЕНИЯ
+oxygen_teleportation.gui.menu.tooltip.camps=Лагеря
+oxygen_teleportation.gui.menu.tooltip.locations=Локации
+oxygen_teleportation.gui.menu.tooltip.players=Игроки
 
-teleportation.gui.menu.info.owner=Владелец:
+oxygen_teleportation.jumpProfile.free=Открытый
+oxygen_teleportation.jumpProfile.request=Запрос
+oxygen_teleportation.jumpProfile.disabled=Запрет
 
-teleportation.gui.menu.tooltip.camps=Лагеря
-teleportation.gui.menu.tooltip.locations=Локации
-teleportation.gui.menu.tooltip.players=Игроки
+oxygen_teleportation.status.campCreated=Лагерь создан
+oxygen_teleportation.status.campEdited=Лагерь отредактирован
+oxygen_teleportation.status.campRemoved=Лагерь удалён
+oxygen_teleportation.status.favoriteCampSet=Избранный лагерь установлен
+oxygen_teleportation.status.campLocked=Лагерь заблокирован
+oxygen_teleportation.status.campUnlocked=Лагерь разблокирован
+oxygen_teleportation.status.locationCreated=Локация создана
+oxygen_teleportation.status.locationEdited=Локация отредактирована
+oxygen_teleportation.status.locationRemoved=Локация удалена
+oxygen_teleportation.status.locationLocked=Локация заблокирована
+oxygen_teleportation.status.locationUnlocked=Локация разблокирована
+oxygen_teleportation.status.prepareForTeleportation=Приготовтесь к перемещению
+oxygen_teleportation.status.movedToCamp=Перемещение в лагерь
+oxygen_teleportation.status.movedToLocation=Перемещение в локацию
+oxygen_teleportation.status.movedToPlayer=Перемещение к игроку
+oxygen_teleportation.status.jumpProfileChanged=Профиль изменен.
+oxygen_teleportation.status.jumpRequestAccepted=Вы приняли запрос на перемещение
+oxygen_teleportation.status.jumpRequestRejected=Вы отклонили запрос на перемещение
+oxygen_teleportation.status.jumpRequestAcceptedVisitor=Ваш запрос на перемещение принят
+oxygen_teleportation.status.jumpRequestRejectedVisitor=Ваш запрос на перемещение отклонён
+oxygen_teleportation.status.jumpRequestTargetOffline=Игрок не в сети
+oxygen_teleportation.status.jumpRequestVisitorOffline=Игрок не в сети
+oxygen_teleportation.status.teleportationAborted=Перемещение отменено
+oxygen_teleportation.status.crossDimTeleportationDisabled=Перемещение между измерениями запрещено
+oxygen_teleportation.status.invitatioinRequestSent=Приглашение в лагерь отправлено
+oxygen_teleportation.status.invitationRequestAccepted=Вы приняли приглашение в лагерь
+oxygen_teleportation.status.invitationRequestRejected=Вы отклонили приглашение в лагерь
+oxygen_teleportation.status.invitationRequestAcceptedOwner=Ваше приглашение в лагерь принято
+oxygen_teleportation.status.invitationRequestRejectedOwner=Ваше приглашение в лагерь отклонено
+oxygen_teleportation.status.playerUninvited=Приглашение отменено
+oxygen_teleportation.status.campLeft=Вы покинули лагерь
+oxygen_teleportation.status.feeStackSpecified=Предмет для сбора установлен
 
-teleportation.jumpProfile.free=Открытый
-teleportation.jumpProfile.request=Запрос
-teleportation.jumpProfile.disabled=Запрет
-
-oxygen_teleportation.message.campCreated=Создан лагерь %s.
-oxygen_teleportation.message.campRemoved=Удалён лагерь %s.
-oxygen_teleportation.message.setFavorite=Новый избранный лагерь %s.
-oxygen_teleportation.message.campLocked=Заблокирован лагерь %s.
-oxygen_teleportation.message.campUnlocked=Разблокирован лагерь %s.
-oxygen_teleportation.message.locationCreated=Создана локация %s.
-oxygen_teleportation.message.locationLocked=Заблокирован лагерь %s.
-oxygen_teleportation.message.locationUnlocked=Разблокирован лагерь %s.
-oxygen_teleportation.message.locationRemoved=Удалён лагерь %s.
-oxygen_teleportation.message.prepareForTeleportation=Перемещение начнётся через %s сек.
-oxygen_teleportation.message.movedToCamp=Перемещение к лагерю %s.
-oxygen_teleportation.message.movedToLocation=Перемещение к локации %s.
-oxygen_teleportation.message.movedToPlayer=Перемещение к игроку %s.
-oxygen_teleportation.message.jumpProfileChanged=Профиль изменен на %s.
-oxygen_teleportation.message.jumpRequestSent=Запрос на перемещение отправлен.
-oxygen_teleportation.message.jumpRequestReset=Запрос на перемещение сброшен.
-oxygen_teleportation.message.jumpRequestAccepted=Вы приняли запрос на перемещение.
-oxygen_teleportation.message.jumpRequestRejected=Вы отклонили запрос на перемещение.
-oxygen_teleportation.message.jumpRequestAcceptedVisitor=Ваш запрос на перемещение принят.
-oxygen_teleportation.message.jumpRequestRejectedVisitor=Ваш запрос на перемещение отклонён.
-oxygen_teleportation.message.jumpRequestTargetOffline=Игрок не в сети.
-oxygen_teleportation.message.jumpRequestVisitorOffline=Игрок не в сети.
-oxygen_teleportation.message.teleportationAborted=Перемещение отменено.
-oxygen_teleportation.message.crossDimTeleportationDisabled=Перемещение между измерениями запрещено.
-oxygen_teleportation.message.invitatioinRequestSent=Приглашение в лагерь <%s> отправлено игроку %s.
-oxygen_teleportation.message.invitatioinRequestReset=Приглашение сброшено.
-oxygen_teleportation.message.invitationRequestAccepted=Вы приняли приглашение от %s в лагерь <%s>.
-oxygen_teleportation.message.invitationRequestRejected=Вы отклонили приглашение от %s в лагерь <%s>.
-oxygen_teleportation.message.invitationRequestAcceptedOwner=Ваше приглашение в лагерь <%s> принято %s.
-oxygen_teleportation.message.invitationRequestRejectedOwner=Ваше приглашение в лагерь <%s> отклонено %s.
-oxygen_teleportation.message.playerUninvited=Приглашение отменено.
-oxygen_teleportation.message.campLeft=Вы покинули лагерь <%s>.
-oxygen_teleportation.message.feeStackSpecified=Предмет для сбора установлен.
-
-teleportation.jump.request=%s отправил вам запрос на перемещение.
-teleportation.invitation.request=%s пригласил вас в лагерь <%s>.
-
-teleportation.dim.unknown=Неиизвестно
-teleportation.dim.overworld=Верхний Мир
-teleportation.dim.nether=Нижний Мир
-teleportation.dim.end=Край
-teleportation.dim.twilightForest=Сумеречный Лес
+oxygen_teleportation.jump.request=%s отправил вам запрос на перемещение.
+oxygen_teleportation.invitation.request=%s пригласил вас в лагерь <%s>.
 
 oxygen_teleportation.command.dataReset=Данные <oxygen: teleportation> сброшены для клиента.
 oxygen_teleportation.command.exception.mainHandEmpty=Нет предмета в руке!

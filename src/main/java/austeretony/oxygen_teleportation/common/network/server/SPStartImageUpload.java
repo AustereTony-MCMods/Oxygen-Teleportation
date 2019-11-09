@@ -1,43 +1,47 @@
 package austeretony.oxygen_teleportation.common.network.server;
 
-import austeretony.oxygen.common.core.api.CommonReference;
-import austeretony.oxygen.common.network.ProxyPacket;
+import austeretony.oxygen_core.common.api.CommonReference;
+import austeretony.oxygen_core.common.network.Packet;
+import austeretony.oxygen_core.server.api.OxygenHelperServer;
+import austeretony.oxygen_core.server.api.RequestsFilterHelper;
+import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.util.ImageTransferingServerBuffer;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.PacketBuffer;
 
-public class SPStartImageUpload extends ProxyPacket {
+public class SPStartImageUpload extends Packet {
 
-    private ImageTransferingServerBuffer.EnumImageTransfer operation;
-
-    private int partsAmount;
+    private int ordinal, fragmentsAmount;
 
     private long pointId;
 
     public SPStartImageUpload() {}
 
-    public SPStartImageUpload(ImageTransferingServerBuffer.EnumImageTransfer operation, long pointId, int partsAmount) {
-        this.operation = operation;
+    public SPStartImageUpload(ImageTransferingServerBuffer.EnumImageTransfer operation, long pointId, int fragmentsAmount) {
+        this.ordinal = operation.ordinal();
         this.pointId = pointId;
-        this.partsAmount = partsAmount;
+        this.fragmentsAmount = fragmentsAmount;
     }
 
     @Override
-    public void write(PacketBuffer buffer, INetHandler netHandler) {
-        buffer.writeByte(this.operation.ordinal());
+    public void write(ByteBuf buffer, INetHandler netHandler) {
+        buffer.writeByte(this.ordinal);
         buffer.writeLong(this.pointId);
-        buffer.writeShort(this.partsAmount);
+        buffer.writeShort(this.fragmentsAmount);
     }
 
     @Override
-    public void read(PacketBuffer buffer, INetHandler netHandler) {
-        this.operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[buffer.readByte()];
-        this.pointId = buffer.readLong();
-        if (!ImageTransferingServerBuffer.exist(this.pointId))
-            ImageTransferingServerBuffer.create(
-                    this.operation, 
-                    CommonReference.getPersistentUUID(getEntityPlayerMP(netHandler)), 
-                    this.pointId, 
-                    buffer.readShort());
+    public void read(ByteBuf buffer, INetHandler netHandler) {
+        final EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
+        if (RequestsFilterHelper.getLock(CommonReference.getPersistentUUID(playerMP), TeleportationMain.IMAGE_UPLOAD_REQUEST_ID)) {
+            final int ordinal = buffer.readByte();
+            if (ordinal >= 0 && ordinal < ImageTransferingServerBuffer.EnumImageTransfer.values().length) {
+                final ImageTransferingServerBuffer.EnumImageTransfer operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[ordinal];
+                final long pointId = buffer.readLong();
+                final int fragmentsAmount = buffer.readShort();
+                OxygenHelperServer.addRoutineTask(()->ImageTransferingServerBuffer.create(operation, CommonReference.getPersistentUUID(playerMP), pointId, fragmentsAmount));
+            }
+        }
     }
 }

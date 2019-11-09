@@ -2,7 +2,6 @@ package austeretony.oxygen_teleportation.client;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,7 +12,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import austeretony.oxygen.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 
@@ -21,23 +20,17 @@ public class ImagesLoaderClient {
 
     private final TeleportationManagerClient manager;
 
-    public ImagesLoaderClient(TeleportationManagerClient manager) {
+    protected ImagesLoaderClient(TeleportationManagerClient manager) {
         this.manager = manager;
     }
 
-    public void loadCampPreviewImagesDelegated() {
+    public void loadCampPreviewImagesAsync() {
         OxygenHelperClient.addIOTask(()->this.loadCampPreviewImages());
     }
 
     public void loadCampPreviewImages() {
         String folder = OxygenHelperClient.getDataFolder() + "/client/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/images/camps";
-        String[] files = new File(folder).list(new FilenameFilter() {
-
-            @Override 
-            public boolean accept(File folder, String name) {
-                return name.endsWith(".png");
-            }          
-        });
+        String[] files = new File(folder).list((file, name)->name.endsWith(".png"));
         File file;
         BufferedImage bufferedImage;
         if (files != null) {
@@ -62,11 +55,11 @@ public class ImagesLoaderClient {
         }
     }
 
-    public void saveLatestCampPreviewImageDelegated(long pointId) {
+    public void saveLatestCampPreviewImageAsync(long pointId) {
         OxygenHelperClient.addIOTask(()->this.saveCampPreviewImage(pointId, manager.getImagesManager().getLatestImage()));
     }
 
-    public void saveCampPreviewImageDelegated(long pointId, BufferedImage image) {
+    public void saveCampPreviewImageAsync(long pointId, BufferedImage image) {
         OxygenHelperClient.addIOTask(()->this.saveCampPreviewImage(pointId, image));
     }
 
@@ -88,19 +81,13 @@ public class ImagesLoaderClient {
         }
     }
 
-    public void removeUnusedCampPreviewImagesDelegated() {
+    public void removeUnusedCampPreviewImagesAsync() {
         OxygenHelperClient.addIOTask(()->this.removeUnusedCampPreviewImages());
     }
 
     public void removeUnusedCampPreviewImages() {
         String folder = OxygenHelperClient.getDataFolder() + "/client/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/images/camps";
-        String[] files = new File(folder).list(new FilenameFilter() {
-
-            @Override 
-            public boolean accept(File folder, String name) {
-                return name.endsWith(".png");
-            }          
-        });
+        String[] files = new File(folder).list((file, name)->name.endsWith(".png"));
         if (files != null) {
             Path path;
             for (String fileName : files) {
@@ -131,7 +118,7 @@ public class ImagesLoaderClient {
         }
     }
 
-    public void renameCampPreviewImageDelegated(long oldPointId, long newPointId) {
+    public void renameCampPreviewImageAsync(long oldPointId, long newPointId) {
         OxygenHelperClient.addIOTask(()->this.renameCampPreviewImage(oldPointId, newPointId));
     }
 
@@ -149,19 +136,13 @@ public class ImagesLoaderClient {
         }
     }
 
-    public void loadLocationPreviewImagesDelegated() {
+    public void loadLocationPreviewImagesAsync() {
         OxygenHelperClient.addIOTask(()->this.loadLocationPreviewImages());
     }
 
     public void loadLocationPreviewImages() {
         String folder = OxygenHelperClient.getDataFolder() + "/client/world/teleportation/locations/images";
-        String[] files = new File(folder).list(new FilenameFilter() {
-
-            @Override 
-            public boolean accept(File folder, String name) {
-                return name.endsWith(".png");
-            }          
-        });
+        String[] files = new File(folder).list((file, name)->name.endsWith(".png"));
         File file;
         BufferedImage bufferedImage;
         if (files != null) {
@@ -176,7 +157,7 @@ public class ImagesLoaderClient {
                         TeleportationMain.LOGGER.error("Invalid location preview image: {}.", fileName);
                         return;
                     }
-                    TeleportationManagerClient.instance().getImagesManager().getPreviewImages().put(Long.parseLong(StringUtils.remove(fileName, ".png")), bufferedImage);
+                    this.manager.getImagesManager().getPreviewImages().put(Long.parseLong(StringUtils.remove(fileName, ".png")), bufferedImage);
                 } catch (IOException exception) {
                     TeleportationMain.LOGGER.error("Failed to load location preview image: {}.", fileName);
                     exception.printStackTrace();
@@ -186,11 +167,11 @@ public class ImagesLoaderClient {
         }
     }
 
-    public void saveLatestLocationPreviewImageDelegated(long pointId) {
+    public void saveLatestLocationPreviewImageAsync(long pointId) {
         OxygenHelperClient.addIOTask(()->this.saveLocationPreviewImage(pointId, manager.getImagesManager().getLatestImage()));
     }
 
-    public void saveLocationPreviewImageDelegated(long pointId, BufferedImage image) {
+    public void saveLocationPreviewImageAsync(long pointId, BufferedImage image) {
         OxygenHelperClient.addIOTask(()->this.saveLocationPreviewImage(pointId, image));
     }
 
@@ -212,24 +193,18 @@ public class ImagesLoaderClient {
         }
     }
 
-    public void removeUnusedLocationPreviewImagesDelegated() {
+    public void removeUnusedLocationPreviewImagesAsync() {
         OxygenHelperClient.addIOTask(()->this.removeUnusedLocationPreviewImages());
     }
 
     public void removeUnusedLocationPreviewImages() {
         String folder = OxygenHelperClient.getDataFolder() + "/client/world/teleportation/locations/images";
-        String[] files = new File(folder).list(new FilenameFilter() {
-
-            @Override 
-            public boolean accept(File folder, String name) {
-                return name.endsWith(".png");
-            }          
-        });
+        String[] files = new File(folder).list((file, name)->name.endsWith(".png"));
         if (files != null) {
             Path path;
             for (String fileName : files) {
                 path = Paths.get(folder + "/" + fileName);
-                if (!TeleportationManagerClient.instance().getWorldData().locationExist(Long.parseLong(StringUtils.remove(fileName, ".png")))) {
+                if (!this.manager.getLocationsContainer().locationExist(Long.parseLong(StringUtils.remove(fileName, ".png")))) {
                     try {
                         Files.delete(path);
                     } catch (IOException exception) {
@@ -242,7 +217,7 @@ public class ImagesLoaderClient {
         }
     }
 
-    public void removeLocationPreviewImageDelegated(long pointId) {
+    public void removeLocationPreviewImageAsync(long pointId) {
         OxygenHelperClient.addIOTask(()->this.removeLocationPreviewImage(pointId));
     }
 
@@ -259,7 +234,7 @@ public class ImagesLoaderClient {
         }
     }
 
-    public void renameLocationPreviewImageDelegated(long oldPointId, long newPointId) {
+    public void renameLocationPreviewImageAsync(long oldPointId, long newPointId) {
         OxygenHelperClient.addIOTask(()->this.renameLocationPreviewImage(oldPointId, newPointId));
     }
 

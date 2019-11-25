@@ -38,6 +38,7 @@ public class TeleportationPlayerData extends AbstractPersistentData {
 
     public void setPlayerUUID(UUID playerUUID) {
         this.playerUUID = playerUUID;
+        this.cooldown.setPlayerUUID(playerUUID);
     }
 
     public void setPath(String path) {

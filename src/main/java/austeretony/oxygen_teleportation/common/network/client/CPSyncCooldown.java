@@ -8,29 +8,29 @@ import net.minecraft.network.INetHandler;
 
 public class CPSyncCooldown extends Packet {
 
-    private long campTime, locationTime, jumpTime;
+    private int campCooldownLeftSeconds, locationCooldownLeftSeconds, jumpCooldownLeftSeconds;
 
     public CPSyncCooldown() {}
 
-    public CPSyncCooldown(long campTime, long locationTime, long jumpTime) {
-        this.campTime = campTime;
-        this.locationTime = locationTime;
-        this.jumpTime = jumpTime;
+    public CPSyncCooldown(int campCooldownLeftSeconds, int locationCooldownLeftSeconds, int jumpCooldownLeftSeconds) {
+        this.campCooldownLeftSeconds = campCooldownLeftSeconds;
+        this.locationCooldownLeftSeconds = locationCooldownLeftSeconds;
+        this.jumpCooldownLeftSeconds = jumpCooldownLeftSeconds;
     }
 
     @Override
     public void write(ByteBuf buffer, INetHandler netHandler) {
-        buffer.writeLong(this.campTime);
-        buffer.writeLong(this.locationTime);
-        buffer.writeLong(this.jumpTime);
+        buffer.writeShort(this.campCooldownLeftSeconds);
+        buffer.writeShort(this.locationCooldownLeftSeconds);
+        buffer.writeShort(this.jumpCooldownLeftSeconds);
     }
 
     @Override
     public void read(ByteBuf buffer, INetHandler netHandler) {
-        final long 
-        campTime = buffer.readLong(),
-        locationTime = buffer.readLong(), 
-        jumpTime = buffer.readLong();   
-        OxygenHelperClient.addRoutineTask(()->TeleportationManagerClient.instance().getPlayerDataManager().updateCooldown(campTime, locationTime, jumpTime));
+        final int 
+        campCooldownLeftSeconds = buffer.readShort(),
+        locationCooldownLeftSeconds = buffer.readShort(), 
+        jumpCooldownLeftSeconds = buffer.readShort();   
+        OxygenHelperClient.addRoutineTask(()->TeleportationManagerClient.instance().getPlayerDataManager().updateCooldown(campCooldownLeftSeconds, locationCooldownLeftSeconds, jumpCooldownLeftSeconds));
     }
 }

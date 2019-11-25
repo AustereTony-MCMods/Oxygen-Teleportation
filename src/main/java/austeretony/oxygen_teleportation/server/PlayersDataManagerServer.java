@@ -73,7 +73,7 @@ public class PlayersDataManagerServer {
     public void onPlayerUnloaded(EntityPlayerMP playerMP) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);        
         if (this.manager.getPlayersDataContainer().isPlayerDataExist(playerUUID))
-            this.manager.getPlayersDataContainer().removePlayerData(playerUUID);
+            this.manager.getPlayersDataContainer().removePlayerData(playerUUID);//TODO May cause reset of cooldowns and jump profile
     }
 
     public void changeJumpProfile(EntityPlayerMP playerMP, EnumJumpProfile profile) {
@@ -136,8 +136,7 @@ public class PlayersDataManagerServer {
     }  
 
     private boolean readyMoveToPlayer(UUID playerUUID) {
-        return System.currentTimeMillis() >= this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCooldownData().getLastJumpTime() 
-                + PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()) * 1000;
+        return System.currentTimeMillis() >= this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCooldownData().getNextJumpTime();
     }
 
     public void moveToCamp(EntityPlayerMP playerMP, long pointId) {
@@ -422,7 +421,6 @@ public class PlayersDataManagerServer {
     }
 
     private boolean readyMoveToCamp(UUID playerUUID) {
-        return System.currentTimeMillis() >= this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCooldownData().getLastCampTime() 
-                + PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.CAMP_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.CAMP_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()) * 1000;
+        return System.currentTimeMillis() >= this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCooldownData().getNextCampTime();
     }
 }

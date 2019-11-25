@@ -128,7 +128,7 @@ public class CampsGUISection extends AbstractGUISection {
         this.addElement(this.createButton = new OxygenGUIButton(25, 138, 40, 10, ClientReference.localize("oxygen_teleportation.gui.menu.createButton")));     
 
         this.addElement(this.pointDataElement = new WorldPointDataGUIElement(91, 15));
-        this.addElement(this.cooldownTextLabel = new OxygenGUIText(164, this.getHeight() - 10, "", GUISettings.get().getSubTextScale() - 0.05F, GUISettings.get().getEnabledTextColor()).setVisible(false));  
+        this.addElement(this.cooldownTextLabel = new OxygenGUIText(164, this.getHeight() - 9, "", GUISettings.get().getSubTextScale() - 0.05F, GUISettings.get().getEnabledTextColor()).setVisible(false));  
         this.addElement(this.moveButton = new OxygenGUIButton(94, 138, 40, 10, ClientReference.localize("oxygen_teleportation.gui.menu.moveButton")).disableFull());     
 
         this.addElement(new SectionsGUIDDList(this.getWidth() - 4, 5, this, this.screen.getLocationsSection(), this.screen.getPlayersSection()));
@@ -197,7 +197,7 @@ public class CampsGUISection extends AbstractGUISection {
     }
 
     public void cooldownSynchronized() {
-        this.cooldownActive = this.getCooldownElapsedTime() > 0;
+        this.cooldownActive = this.getCooldownElapsedTimeSeconds() > 0;
     }
 
     public void campCreated(WorldPoint worldPoint) {
@@ -304,8 +304,8 @@ public class CampsGUISection extends AbstractGUISection {
     @Override
     public void update() {
         if (this.cooldownActive) {
-            if (this.getCooldownElapsedTime() > 0)
-                this.cooldownTextLabel.setDisplayText("[" + (this.getCooldownElapsedTime() / 1000) + "]");
+            if (this.getCooldownElapsedTimeSeconds() > 0)
+                this.cooldownTextLabel.setDisplayText("[" + String.valueOf(this.getCooldownElapsedTimeSeconds()) + "]");
             else if (this.cooldownActive) {
                 this.cooldownActive = false;
                 this.cooldownTextLabel.setVisible(false);
@@ -314,8 +314,8 @@ public class CampsGUISection extends AbstractGUISection {
         }
     }
 
-    private int getCooldownElapsedTime() {
-        return (int) (this.cooldownTime - (System.currentTimeMillis() - TeleportationManagerClient.instance().getPlayerData().getCooldownData().getLastCampTime()));
+    private long getCooldownElapsedTimeSeconds() {
+        return (TeleportationManagerClient.instance().getPlayerData().getCooldownData().getNextCampTime() - System.currentTimeMillis()) / 1000;
     }
 
     public void updateCreateButtonState() {

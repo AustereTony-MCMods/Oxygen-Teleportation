@@ -8,35 +8,39 @@ import net.minecraft.network.INetHandler;
 
 public class CPSyncAdditionalData extends Packet {
 
-    private long campTime, locationTime, jumpTime, favoriteCampId, invitationsId;
+    private long favoriteCampId, invitationsId;
+
+    private int campCooldownLeftSeconds, locationCooldownLeftSeconds, jumpCooldownLeftSeconds;
 
     public CPSyncAdditionalData() {}
 
-    public CPSyncAdditionalData(long campTime, long locationTime, long jumpTime, long favoriteCampId, long invitationsId) {
-        this.campTime = campTime;
-        this.locationTime = locationTime;
-        this.jumpTime = jumpTime;
+    public CPSyncAdditionalData(int campCooldownLeftSeconds, int locationCooldownLeftSeconds, int jumpCooldownLeftSeconds, long favoriteCampId, long invitationsId) {
+        this.campCooldownLeftSeconds = campCooldownLeftSeconds;
+        this.locationCooldownLeftSeconds = locationCooldownLeftSeconds;
+        this.jumpCooldownLeftSeconds = jumpCooldownLeftSeconds;
         this.favoriteCampId = favoriteCampId;
         this.invitationsId = invitationsId;
     }
 
     @Override
     public void write(ByteBuf buffer, INetHandler netHandler) {
-        buffer.writeLong(this.campTime);
-        buffer.writeLong(this.locationTime);
-        buffer.writeLong(this.jumpTime);
+        buffer.writeShort(this.campCooldownLeftSeconds);
+        buffer.writeShort(this.locationCooldownLeftSeconds);
+        buffer.writeShort(this.jumpCooldownLeftSeconds);
         buffer.writeLong(this.favoriteCampId);
         buffer.writeLong(this.invitationsId);
     }
 
     @Override
     public void read(ByteBuf buffer, INetHandler netHandler) {
+        final int 
+        campCooldownLeftSeconds = buffer.readShort(),
+        locationCooldownLeftSeconds = buffer.readShort(), 
+        jumpCooldownLeftSeconds = buffer.readShort();   
         final long 
-        campTime = buffer.readLong(),
-        locationTime = buffer.readLong(), 
-        jumpTime = buffer.readLong(),
         favoriteCampId = buffer.readLong(),
         invitationsId = buffer.readLong();   
-        OxygenHelperClient.addRoutineTask(()->TeleportationManagerClient.instance().getPlayerDataManager().additionalDataReceived(campTime, locationTime, jumpTime, favoriteCampId, invitationsId));     
+        OxygenHelperClient.addRoutineTask(()->TeleportationManagerClient.instance().getPlayerDataManager().additionalDataReceived(
+                campCooldownLeftSeconds, locationCooldownLeftSeconds, jumpCooldownLeftSeconds, favoriteCampId, invitationsId));     
     }
 }

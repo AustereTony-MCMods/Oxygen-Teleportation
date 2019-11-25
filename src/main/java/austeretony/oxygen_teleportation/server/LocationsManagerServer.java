@@ -180,7 +180,6 @@ public class LocationsManagerServer {
     }
 
     private boolean readyMoveToLocation(UUID playerUUID) {
-        return System.currentTimeMillis() > this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCooldownData().getLastLocationTime() 
-                + PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()) * 1000;
+        return System.currentTimeMillis() >= this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCooldownData().getNextLocationTime();
     }
 }

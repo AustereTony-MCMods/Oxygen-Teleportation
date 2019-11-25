@@ -29,12 +29,12 @@ public class PlayerDataManagerClient {
         this.manager = manager;
     }
 
-    public void updateCooldown(long campTime, long locationTime, long jumpTime) {
-        this.manager.getPlayerData().getCooldownData().updateCooldown(campTime, locationTime, jumpTime);
+    public void updateCooldown(int campCooldownLeftSeconds, int locationCooldownLeftSeconds, int jumpCooldownLeftSeconds) {
+        this.manager.getPlayerData().getCooldownData().updateCooldown(campCooldownLeftSeconds, locationCooldownLeftSeconds, jumpCooldownLeftSeconds);
     }
 
-    public void additionalDataReceived(long campTime, long locationTime, long jumpTime, long favoriteCampId, long invitationsId) {
-        this.updateCooldown(campTime, locationTime, jumpTime);
+    public void additionalDataReceived(int campCooldownLeftSeconds, int locationCooldownLeftSeconds, int jumpCooldownLeftSeconds, long favoriteCampId, long invitationsId) {
+        this.updateCooldown(campCooldownLeftSeconds, locationCooldownLeftSeconds, jumpCooldownLeftSeconds);
         this.manager.getTeleportationMenuManager().cooldownSynchronized();
         this.manager.getPlayerData().setFavoriteCampId(favoriteCampId);
         if (invitationsId != 0L &&

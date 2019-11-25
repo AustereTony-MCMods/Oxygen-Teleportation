@@ -181,7 +181,7 @@ public class PlayersGUISection extends AbstractGUISection {
     }
 
     public void cooldownSynchronized() {
-        this.cooldownActive = this.getCooldownElapsedTime() > 0;
+        this.cooldownActive = this.getCooldownElapsedTimeSeconds() > 0;
     }
 
     private void showPlayerInfo() {
@@ -215,8 +215,8 @@ public class PlayersGUISection extends AbstractGUISection {
     @Override
     public void update() {
         if (this.cooldownActive) {
-            if (this.getCooldownElapsedTime() > 0)
-                this.cooldownTextLabel.setDisplayText("[" + (this.getCooldownElapsedTime() / 1000) + "]");
+            if (this.getCooldownElapsedTimeSeconds() > 0)
+                this.cooldownTextLabel.setDisplayText("[" + String.valueOf(this.getCooldownElapsedTimeSeconds()) + "]");
             else if (this.cooldownActive) {
                 this.cooldownActive = false;
                 this.cooldownTextLabel.setVisible(false);
@@ -224,8 +224,8 @@ public class PlayersGUISection extends AbstractGUISection {
         }
     }
 
-    private int getCooldownElapsedTime() {
-        return (int) (this.cooldownTime - (System.currentTimeMillis() - TeleportationManagerClient.instance().getPlayerData().getCooldownData().getLastJumpTime()));
+    private long getCooldownElapsedTimeSeconds() {
+        return (TeleportationManagerClient.instance().getPlayerData().getCooldownData().getNextJumpTime() - System.currentTimeMillis()) / 1000;
     }
 
     public boolean isCooldownActive() {

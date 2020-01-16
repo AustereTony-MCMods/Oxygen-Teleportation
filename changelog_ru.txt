@@ -1,0 +1,76 @@
+0.10.0b [2020-01-17]
++ Доработан дизайн меню.
++ Добавлен кулдаун в 1 секунду для отправки пакетов - операций в меню перемещения.
++ Обновлены параметры конфигурации:
+ Клиент 
+ - "enable_teleportation_menu_key" [boolean] - разрешить добавление клавиши "открыть меню перемещения"
+ 
+ Сервер 
+ - "image_width" [int](синхронизируется) - ширина превью-изображения
+ - "image_height" [int](синхронизируется) - высота превью-изображения
+ - "process_teleportation_on_move" [boolean](синхронизируется) - возможность перемещения пока игрок в движении
+ - "enable_cross_dim_teleportation" [boolean](синхронизируется) - возможность перемещения если цель находится в другом измерении
+ - "enable_camps" [boolean](синхронизируется) - возможность использовать приватные POI - лагеря
+ - "camps_max_amount" [int](синхронизируется) - максимальное количество лагерей для игрока
+ - "camp_teleportation_delay_seconds" [int] - задержка перед перемещением в лагерь
+ - "camp_cooldown_seconds" [int](синхронизируется) - кулдаун перемещения в лагерь
+ - "enable_favorite_camp" [boolean](синхронизируется) - возможность использования избранного лагеря (перемещение по нажатию клавиши)
+ - "enable_camp_invitations" [boolean](синхронизируется) - возможность приглашать игроков в свои лагеря
+ - "max_invited_players_per_camp" [int](синхронизируется) - максимальное количество приглашённых в лагерь
+ - "camp_invitation_request_expire_time_seconds" [int] - время активности приглашения в лагерь в секундах
+ - "enable_locations" [boolean](синхронизируется) - возможность использовать публичные POI - локации
+ - "locations_max_amount" [int](синхронизируется) - максимальное количество лакаций на сервере
+ - "location_teleportation_delay_seconds" [int] - задержка перед перемещением в локацию
+ - "location_cooldown_seconds" [int](синхронизируется) - кулдаун перемещения в локацию
+ - "allow_locations_creation_for_all" [boolean](синхронизируется) - возможность создавать и управлять своими локациями для всех игроков
+ - "enable_player_teleportation" [boolean](синхронизируется) - возможность перемещения к игрокам
+ - "player_teleportation_delay_seconds" [int] - задержка перед перемещением к игроку
+ - "player_teleportation_cooldown_seconds" [int](синхронизируется) - кулдаун перемещения к игроку
+ - "default_player_teleportation_profile" [int] - профиль перемещения игрока по умолчанию
+ - "player_teleportation_request_expire_seconds" [int] - время активности запроса на телепортацию в секундах
+ - "fee_mode" [int](синхронизируется) - режим денежного сбора за перемещение
+ - "camp_teleportation_fee" [long](синхронизируется) - сбор за перемещение в лагерь
+ - "location_teleportation_fee" [long](синхронизируется) - сбор за перемещение в локацию
+ - "teleportation_to_player_fee" [long](синхронизируется) - сбор за перемещение к игроку
+
++ Добавлены команды:
+ Сервер - Операторы [/oxygenop]
+ - Установить предмет для сбора за перемещение: /oxygenop teleportation -set-fee-stack
+ 
+ Клиент [/oxygenc]
+ - Открыть меню перемещения: /oxygenc teleportation
+ - Переместиться в избранный лагерь: /oxygenc teleportation -fav-camp
+ - Сбросить данные клиента: /oxygenc teleportation -reset-data
+ 
++ Добавлены привилегии:
+ - "teleportation:teleportOnMove" [id - 100, type - BOOLEAN] - возможность перемещения пока игрок в движении
+ - "teleportation:crossDimTeleportation" [id - 101, type - BOOLEAN] - возможность перемещения если цель находится в другом измерении
+ - "teleportation:teleportToLockedLocations" [id - 102, type - BOOLEAN] - возможность перемещения в заблокированные локации
+ - "teleportation:teleportToAnyPlayer" [id - 103, type - BOOLEAN] - возможность перемещения к любому игроку
+ - "teleportation:allowCampsUsage" [id - 104, type - BOOLEAN] - возможность использовать лагеря
+ - "teleportation:allowLocationsUsage" [id - 105, type - BOOLEAN] - возможность использовать локации
+ - "teleportation:allowPlayerTeleportationUsage" [id - 106, type - BOOLEAN] - возможность перемещения к игрокам
+ 
+ - "teleportation:campsMaxAmount" [id - 110, type - INT] - максимальное количество лагерей для игрока
+ - "teleportation:campTeleportDelay" [id - 111, type - INT] - задержка перед перемещением в лагерь
+ - "teleportation:campTeleportCooldown" [id - 112, type - INT] - кулдаун перемещения в лагерь
+ - "teleportation:enableFavoriteCamp" [id - 113, type - BOOLEAN] - возможность использования избранного лагеря (перемещение по нажатию клавиши)
+ 
+ - "teleportation:locationsManagement" [id - 120, type - BOOLEAN] - возможность создания и управления локациями (всеми)
+ - "teleportation:locationsCreation" [id - 121, type - BOOLEAN] - возможность создания и управления своими локациями
+ - "teleportation:locationTeleportDelay" [id - 122, type - INT] - задержка перед перемещением в локацию
+ - "teleportation:locationTeleportCooldown" [id - 123, type - INT] - кулдаун перемещения в локацию
+ 
+ - "teleportation:playerTeleportDelay" [id - 130, type - INT] - задержка перед перемещением к игроку
+ - "teleportation:playerTeleportCooldown" [id - 131, type - INT] - кулдаун перемещения к игроку
+ 
+ - "teleportation:campTeleportationFee" [id - 140, type - LONG] - сбор за перемещение в лагерь
+ - "teleportation:locationTeleportationFee" [id - 141, type - LONG] - сбор за перемещение в локацию
+ - "teleportation:playerTeleportationFee" [id - 142, type - LONG] - сбор за перемещение к игроку
+ 
++ Добавлены клиентские настройки:
+ Общие
+ - возможность открыть меню перемещения через общее меню (Oxygen Menu)
+ 
+ Интерфейс
+ - расположение меню

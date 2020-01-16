@@ -1,58 +1,135 @@
+0.10.0b [2020-01-17]
++ Improved menu design.
++ Added 1 second cooldown for sending packets - operations in the navigation menu.
++ Updated configuration options:
+ Client
+ - "enable_teleportation_menu_key" [boolean] - enable the "open navigation menu" key
+ 
+ Server
+ - "image_width" [int] (synchronized) - the width of the preview image
+ - "image_height" [int] (synchronized) - the height of the preview image
+ - "process_teleportation_on_move" [boolean] (synchronized) - the ability to move while the player is teleporting
+ - "enable_cross_dim_teleportation" [boolean] (synchronized) - the ability to teleport if the destination is in another dimension
+ - "enable_camps" [boolean] (synchronized) - the ability to use private POIs - camps
+ - "camps_max_amount" [int] (synchronized) - the maximum number of camps for a player
+ - "camp_teleportation_delay_seconds" [int] - delay before teleportation to the camp
+ - "camp_cooldown_seconds" [int] (synchronized) - cooldown for teleportation to the camp
+ - "enable_favorite_camp" [boolean] (synchronized) - the ability to use your favorite camp (teleportation by pressing a key)
+ - "enable_camp_invitations" [boolean] (synchronized) - the ability to invite players to your camps
+ - "max_invited_players_per_camp" [int] (synchronized) - the maximum number of invitees to the camp
+ - "camp_invitation_request_expire_time_seconds" [int] - time of the invitation to the camp in seconds
+ - "enable_locations" [boolean] (synchronized) - the ability to use public POI - locations
+ - "locations_max_amount" [int] (synchronized) - the maximum number of locations on the server
+ - "location_teleportation_delay_seconds" [int] - delay before teleportation to a location
+ - "location_cooldown_seconds" [int] (synchronized) - cooldown for teleportation to a location
+ - "allow_locations_creation_for_all" [boolean] (synchronized) - the ability to create and manage own locations for all players
+ - "enable_player_teleportation" [boolean] (synchronized) - the ability to teleport to the players
+ - "player_teleportation_delay_seconds" [int] - delay before teleportation to the player
+ - "player_teleportation_cooldown_seconds" [int] (synchronized) - cooldown for teleportation to the player
+ - "default_player_teleportation_profile" [int] - default player teleportation profile
+ - "player_teleportation_request_expire_seconds" [int] - time of the teleportation request activity in seconds
+ - "fee_mode" [int] (synchronized) - teleportation fee mode
+ - "camp_teleportation_fee" [long] (synchronized) - fee for teleportation to the camp
+ - "location_teleportation_fee" [long] (synchronized) - fee for teleportation to a location
+ - "teleportation_to_player_fee" [long] (synchronized) - fee for teleportation to the player
+ 
++ Added chat commands:
+  Server - Operators [/oxygenop]
+  - Set item for teleportation fee: /oxygenop teleportation -set-fee-stack
+ 
+  Client [/ oxygenc]
+  - Open the teleportation menu: /oxygenc teleportation
+  - Teleport to your favorite camp: /oxygenc teleportation -fav-camp
+  - Reset client data: /oxygenc teleportation -reset-data
+  
++ Added privileges:
+ - "teleportation:teleportOnMove" [id - 100, type - BOOLEAN] - the ability to teleport while the player is in motion
+ - "teleportation:crossDimTeleportation" [id - 101, type - BOOLEAN] - the ability to teleport if the target is in another dimension
+ - "teleportation:teleportToLockedLocations" [id - 102, type - BOOLEAN] - the ability to teleport to locked locations
+ - "teleportation:teleportToAnyPlayer" [id - 103, type - BOOLEAN] - the ability to teleport to any player
+ - "teleportation:allowCampsUsage" [id - 104, type - BOOLEAN] - the ability to use camps
+ - "teleportation:allowLocationsUsage" [id - 105, type - BOOLEAN] - the ability to use locations
+ - "teleportation:allowPlayerTeleportationUsage" [id - 106, type - BOOLEAN] - the ability to teleport to the players
+ 
+ - "teleportation:campsMaxAmount" [id - 110, type - INT] - maximum number of camps for a player
+ - "teleportation:campTeleportDelay" [id - 111, type - INT] - delay before teleportation to the camp
+ - "teleportation:campTeleportCooldown" [id - 112, type - INT] - cooldown for teleportation to the camp
+ - "teleportation:enableFavoriteCamp" [id - 113, type - BOOLEAN] - the ability to use your favorite camp (teleportation by pressing a key)
+ 
+ - "teleportation:locationsManagement" [id - 120, type - BOOLEAN] - the ability to create and manage any locations
+ - "teleportation:locationsCreation" [id - 121, type - BOOLEAN] - the ability to create and manage own locations
+ - "teleportation:locationTeleportDelay" [id - 122, type - INT] - delay before teleportation to a location
+ - "teleportation:locationTeleportCooldown" [id - 123, type - INT] - cooldown for teleportation to a location
+ 
+ - "teleportation:playerTeleportDelay" [id - 130, type - INT] - delay before teleportation to the player
+ - "teleportation:playerTeleportCooldown" [id - 131, type - INT] - cooldown for teleportation to the player
+ 
+ - "teleportation:campTeleportationFee" [id - 140, type - LONG] - fee for teleportation to the camp
+ - "teleportation:locationTeleportationFee" [id - 141, type - LONG] - fee for teleportation to a location
+ - "teleportation:playerTeleportationFee" [id - 142, type - LONG] - fee for teleportation to the player
+ 
++ Added client settings:
+  Common
+  - the ability to open the navigation menu through the general menu (Oxygen Menu)
+ 
+  Interface
+  - menu alignment
+
 0.9.1b [2019-11-26]
-+Fixed bug with endless cooldown.
++ Fixed bug with endless cooldown.
 
 0.9.0b [2019-11-09]
-+Major improvements.
++ Major improvements.
 
 0.8.3b [2019-08-20]
-+Added teleportation fees setup. The fee can be set separately for 
++ Added teleportation fees setup. The fee can be set separately for 
 teleportation to camp, location and player. Currency or item can be used.
-+Description for camps can now be multi-line. The maximum number of characters in the 
++ Description for camps can now be multi-line. The maximum number of characters in the 
 description is increased to 400.
-+Added 'privilege' to use your favorite camp keybind.
++ Added 'privilege' to use your favorite camp keybind.
 
 0.8.2b [2019-08-12]
-+Added Oxygen Menu support.
++ Added Oxygen Menu support.
 
 0.8.1b [2019-08-08]
-+Fixed images synchronization for unknown points.
-+Fixed camp invitations synchrinization.
-+Fixed interface desync when uninviting an player from camp.
-+Fixed minor bugs for point information displaying.
++ Fixed images synchronization for unknown points.
++ Fixed camp invitations synchrinization.
++ Fixed interface desync when uninviting an player from camp.
++ Fixed minor bugs for point information displaying.
 
 0.8.0b
-+Performance improvements.
++ Performance improvements.
 
 0.4.3a
-+Compatibility with Oxygen Core 0.7.0a.
++ Compatibility with Oxygen Core 0.7.0a.
 
 0.4.2a
-+Removed 'downloaded' icon for locations, created by other players.
-+Fixed impossibility to disable favorite camp keybind from server.
-+All GUIs will be closed on player teleportation context action usage.
++ Removed 'downloaded' icon for locations, created by other players.
++ Fixed impossibility to disable favorite camp keybind from server.
++ All GUIs will be closed on player teleportation context action usage.
 
 0.4.1a
-+Added config option to disable camp invitations.
-+GUI fixes.
++ Added config option to disable camp invitations.
++ GUI fixes.
 
 0.4.0a
-+Added camp invitation feature. Maximum invited players per camp limited to 5 (configurable). 
++ Added camp invitation feature. Maximum invited players per camp limited to 5 (configurable). 
 To invite player use "Invite" context option in Camps section.
 
 0.3.2a
-+Performance improvements.
-+Added sound effects to GUI.
++ Performance improvements.
++ Added sound effects to GUI.
 
 0.3.1a
-+Added config option 'allow_locations_creation_for_all' to allow locations creation for everyone ('false' by
++ Added config option 'allow_locations_creation_for_all' to allow locations creation for everyone ('false' by
 default).
-+Teleportation Menu keybinding remapped to 'Y' key.
-+Performance and GUI improvements.
++ Teleportation Menu keybinding remapped to 'Y' key.
++ Performance and GUI improvements.
 
 0.3.0a
-+Increased points names maximum length (from 16 to 20 symbols).
-+Increased points descriptions maximum length (from 64 to 80 symbols).
-+Changes for GUI:
++ Increased points names maximum length (from 16 to 20 symbols).
++ Increased points descriptions maximum length (from 64 to 80 symbols).
++ Changes for GUI:
  - Replaced points management buttons with context menu (open with right mouse click on element).
  - Fixed some GUI interaction problems.
  - Improved text scale.
@@ -60,23 +137,23 @@ default).
  - Activity status display for players list in 'Players' section.
 
 0.2.0a
-+Improvements for performance.
-+Improvements for GUI design.
-+Added privileges for teleportation behavior management. To use teleportations in operators mode
++ Improvements for performance.
++ Improvements for GUI design.
++ Added privileges for teleportation behavior management. To use teleportations in operators mode
 you will need promote yourself to operators group (oxygen privileged group).
 
 0.1.2a
-+Added sort buttons for GUI.
-+Fixes:
++ Added sort buttons for GUI.
++ Fixes:
  - Fixed camps preview images download from server, images will be downloaded and saved properly.
  - Fixed locations preview images download from server, images will be downloaded and saved properly.
-+GUI fixes:
++ GUI fixes:
  - Fixed long descriptions display.
  - Fixed text display in text fields.
  - GUI menus design optimizations.
 
 0.1.1a
-+GUI fixes:
++ GUI fixes:
  - points creation: text fields will be reset on creation menu reopen.
  - points editing: text fields will contain current values (e.g. "name" will contain current point name) on editing menu open.
  - points editing: buttons states will be reset on editing menu reopen.
@@ -84,4 +161,4 @@ you will need promote yourself to operators group (oxygen privileged group).
  - changed disabled state color for "creation" button, it will not merge with the background if button inactive.
 
 0.1.0a
-+Initial release
++ Initial release

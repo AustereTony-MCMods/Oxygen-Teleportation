@@ -1,7 +1,8 @@
-key.teleportation.openMenu=Открыть Меню Перемещение
-key.teleportation.moveToCamp=Переместиться в Избранный Лагерь
+key.teleportation.teleportationMenu=Открыть Меню Перемещения
+key.teleportation.moveToFavCamp=Переместиться в Избранный Лагерь
 
-oxygen_teleportation.gui.closeButton=Закрыть
+oxygen_teleportation.gui.settings.option.addTeleportationMenu=Меню Перемещения
+oxygen_teleportation.gui.settings.option.alignmentTeleportationMenu=Меню Перемещения
 
 oxygen_teleportation.gui.menu.title=Телепортация
 oxygen_teleportation.gui.menu.camps=Лагеря

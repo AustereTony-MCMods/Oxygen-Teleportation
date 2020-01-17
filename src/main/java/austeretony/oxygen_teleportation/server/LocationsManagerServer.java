@@ -5,7 +5,7 @@ import java.util.UUID;
 import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
-import austeretony.oxygen_core.server.api.PrivilegeProviderServer;
+import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_teleportation.common.WorldPoint;
 import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
@@ -26,14 +26,14 @@ public class LocationsManagerServer {
     }
 
     public void moveToLocation(EntityPlayerMP playerMP, long pointId) {
-        if (TeleportationConfig.ENABLE_LOCATIONS.getBooleanValue()) {
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_LOCATIONS_USAGE.id(), TeleportationConfig.ENABLE_LOCATIONS.asBoolean())) {
             if (this.locationExist(pointId)) { 
-                UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
                 WorldPoint worldPoint = this.getLocation(pointId);
                 if (this.locationAvailable(worldPoint, playerUUID) 
                         && !this.manager.getPlayersDataManager().isPlayerTeleporting(playerUUID) 
                         && this.readyMoveToLocation(playerUUID)) {
-                    if (!PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.ENABLE_CROSS_DIM_TELEPORTATION.toString(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.getBooleanValue())
+                    if (!PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ENABLE_CROSS_DIM_TELEPORTATION.id(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.asBoolean())
                             && playerMP.dimension != worldPoint.getDimensionId()) {
                         OxygenHelperServer.sendStatusMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationStatusMessage.CROSS_DIM_TELEPORTSTION_DISABLED.ordinal());
                         return;
@@ -45,10 +45,11 @@ public class LocationsManagerServer {
     }
 
     public void createLocation(EntityPlayerMP playerMP, String name, String description) {
-        if (TeleportationConfig.ENABLE_LOCATIONS.getBooleanValue()) {
+        if (TeleportationConfig.ENABLE_LOCATIONS.asBoolean()) {
             UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
-            if (this.canCreateLocation(playerUUID) 
-                    && this.manager.getLocationsContainer().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.getIntValue()) {
+            if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_LOCATIONS_USAGE.id(), TeleportationConfig.ENABLE_LOCATIONS.asBoolean())
+                    && this.canCreateLocation(playerUUID) 
+                    && this.manager.getLocationsContainer().getLocationsAmount() < TeleportationConfig.LOCATIONS_MAX_AMOUNT.asInt()) {
                 if (name.isEmpty())
                     name = String.format("Location #%d", this.manager.getLocationsContainer().getLocationsAmount() + 1);
                 name = name.trim();
@@ -83,7 +84,8 @@ public class LocationsManagerServer {
         if (this.locationExist(pointId)) {
             UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
             WorldPoint worldPoint = this.getLocation(pointId);
-            if (this.canEditLocation(playerUUID, worldPoint)) {
+            if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_LOCATIONS_USAGE.id(), TeleportationConfig.ENABLE_LOCATIONS.asBoolean())
+                    && this.canEditLocation(playerUUID, worldPoint)) {
                 this.manager.getLocationsContainer().removeLocation(pointId);
                 this.manager.getLocationsContainer().setChanged(true);
                 this.manager.getImagesLoader().removeLocationPreviewImageAsync(pointId);
@@ -99,7 +101,8 @@ public class LocationsManagerServer {
         if (this.locationExist(pointId)) {
             UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
             WorldPoint worldPoint = this.getLocation(pointId);
-            if (this.canEditLocation(playerUUID, worldPoint)) {
+            if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_LOCATIONS_USAGE.id(), TeleportationConfig.ENABLE_LOCATIONS.asBoolean())
+                    && this.canEditLocation(playerUUID, worldPoint)) {
                 worldPoint.setLocked(flag);
                 worldPoint.setId(this.manager.getLocationsContainer().createId(pointId));
                 this.manager.getLocationsContainer().addLocation(worldPoint);
@@ -122,7 +125,8 @@ public class LocationsManagerServer {
         if (this.locationExist(pointId)) { 
             UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
             WorldPoint worldPoint = this.getLocation(pointId);
-            if (this.canEditLocation(playerUUID, worldPoint)) {
+            if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_LOCATIONS_USAGE.id(), TeleportationConfig.ENABLE_LOCATIONS.asBoolean())
+                    && this.canEditLocation(playerUUID, worldPoint)) {
                 long newPointId = this.manager.getLocationsContainer().createId(pointId);
                 if (name.isEmpty())
                     name = "Location";
@@ -155,9 +159,9 @@ public class LocationsManagerServer {
     }
 
     private boolean canCreateLocation(UUID playerUUID) {
-        return TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.getBooleanValue() 
-                || PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.LOCATIONS_CREATION.toString(), false) 
-                || PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.toString(), false);
+        return TeleportationConfig.ALLOW_LOCATIONS_CREATION_FOR_ALL.asBoolean() 
+                || PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.LOCATIONS_CREATION.id(), false) 
+                || PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.id(), false);
     }
 
     private boolean locationExist(long pointId) {
@@ -170,12 +174,12 @@ public class LocationsManagerServer {
 
     private boolean locationAvailable(WorldPoint worldPoint, UUID playerUUID) {
         return !worldPoint.isLocked() 
-                || PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.ENABLE_MOVE_TO_LOCKED_LOCATIONS.toString(), false) 
+                || PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ENABLE_TELEPORTATION_TO_LOCKED_LOCATIONS.id(), false) 
                 || worldPoint.isOwner(playerUUID);
     }
 
     private boolean canEditLocation(UUID playerUUID, WorldPoint worldPoint) {
-        return PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.toString(), false) 
+        return PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.id(), false) 
                 || worldPoint.isOwner(playerUUID);
     }
 

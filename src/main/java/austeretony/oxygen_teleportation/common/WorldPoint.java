@@ -3,23 +3,18 @@ package austeretony.oxygen_teleportation.common;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.UUID;
 
-import austeretony.oxygen_core.common.sync.SynchronizedData;
+import austeretony.oxygen_core.common.sync.SynchronousEntry;
 import austeretony.oxygen_core.common.util.ByteBufUtils;
 import austeretony.oxygen_core.common.util.StreamUtils;
 import io.netty.buffer.ByteBuf;
 
-public class WorldPoint implements SynchronizedData {
+public class WorldPoint implements SynchronousEntry {
 
     public static final int 
     MAX_NAME_LENGTH = 20,
     MAX_DESCRIPTION_LENGTH = 400;
-
-    public static final DateFormat CREATED_DATE_FORMAT = new SimpleDateFormat("d MM yyyy");
 
     private long id;
 
@@ -89,10 +84,6 @@ public class WorldPoint implements SynchronizedData {
 
     public void setDescription(String description) {		
         this.desc = description;
-    }
-
-    public String getCreationDate() {		
-        return CREATED_DATE_FORMAT.format(new Date(this.id));
     }
 
     public float getYaw() {		

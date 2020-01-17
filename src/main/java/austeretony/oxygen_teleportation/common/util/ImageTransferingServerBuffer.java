@@ -72,9 +72,9 @@ public class ImageTransferingServerBuffer {
         for (int i = 0; i < this.fragmentsAmount; i++)
             ordered.add(this.fragments.get(i));
         if (this.operation == EnumImageTransfer.UPLOAD_CAMP)
-            TeleportationManagerServer.instance().getImagesLoader().saveCampPreviewImageAsync(this.playerUUID, this.pointId, convertIntArraysListToBufferedImage(ordered, TeleportationConfig.IMAGE_WIDTH.getIntValue(), TeleportationConfig.IMAGE_HEIGHT.getIntValue()));
+            TeleportationManagerServer.instance().getImagesLoader().saveCampPreviewImageAsync(this.playerUUID, this.pointId, convertIntArraysListToBufferedImage(ordered, TeleportationConfig.IMAGE_WIDTH.asInt(), TeleportationConfig.IMAGE_HEIGHT.asInt()));
         else
-            TeleportationManagerServer.instance().getImagesLoader().saveAndLoadBytesLocationPreviewAsync(this.pointId, convertIntArraysListToBufferedImage(ordered, TeleportationConfig.IMAGE_WIDTH.getIntValue(), TeleportationConfig.IMAGE_HEIGHT.getIntValue()));
+            TeleportationManagerServer.instance().getImagesLoader().saveAndLoadBytesLocationPreviewAsync(this.pointId, convertIntArraysListToBufferedImage(ordered, TeleportationConfig.IMAGE_WIDTH.asInt(), TeleportationConfig.IMAGE_HEIGHT.asInt()));
         TeleportationManagerServer.instance().getImagesManager().getImageTransfers().remove(this.pointId);
         TeleportationMain.LOGGER.info("Image {}.png saved.", this.pointId);
     }

@@ -52,7 +52,7 @@ public class CampInvitationRequest extends AbstractNotification {
 
     @Override
     public int getExpireTimeSeconds() {
-        return TeleportationConfig.INVITATION_REQUEST_EXPIRE_TIME_SECONDS.getIntValue();
+        return TeleportationConfig.INVITATION_REQUEST_EXPIRE_TIME_SECONDS.asInt();
     }
 
     @Override

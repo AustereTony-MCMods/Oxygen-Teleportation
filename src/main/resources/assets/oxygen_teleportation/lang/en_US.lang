@@ -1,7 +1,9 @@
-key.teleportation.openMenu=Open Teleportation Menu
-key.teleportation.moveToCamp=Move to Favorite Camp
+key.teleportation.teleportationMenu=Open Teleportation Menu
+key.teleportation.moveToFavCamp=Move to Favorite Camp
 
-oxygen_teleportation.gui.closeButton=Close
+oxygen_teleportation.gui.settings.module.teleportation=Teleportation
+oxygen_teleportation.gui.settings.option.addTeleportationMenu=Teleportation Menu
+oxygen_teleportation.gui.settings.option.alignmentTeleportationMenu=Teleportation Menu
 
 oxygen_teleportation.gui.menu.title=Teleportation
 oxygen_teleportation.gui.menu.camps=Camps

@@ -39,8 +39,8 @@ public class ImagesLoaderClient {
                 try {
                     bufferedImage = ImageIO.read(file);
                     try {
-                        Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.getIntValue());
-                        Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.getIntValue());
+                        Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.asInt());
+                        Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.asInt());
                     } catch (IllegalStateException exception) {
                         TeleportationMain.LOGGER.error("Invalid camp preview image {}.", fileName);
                         return;
@@ -151,8 +151,8 @@ public class ImagesLoaderClient {
                 try {
                     bufferedImage = ImageIO.read(file);
                     try {
-                        Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.getIntValue());
-                        Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.getIntValue());
+                        Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.asInt());
+                        Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.asInt());
                     } catch (IllegalStateException exception) {
                         TeleportationMain.LOGGER.error("Invalid location preview image: {}.", fileName);
                         return;

@@ -2,20 +2,20 @@ package austeretony.oxygen_teleportation.client.gui.teleportation.camps.context;
 
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen_core.client.api.ClientReference;
-import austeretony.oxygen_core.client.gui.elements.OxygenGUIContextMenuElement.ContextMenuAction;
+import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu.OxygenContextMenuAction;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
-import austeretony.oxygen_teleportation.client.gui.teleportation.CampsGUISection;
+import austeretony.oxygen_teleportation.client.gui.teleportation.CampsSection;
 
-public class MakeFavoriteContextAction implements ContextMenuAction {
+public class MakeFavoriteContextAction implements OxygenContextMenuAction {
 
-    private CampsGUISection section;
+    private CampsSection section;
 
-    public MakeFavoriteContextAction(CampsGUISection section) {
+    public MakeFavoriteContextAction(CampsSection section) {
         this.section = section;
     }
 
     @Override
-    public String getName(GUIBaseElement currElement) {
+    public String getLocalizedName(GUIBaseElement currElement) {
         return ClientReference.localize("oxygen_teleportation.gui.menu.makeFvorite");
     }
 

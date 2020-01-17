@@ -48,7 +48,7 @@ public class TeleportationRequest extends AbstractNotification {
 
     @Override
     public int getExpireTimeSeconds() {
-        return TeleportationConfig.JUMP_REQUEST_EXPIRE_TIME.getIntValue();
+        return TeleportationConfig.PLAYER_TELEPORTATION_REQUEST_EXPIRE_TIME.asInt();
     }
 
     @Override

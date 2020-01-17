@@ -1,15 +1,13 @@
 package austeretony.oxygen_teleportation.server;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import austeretony.oxygen_core.common.api.OxygenHelperCommon;
 import austeretony.oxygen_core.common.item.ItemStackWrapper;
+import austeretony.oxygen_core.common.util.JsonUtils;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import net.minecraft.init.Items;
@@ -17,15 +15,16 @@ import net.minecraft.item.ItemStack;
 
 public class TeleportationLoaderServer {
 
-    public static void loadFeeItemStackDelegated() {
+    public static void loadFeeItemStackAsync() {
         OxygenHelperServer.addIOTask(()->{
-            String folder = OxygenHelperServer.getDataFolder() + "/server/world/teleportation/fee_stack.dat";
+            String folder = OxygenHelperCommon.getConfigFolder() + "data/server/teleportation/fee_itemstack.json";
             Path path = Paths.get(folder);
             if (Files.exists(path)) {
-                try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(folder))) {    
-                    TeleportationManagerServer.instance().setFeeStack(ItemStackWrapper.read(bis));
+                try {    
+                    TeleportationManagerServer.instance().setFeeStack(
+                            ItemStackWrapper.fromJson(JsonUtils.getExternalJsonData(folder).getAsJsonObject()));
                 } catch (IOException exception) {
-                    TeleportationMain.LOGGER.error("Server fee stack data loading failed! Path: {}", folder);
+                    TeleportationMain.LOGGER.error("Fee stack data loading failed! Path: {}", folder);
                     exception.printStackTrace();
                 }
             } else
@@ -33,9 +32,9 @@ public class TeleportationLoaderServer {
         });
     }
 
-    public static void saveFeeItemStackDelegated() {
+    public static void saveFeeItemStackAsync() {
         OxygenHelperServer.addIOTask(()->{
-            String folder = OxygenHelperServer.getDataFolder() + "/server/world/teleportation/fee_stack.dat";
+            String folder = OxygenHelperCommon.getConfigFolder() + "data/server/teleportation/fee_itemstack.json";
             Path path = Paths.get(folder);
             if (!Files.exists(path)) {
                 try {
@@ -44,10 +43,10 @@ public class TeleportationLoaderServer {
                     exception.printStackTrace();
                 }
             }
-            try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(folder))) {   
-                TeleportationManagerServer.instance().getFeeStackWrapper().write(bos);
+            try {   
+                JsonUtils.createExternalJsonFile(folder, TeleportationManagerServer.instance().getFeeStackWrapper().toJson());
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Server fee stack data saving failed! Path: {}", folder);
+                TeleportationMain.LOGGER.error("Fee stack data saving failed! Path: {}", folder);
                 exception.printStackTrace();
             }
         });

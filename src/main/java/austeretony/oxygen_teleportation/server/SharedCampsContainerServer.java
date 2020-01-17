@@ -13,7 +13,6 @@ import austeretony.oxygen_core.common.util.ConcurrentSetWrapper;
 import austeretony.oxygen_core.common.util.StreamUtils;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.WorldPoint;
-import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 
 public class SharedCampsContainerServer extends AbstractPersistentData {
 
@@ -189,11 +188,6 @@ public class SharedCampsContainerServer extends AbstractPersistentData {
     @Override
     public String getPath() {
         return OxygenHelperServer.getDataFolder() + "/server/world/teleportation/shared_camps.dat";
-    }
-
-    @Override
-    public long getSaveDelayMinutes() {
-        return TeleportationConfig.CAMPS_SAVE_DELAY_MINUTES.getIntValue();
     }
 
     @Override

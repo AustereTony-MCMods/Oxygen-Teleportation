@@ -6,63 +6,86 @@ import austeretony.alternateui.screen.core.AbstractGUIScreen;
 import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.core.GUIWorkspace;
+import austeretony.alternateui.util.EnumGUIAlignment;
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.client.api.PrivilegesProviderClient;
 import austeretony.oxygen_core.client.api.WatcherHelperClient;
 import austeretony.oxygen_core.client.gui.menu.OxygenMenuEntry;
 import austeretony.oxygen_core.common.inventory.InventoryHelper;
-import austeretony.oxygen_core.server.OxygenPlayerData;
+import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
+import austeretony.oxygen_teleportation.client.gui.menu.TeleportationMenuEntry;
+import austeretony.oxygen_teleportation.client.settings.gui.EnumTeleportationGUISetting;
 import austeretony.oxygen_teleportation.common.WorldPoint;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
+import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 
-public class TeleportationMenuGUIScreen extends AbstractGUIScreen {
+public class TeleportationMenuScreen extends AbstractGUIScreen {
 
     public static final OxygenMenuEntry TELEPORTATIOIN_MENU_ENTRY = new TeleportationMenuEntry();
 
-    private CampsGUISection campsSection;
+    private CampsSection campsSection;
 
-    private LocationsGUISection locationsSection;
+    private LocationsSection locationsSection;
 
-    private PlayersGUISection playersSection;
+    private PlayersSection playersSection;
 
     public final long balance;
 
-    public TeleportationMenuGUIScreen() {
+    public final boolean campsEnabled, locationsEnabled, jumpsEnabled;
+
+    public TeleportationMenuScreen() {
         OxygenHelperClient.syncSharedData(TeleportationMain.TELEPORTATION_MENU_SCREEN_ID);
 
         OxygenHelperClient.syncData(TeleportationMain.CAMPS_DATA_ID);
         OxygenHelperClient.syncData(TeleportationMain.LOCATIONS_DATA_ID);
 
-        if (TeleportationConfig.FEE_MODE.getIntValue() == 1)
+        if (TeleportationConfig.FEE_MODE.asInt() == 1)
             this.balance = InventoryHelper.getEqualStackAmount(ClientReference.getClientPlayer(), TeleportationManagerClient.instance().getFeeStackWrapper());
         else
-            this.balance = WatcherHelperClient.getLong(OxygenPlayerData.CURRENCY_COINS_WATCHER_ID);
+            this.balance = WatcherHelperClient.getLong(OxygenMain.COMMON_CURRENCY_INDEX);
+
+        this.campsEnabled = PrivilegesProviderClient.getAsBoolean(EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean());
+        this.locationsEnabled = PrivilegesProviderClient.getAsBoolean(EnumTeleportationPrivilege.ALLOW_LOCATIONS_USAGE.id(), TeleportationConfig.ENABLE_LOCATIONS.asBoolean());
+        this.jumpsEnabled = PrivilegesProviderClient.getAsBoolean(EnumTeleportationPrivilege.ALLOW_PLAYER_TELEPORTATION_USAGE.id(), TeleportationConfig.ENABLE_PLAYER_TELEPORTATION.asBoolean());
     }
 
     @Override
     protected GUIWorkspace initWorkspace() {
-        return new GUIWorkspace(this, 333, 151);
+        EnumGUIAlignment alignment = EnumGUIAlignment.CENTER;
+        switch (EnumTeleportationGUISetting.TELEPORTATION_MENU_ALIGNMENT.get().asInt()) {
+        case - 1: 
+            alignment = EnumGUIAlignment.LEFT;
+            break;
+        case 0:
+            alignment = EnumGUIAlignment.CENTER;
+            break;
+        case 1:
+            alignment = EnumGUIAlignment.RIGHT;
+            break;    
+        default:
+            alignment = EnumGUIAlignment.CENTER;
+            break;
+        }
+        return new GUIWorkspace(this, 333, 149).setAlignment(alignment, 0, 0);
     }
 
     @Override
     protected void initSections() {
-        this.getWorkspace().initSection(this.campsSection = (CampsGUISection) new CampsGUISection(this)
-                .setDisplayText(ClientReference.localize("oxygen_teleportation.gui.menu.camps")).setEnabled(TeleportationConfig.ENABLE_CAMPS.getBooleanValue()));        
-        this.getWorkspace().initSection(this.locationsSection = (LocationsGUISection) new LocationsGUISection(this)
-                .setDisplayText(ClientReference.localize("oxygen_teleportation.gui.menu.locations")).setEnabled(TeleportationConfig.ENABLE_LOCATIONS.getBooleanValue()));   
-        this.getWorkspace().initSection(this.playersSection = (PlayersGUISection) new PlayersGUISection(this)
-                .setDisplayText(ClientReference.localize("oxygen_teleportation.gui.menu.players")).setEnabled(TeleportationConfig.ENABLE_PLAYERS.getBooleanValue()));
+        this.getWorkspace().initSection(this.campsSection = (CampsSection) new CampsSection(this).setEnabled(this.campsEnabled));        
+        this.getWorkspace().initSection(this.locationsSection = (LocationsSection) new LocationsSection(this).setEnabled(this.locationsEnabled));   
+        this.getWorkspace().initSection(this.playersSection = (PlayersSection) new PlayersSection(this).setEnabled(this.jumpsEnabled));
     }
 
     @Override
     protected AbstractGUISection getDefaultSection() {	        
-        if (TeleportationConfig.ENABLE_CAMPS.getBooleanValue())
+        if (this.campsEnabled)
             return this.campsSection;
-        if (TeleportationConfig.ENABLE_LOCATIONS.getBooleanValue())
+        if (this.locationsEnabled)
             return this.locationsSection;
-        if (TeleportationConfig.ENABLE_PLAYERS.getBooleanValue())
+        if (this.jumpsEnabled)
             return this.playersSection;
         return null;
     }
@@ -125,15 +148,15 @@ public class TeleportationMenuGUIScreen extends AbstractGUIScreen {
         this.locationsSection.locationRemoved(pointId);
     }
 
-    public CampsGUISection getCampsSection() {
+    public CampsSection getCampsSection() {
         return this.campsSection;
     }
 
-    public LocationsGUISection getLocationsSection() {
+    public LocationsSection getLocationsSection() {
         return this.locationsSection;
     }
 
-    public PlayersGUISection getPlayersSection() {
+    public PlayersSection getPlayersSection() {
         return this.playersSection;
     }
 }

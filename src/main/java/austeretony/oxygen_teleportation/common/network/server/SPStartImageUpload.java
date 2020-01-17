@@ -3,7 +3,6 @@ package austeretony.oxygen_teleportation.common.network.server;
 import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.network.Packet;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
-import austeretony.oxygen_core.server.api.RequestsFilterHelper;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.util.ImageTransferingServerBuffer;
 import io.netty.buffer.ByteBuf;
@@ -34,7 +33,7 @@ public class SPStartImageUpload extends Packet {
     @Override
     public void read(ByteBuf buffer, INetHandler netHandler) {
         final EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
-        if (RequestsFilterHelper.getLock(CommonReference.getPersistentUUID(playerMP), TeleportationMain.IMAGE_UPLOAD_REQUEST_ID)) {
+        if (OxygenHelperServer.isNetworkRequestAvailable(CommonReference.getPersistentUUID(playerMP), TeleportationMain.IMAGE_UPLOAD_REQUEST_ID)) {
             final int ordinal = buffer.readByte();
             if (ordinal >= 0 && ordinal < ImageTransferingServerBuffer.EnumImageTransfer.values().length) {
                 final ImageTransferingServerBuffer.EnumImageTransfer operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[ordinal];

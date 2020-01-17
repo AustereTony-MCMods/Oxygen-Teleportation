@@ -1,19 +1,16 @@
 package austeretony.oxygen_teleportation.server;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
+import java.awt.image.DataBufferByte;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen_core.common.main.OxygenMain;
-import austeretony.oxygen_core.common.util.BufferedImageUtils;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
+import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
-import austeretony.oxygen_teleportation.common.network.client.CPDownloadImagePart;
-import austeretony.oxygen_teleportation.common.network.client.CPStartImageDownload;
-import austeretony.oxygen_teleportation.common.util.ImageTransferingClientBuffer;
+import austeretony.oxygen_teleportation.common.network.client.CPDownloadPreviewImage;
 import austeretony.oxygen_teleportation.common.util.ImageTransferingServerBuffer;
-import austeretony.oxygen_teleportation.common.util.SplittedByteArray;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ImagesManagerServer {
@@ -22,7 +19,7 @@ public class ImagesManagerServer {
 
     private final Map<Long, ImageTransferingServerBuffer> transfers = new ConcurrentHashMap<>(5);
 
-    private final Map<Long, SplittedByteArray> images = new ConcurrentHashMap<>();
+    private final Map<Long, byte[]> rawImages = new ConcurrentHashMap<>();
 
     protected ImagesManagerServer(TeleportationManagerServer manager) {
         this.manager = manager;
@@ -32,14 +29,14 @@ public class ImagesManagerServer {
         return this.transfers;
     }
 
-    public Map<Long, SplittedByteArray> getLocationPreviews() {
-        return this.images;
+    public Map<Long, byte[]> getLocationPreviews() {
+        return this.rawImages;
     }
 
     public void replaceImageBytes(long oldPointId, long newPointId) {
-        if (this.images.containsKey(oldPointId)) {
-            this.images.put(newPointId, this.images.get(oldPointId));
-            this.images.remove(oldPointId);
+        if (this.rawImages.containsKey(oldPointId)) {
+            this.rawImages.put(newPointId, this.rawImages.get(oldPointId));
+            this.rawImages.remove(oldPointId);
         }
     }
 
@@ -48,13 +45,8 @@ public class ImagesManagerServer {
     }
 
     public void downloadCampPreviewToClient(EntityPlayerMP playerMP, long pointId, BufferedImage bufferedImage) {
-        List<byte[]> fragments = BufferedImageUtils.convertBufferedImageToByteArraysList(bufferedImage);
-        OxygenMain.network().sendTo(new CPStartImageDownload(ImageTransferingClientBuffer.EnumImageTransfer.DOWNLOAD_CAMP, pointId, fragments.size()), playerMP);  
-        int index = 0;
-        for (byte[] part : fragments) {
-            OxygenMain.network().sendTo(new CPDownloadImagePart(ImageTransferingClientBuffer.EnumImageTransfer.DOWNLOAD_CAMP, pointId, index, part, fragments.size()), playerMP);
-            index++;
-        }
+        final byte[] imageRaw = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+        OxygenMain.network().sendTo(new CPDownloadPreviewImage(EnumWorldPoint.CAMP, pointId, imageRaw), playerMP);  
     }
 
     public void downloadLocationPreviewsToClientAsync(EntityPlayerMP playerMP, long[] locationIds) {
@@ -63,21 +55,16 @@ public class ImagesManagerServer {
                 this.downloadLocationPreviewToClient(playerMP, id);
         });
     }
-    
+
     public void downloadLocationPreviewToClientAsync(EntityPlayerMP playerMP, long pointId) {
         OxygenHelperServer.addRoutineTask(()->this.downloadLocationPreviewToClient(playerMP, pointId));
     }
 
     public void downloadLocationPreviewToClient(EntityPlayerMP playerMP, long pointId) {
-        if (this.getLocationPreviews().containsKey(pointId)) {
-            List<byte[]> fragments = this.getLocationPreviews().get(pointId).getParts();
-            OxygenMain.network().sendTo(new CPStartImageDownload(ImageTransferingClientBuffer.EnumImageTransfer.DOWNLOAD_LOCATION, pointId, fragments.size()), playerMP);  
-            int index = 0;
-            for (byte[] part : fragments) {
-                OxygenMain.network().sendTo(new CPDownloadImagePart(ImageTransferingClientBuffer.EnumImageTransfer.DOWNLOAD_LOCATION, pointId, index, part, fragments.size()), playerMP);
-                index++;
-            }
-        } else 
+        final byte[] imageRaw = this.getLocationPreviews().get(pointId);
+        if (imageRaw != null)
+            OxygenMain.network().sendTo(new CPDownloadPreviewImage(EnumWorldPoint.LOCATION, pointId, imageRaw), playerMP);  
+        else 
             TeleportationMain.LOGGER.error("Location preview image {}.png bytes are absent, can't download image.", pointId);
     }
 }

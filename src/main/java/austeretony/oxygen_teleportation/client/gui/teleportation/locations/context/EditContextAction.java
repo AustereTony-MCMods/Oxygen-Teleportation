@@ -3,27 +3,27 @@ package austeretony.oxygen_teleportation.client.gui.teleportation.locations.cont
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
-import austeretony.oxygen_core.client.api.PrivilegeProviderClient;
-import austeretony.oxygen_core.client.gui.elements.OxygenGUIContextMenuElement.ContextMenuAction;
-import austeretony.oxygen_teleportation.client.gui.teleportation.LocationsGUISection;
+import austeretony.oxygen_core.client.api.PrivilegesProviderClient;
+import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu.OxygenContextMenuAction;
+import austeretony.oxygen_teleportation.client.gui.teleportation.LocationsSection;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 
-public class EditContextAction implements ContextMenuAction {
+public class EditContextAction implements OxygenContextMenuAction {
 
-    private LocationsGUISection section;
+    private LocationsSection section;
 
-    public EditContextAction(LocationsGUISection section) {
+    public EditContextAction(LocationsSection section) {
         this.section = section;
     }
 
     @Override   
-    public String getName(GUIBaseElement currElement) {
+    public String getLocalizedName(GUIBaseElement currElement) {
         return ClientReference.localize("oxygen_teleportation.gui.menu.edit");
     }
 
     @Override
     public boolean isValid(GUIBaseElement currElement) {
-        return PrivilegeProviderClient.getValue(EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.toString(), false) 
+        return PrivilegesProviderClient.getAsBoolean(EnumTeleportationPrivilege.LOCATIONS_MANAGEMENT.id(), false) 
                 || this.section.getCurrentPoint().isOwner(OxygenHelperClient.getPlayerUUID());
     }
 

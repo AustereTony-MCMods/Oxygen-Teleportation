@@ -12,7 +12,6 @@ import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.common.persistent.AbstractPersistentData;
 import austeretony.oxygen_core.common.util.StreamUtils;
 import austeretony.oxygen_teleportation.common.WorldPoint;
-import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 
 public class LocationsContainerClient extends AbstractPersistentData {
 
@@ -60,11 +59,6 @@ public class LocationsContainerClient extends AbstractPersistentData {
     @Override
     public String getPath() {
         return OxygenHelperClient.getDataFolder() + "/client/world/teleportation/locations.dat";
-    }
-
-    @Override
-    public long getSaveDelayMinutes() {
-        return TeleportationConfig.LOCATIONS_SAVE_DELAY_MINUTES.getIntValue();
     }
 
     @Override

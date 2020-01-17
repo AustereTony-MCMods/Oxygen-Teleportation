@@ -11,7 +11,6 @@ import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.common.persistent.AbstractPersistentData;
 import austeretony.oxygen_core.common.util.ConcurrentSetWrapper;
 import austeretony.oxygen_core.common.util.StreamUtils;
-import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import io.netty.buffer.ByteBuf;
 
 public class SharedCampsManagerContainer extends AbstractPersistentData {
@@ -66,11 +65,6 @@ public class SharedCampsManagerContainer extends AbstractPersistentData {
     @Override
     public String getPath() {
         return OxygenHelperClient.getDataFolder() + "/server/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/invitations.dat";
-    }
-
-    @Override
-    public long getSaveDelayMinutes() {
-        return TeleportationConfig.CAMPS_SAVE_DELAY_MINUTES.getIntValue();
     }
 
     @Override

@@ -4,7 +4,6 @@ import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.network.Packet;
 import austeretony.oxygen_core.common.util.ByteBufUtils;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
-import austeretony.oxygen_core.server.api.RequestsFilterHelper;
 import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.server.TeleportationManagerServer;
@@ -46,7 +45,7 @@ public class SPEditWorldPoint extends Packet {
     @Override
     public void read(ByteBuf buffer, INetHandler netHandler) {
         final EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
-        if (RequestsFilterHelper.getLock(CommonReference.getPersistentUUID(playerMP), TeleportationMain.MANAGE_POINT_REQUEST_ID)) {
+        if (OxygenHelperServer.isNetworkRequestAvailable(CommonReference.getPersistentUUID(playerMP), TeleportationMain.MANAGE_POINT_REQUEST_ID)) {
             final int ordinal = buffer.readByte();
             if (ordinal >= 0 && ordinal < EnumWorldPoint.values().length) {
                 final EnumWorldPoint point = EnumWorldPoint.values()[ordinal];

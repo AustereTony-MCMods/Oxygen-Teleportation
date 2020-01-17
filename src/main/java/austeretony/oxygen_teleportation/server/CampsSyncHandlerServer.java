@@ -7,7 +7,7 @@ import java.util.UUID;
 import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.common.util.MathUtils;
-import austeretony.oxygen_core.server.api.PrivilegeProviderServer;
+import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_core.server.sync.DataSyncHandlerServer;
 import austeretony.oxygen_teleportation.common.TeleportationPlayerData;
 import austeretony.oxygen_teleportation.common.WorldPoint;
@@ -37,13 +37,13 @@ public class CampsSyncHandlerServer implements DataSyncHandlerServer<WorldPoint>
                 TeleportationManagerServer.instance().getSharedCampsContainer().getInvitationsContainer(playerUUID).getId() : 0L;
 
                 int 
-                campCooldownSeconds = PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.CAMP_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.CAMP_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()),
+                campCooldownSeconds = PrivilegesProviderServer.getAsInt(playerUUID, EnumTeleportationPrivilege.CAMP_TELEPORTATION_COOLDOWN_SECONDS.id(), TeleportationConfig.CAMP_TELEPORTATION_COOLDOWN_SECONDS.asInt()),
                 campCooldownLeftSeconds = (int) MathUtils.clamp((playerData.getCooldownData().getNextCampTime() - System.currentTimeMillis()) / 1000L, 0L, campCooldownSeconds),
 
-                locationCooldownSeconds = PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()),
+                locationCooldownSeconds = PrivilegesProviderServer.getAsInt(playerUUID, EnumTeleportationPrivilege.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.id(), TeleportationConfig.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.asInt()),
                 locationCooldownLeftSeconds = (int) MathUtils.clamp((playerData.getCooldownData().getNextLocationTime() - System.currentTimeMillis()) / 1000L, 0L, locationCooldownSeconds),
 
-                jumpCooldownSeconds = PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()),
+                jumpCooldownSeconds = PrivilegesProviderServer.getAsInt(playerUUID, EnumTeleportationPrivilege.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.id(), TeleportationConfig.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.asInt()),
                 jumpCooldownLeftSeconds = (int) MathUtils.clamp((playerData.getCooldownData().getNextJumpTime() - System.currentTimeMillis()) / 1000L, 0L, jumpCooldownSeconds);
 
                 OxygenMain.network().sendTo(new CPSyncAdditionalData(

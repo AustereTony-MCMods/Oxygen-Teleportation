@@ -1,7 +1,9 @@
 package austeretony.oxygen_teleportation.client;
 
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.item.ItemStackWrapper;
+import austeretony.oxygen_teleportation.client.input.TeleportationKeyHandler;
 import austeretony.oxygen_teleportation.common.TeleportationPlayerData;
 
 public class TeleportationManagerClient {
@@ -29,6 +31,8 @@ public class TeleportationManagerClient {
     //Menu
     private final TeleportationMenuManager menuManager;
 
+    private final TeleportationKeyHandler keyHandler = new TeleportationKeyHandler();
+
     //Fee
     private ItemStackWrapper feeStackWrapper;
 
@@ -39,15 +43,20 @@ public class TeleportationManagerClient {
         this.imagesManager = new ImagesManagerClient(this);
         this.imagesLoader = new ImagesLoaderClient(this);
         this.menuManager = new TeleportationMenuManager(this);
+        CommonReference.registerEvent(this.keyHandler);
+    }
 
+    private void registerPersistentData() {
         OxygenHelperClient.registerPersistentData(this.playerData);
         OxygenHelperClient.registerPersistentData(this.sharedCampsContainer);
         OxygenHelperClient.registerPersistentData(this.locationsContainer);
     }
 
     public static void create() {
-        if (instance == null) 
+        if (instance == null) {
             instance = new TeleportationManagerClient();
+            instance.registerPersistentData();
+        }
     }
 
     public static TeleportationManagerClient instance() {
@@ -84,6 +93,10 @@ public class TeleportationManagerClient {
 
     public TeleportationMenuManager getTeleportationMenuManager() {
         return this.menuManager;
+    }
+
+    public TeleportationKeyHandler getKeyHandler() {
+        return this.keyHandler;
     }
 
     public void init() {

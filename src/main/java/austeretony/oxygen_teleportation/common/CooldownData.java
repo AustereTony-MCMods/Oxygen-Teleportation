@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import austeretony.oxygen_core.common.util.StreamUtils;
-import austeretony.oxygen_core.server.api.PrivilegeProviderServer;
+import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 
@@ -21,15 +21,15 @@ public class CooldownData {
     }
 
     public void movedToCamp() {
-        this.nextCamp = System.currentTimeMillis() + PrivilegeProviderServer.getValue(this.playerUUID, EnumTeleportationPrivilege.CAMP_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.CAMP_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()) * 1000L;
+        this.nextCamp = System.currentTimeMillis() + PrivilegesProviderServer.getAsInt(this.playerUUID, EnumTeleportationPrivilege.CAMP_TELEPORTATION_COOLDOWN_SECONDS.id(), TeleportationConfig.CAMP_TELEPORTATION_COOLDOWN_SECONDS.asInt()) * 1000L;
     }
 
     public void movedToLocation() {
-        this.nextLocation = System.currentTimeMillis() + PrivilegeProviderServer.getValue(this.playerUUID, EnumTeleportationPrivilege.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()) * 1000L;;
+        this.nextLocation = System.currentTimeMillis() + PrivilegesProviderServer.getAsInt(this.playerUUID, EnumTeleportationPrivilege.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.id(), TeleportationConfig.LOCATION_TELEPORTATION_COOLDOWN_SECONDS.asInt()) * 1000L;;
     }
 
     public void jumped() {
-        this.nextJump = System.currentTimeMillis() + PrivilegeProviderServer.getValue(this.playerUUID, EnumTeleportationPrivilege.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.toString(), TeleportationConfig.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.getIntValue()) * 1000L;
+        this.nextJump = System.currentTimeMillis() + PrivilegesProviderServer.getAsInt(this.playerUUID, EnumTeleportationPrivilege.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.id(), TeleportationConfig.PLAYER_TELEPORTATION_COOLDOWN_SECONDS.asInt()) * 1000L;
     }
 
     public void updateCooldown(int campCooldownLeftSeconds, int locationCooldownLeftSeconds, int jumpCooldownLeftSeconds) {

@@ -1,6 +1,7 @@
 package austeretony.oxygen_teleportation.server;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,11 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import austeretony.oxygen_core.common.api.CommonReference;
-import austeretony.oxygen_core.common.util.BufferedImageUtils;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
-import austeretony.oxygen_teleportation.common.util.SplittedByteArray;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ImagesLoaderServer {
@@ -146,15 +145,15 @@ public class ImagesLoaderServer {
                 try {
                     bufferedImage = ImageIO.read(file);
                     try {
-                        Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.getIntValue());
-                        Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.getIntValue());
+                        Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.asInt());
+                        Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.asInt());
                     } catch (IllegalStateException exception) {
                         TeleportationMain.LOGGER.error("Invalid location preview image {}.", fileName);
                         return;
                     }
                     this.manager.getImagesManager().getLocationPreviews().put(
                             Long.parseLong(StringUtils.remove(fileName, ".png")), 
-                            new SplittedByteArray(BufferedImageUtils.convertBufferedImageToByteArraysList(bufferedImage)));              
+                            ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData());              
                 } catch (IOException exception) {
                     TeleportationMain.LOGGER.error("Filed to load location preview image {}.", fileName);
                     exception.printStackTrace();
@@ -196,7 +195,9 @@ public class ImagesLoaderServer {
         if (Files.exists(path)) {
             bufferedImage = loadLocationPreviewImageServer(pointId);
             if (bufferedImage != null)
-                this.manager.getImagesManager().getLocationPreviews().put(pointId, new SplittedByteArray(BufferedImageUtils.convertBufferedImageToByteArraysList(bufferedImage)));              
+                this.manager.getImagesManager().getLocationPreviews().put(
+                        pointId, 
+                        ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData());              
         }
     }
 

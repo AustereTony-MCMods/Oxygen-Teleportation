@@ -1,24 +1,27 @@
 package austeretony.oxygen_teleportation.client;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.client.util.ScreenshotHelper;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.common.util.BufferedImageUtils;
-import austeretony.oxygen_teleportation.client.util.ScreenshotHelper;
+import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
+import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
+import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.network.server.SPStartImageUpload;
 import austeretony.oxygen_teleportation.common.network.server.SPUploadImagePart;
-import austeretony.oxygen_teleportation.common.util.ImageTransferingClientBuffer;
 import austeretony.oxygen_teleportation.common.util.ImageTransferingServerBuffer;
 
 public class ImagesManagerClient {
 
     private final TeleportationManagerClient manager;
-
-    private final Map<Long, ImageTransferingClientBuffer> transfers = new ConcurrentHashMap<>(5);
 
     private final Map<Long, BufferedImage> images = new ConcurrentHashMap<>();
 
@@ -29,7 +32,7 @@ public class ImagesManagerClient {
     }
 
     public void preparePreviewImage() {
-        this.latestImage = ScreenshotHelper.createScreenshot();
+        this.latestImage = ScreenshotHelper.createScreenshot(TeleportationConfig.IMAGE_WIDTH.asInt(), TeleportationConfig.IMAGE_HEIGHT.asInt());
     }
 
     public BufferedImage getLatestImage() {
@@ -59,10 +62,6 @@ public class ImagesManagerClient {
         }
     }
 
-    public Map<Long, ImageTransferingClientBuffer> getImageTransfers() {
-        return this.transfers;
-    }
-
     public void uploadCampPreviewToServerAsync(long pointId) {
         OxygenHelperClient.addIOTask(()->this.uploadCampPreviewToServer(pointId));
     }
@@ -89,5 +88,19 @@ public class ImagesManagerClient {
             OxygenMain.network().sendToServer(new SPUploadImagePart(ImageTransferingServerBuffer.EnumImageTransfer.UPLOAD_LOCATION, pointId, index, part, fragments.size()));
             index++;
         }
+    }
+
+    public void processDownloadedPreviewImage(EnumWorldPoint type, long pointId, byte[] imageRaw) {
+        BufferedImage bufferedImage = new BufferedImage(TeleportationConfig.IMAGE_WIDTH.asInt(), TeleportationConfig.IMAGE_HEIGHT.asInt(), BufferedImage.TYPE_3BYTE_BGR);
+        bufferedImage.setData(Raster.createRaster(bufferedImage.getSampleModel(), new DataBufferByte(imageRaw, imageRaw.length), new Point()));
+
+        if (type == EnumWorldPoint.CAMP)
+            TeleportationManagerClient.instance().getImagesLoader().saveCampPreviewImageAsync(pointId, bufferedImage);
+        else
+            TeleportationManagerClient.instance().getImagesLoader().saveLocationPreviewImageAsync(pointId, bufferedImage);
+
+        TeleportationManagerClient.instance().getImagesManager().cacheImage(pointId, bufferedImage);
+
+        TeleportationMain.LOGGER.info("Image {}.png saved.", pointId);
     }
 }

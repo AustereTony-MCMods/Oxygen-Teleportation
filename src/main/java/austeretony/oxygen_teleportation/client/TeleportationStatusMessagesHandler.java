@@ -1,6 +1,6 @@
 package austeretony.oxygen_teleportation.client;
 
-import austeretony.oxygen_core.common.status.ChatMessagesHandler;
+import austeretony.oxygen_core.common.chat.ChatMessagesHandler;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationStatusMessage;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 

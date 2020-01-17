@@ -1,9 +1,6 @@
 package austeretony.oxygen_teleportation.server;
 
-import java.util.concurrent.TimeUnit;
-
 import austeretony.oxygen_core.common.item.ItemStackWrapper;
-import austeretony.oxygen_core.server.OxygenManagerServer;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -38,25 +35,18 @@ public class TeleportationManagerServer {
         this.locationsManager = new LocationsManagerServer(this);
         this.imagesManager = new ImagesManagerServer(this);
         this.imagesLoader = new ImagesLoaderServer(this);
-
-        OxygenHelperServer.registerPersistentData(this.sharedCampsContainer);
-        OxygenHelperServer.registerPersistentData(this.locationsContainer);
     }
 
-    private void scheduleRepeatableProcesses() {
-        OxygenManagerServer.instance().getExecutionManager().getExecutors().getSchedulerExecutorService().scheduleAtFixedRate(
-                ()->this.playersDataContainer.saveData(), 
-                TeleportationConfig.CAMPS_SAVE_DELAY_MINUTES.getIntValue(), 
-                TeleportationConfig.CAMPS_SAVE_DELAY_MINUTES.getIntValue(), 
-                TimeUnit.MINUTES);
-        OxygenManagerServer.instance().getExecutionManager().getExecutors().getSchedulerExecutorService().scheduleAtFixedRate(
-                ()->this.playersDataManager.runTeleportations(), 1L, 1L, TimeUnit.SECONDS);
+    private void registerPersistentData() {
+        OxygenHelperServer.registerPersistentData(()->this.playersDataContainer.save());
+        OxygenHelperServer.registerPersistentData(this.sharedCampsContainer);
+        OxygenHelperServer.registerPersistentData(this.locationsContainer);
     }
 
     public static void create() {
         if (instance == null) {
             instance = new TeleportationManagerServer();
-            instance.scheduleRepeatableProcesses();
+            instance.registerPersistentData();
         }
     }
 
@@ -95,8 +85,8 @@ public class TeleportationManagerServer {
     public void worldLoaded() {
         OxygenHelperServer.loadPersistentDataAsync(this.sharedCampsContainer);
         OxygenHelperServer.loadPersistentDataAsync(this.locationsContainer);
-        if (TeleportationConfig.FEE_MODE.getIntValue() == 1)
-            TeleportationLoaderServer.loadFeeItemStackDelegated();
+        if (TeleportationConfig.FEE_MODE.asInt() == 1)
+            TeleportationLoaderServer.loadFeeItemStackAsync();
         this.imagesLoader.loadLocationPreviewImagesAsync();
     }
 

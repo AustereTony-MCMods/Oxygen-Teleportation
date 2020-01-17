@@ -1,21 +1,22 @@
 package austeretony.oxygen_teleportation.client.gui.teleportation.camps;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import austeretony.alternateui.screen.core.GUIAdvancedElement;
 import austeretony.oxygen_core.client.api.ClientReference;
-import austeretony.oxygen_core.client.gui.settings.GUISettings;
-import austeretony.oxygen_core.common.api.EnumDimension;
+import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
+import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.common.WorldPoint;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
 
-public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataGUIElement> {
+public class WorldPointPreview extends GUIAdvancedElement<WorldPointPreview> {
 
     private String name, owner, creationDate, position, dimension;
 
@@ -23,12 +24,15 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
 
     private final Map<Long, ResourceLocation> cache = new HashMap<>();
 
-    private final List<String> description = new ArrayList<>(5);
+    private final List<String> description = new ArrayList<>(2);
 
-    public WorldPointDataGUIElement(int xPosition, int yPosition) {
+    public WorldPointPreview(int xPosition, int yPosition) {
         this.setPosition(xPosition, yPosition);
-        this.setDynamicBackgroundColor(GUISettings.get().getEnabledElementColor(), GUISettings.get().getDisabledElementColor(), GUISettings.get().getHoveredElementColor());
-        this.setTextDynamicColor(GUISettings.get().getEnabledTextColor(), GUISettings.get().getDisabledTextColor(), GUISettings.get().getHoveredTextColor());
+        this.setDynamicBackgroundColor(EnumBaseGUISetting.ELEMENT_ENABLED_COLOR.get().asInt(), EnumBaseGUISetting.ELEMENT_DISABLED_COLOR.get().asInt(), EnumBaseGUISetting.ELEMENT_HOVERED_COLOR.get().asInt());
+        this.setTextDynamicColor(EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt(), EnumBaseGUISetting.TEXT_DISABLED_COLOR.get().asInt(), EnumBaseGUISetting.TEXT_HOVERED_COLOR.get().asInt());
+        this.setStaticBackgroundColor(EnumBaseGUISetting.BACKGROUND_BASE_COLOR.get().asInt());
+        this.setTextScale(EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat());
+        this.setTooltipScaleFactor(EnumBaseGUISetting.TEXT_TITLE_SCALE.get().asFloat());
         this.disableFull();
     }
 
@@ -49,9 +53,9 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
             drawGradientRect(0, 0, 241, 70, 0x00000000, 0xC8000000);
             GlStateManager.disableBlend(); 
 
-            drawRect(0, 120, 241, 135, GUISettings.get().getBaseGUIBackgroundColor());
+            drawRect(0, 120, 241, 135, this.getStaticBackgroundColor());
 
-            float textScale = GUISettings.get().getTitleScale() + 0.2F;
+            float textScale = this.getTooltipScaleFactor() + 0.2F;
 
             GlStateManager.pushMatrix();           
             GlStateManager.translate(5.0F, 6.0F, 0.0F);           
@@ -59,7 +63,7 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
             this.mc.fontRenderer.drawString(this.name, 0, 0, this.getEnabledTextColor(), true);
             GlStateManager.popMatrix();
 
-            textScale = GUISettings.get().getSubTextScale() - 0.05F;
+            textScale = this.getTextScale() - 0.05F;
 
             GlStateManager.pushMatrix();           
             GlStateManager.translate(5.0F, 18.0F, 0.0F);           
@@ -67,8 +71,8 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
             this.mc.fontRenderer.drawString(this.owner, 0, 0, this.getEnabledTextColor(), true);
             GlStateManager.popMatrix();
 
-            textScale = GUISettings.get().getSubTextScale() - 0.02F;
-            
+            textScale = this.getTextScale()- 0.02F;
+
             GlStateManager.pushMatrix();           
             GlStateManager.translate(5.0F, 28.0F, 0.0F);           
             GlStateManager.scale(textScale, textScale, 0.0F);  
@@ -77,7 +81,7 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
             this.mc.fontRenderer.drawString(this.dimension, 0, 24, this.getEnabledTextColor(), true);
             GlStateManager.popMatrix();
 
-            textScale = GUISettings.get().getSubTextScale() + 0.05F;
+            textScale = this.getTextScale() + 0.05F;
 
             GlStateManager.pushMatrix();           
             GlStateManager.translate(15.0F, 56.0F, 0.0F);           
@@ -99,9 +103,9 @@ public class WorldPointDataGUIElement extends GUIAdvancedElement<WorldPointDataG
             this.setTexture(image, 241, 135);
         this.name = worldPoint.getName();
         this.owner = ClientReference.localize("oxygen_teleportation.gui.menu.info.owner") + " " + worldPoint.getOwnerName();
-        this.creationDate = worldPoint.getCreationDate();
+        this.creationDate = OxygenHelperClient.getDateFormat().format(new Date(worldPoint.getId()));
         this.position = String.valueOf((int) worldPoint.getXPos()) + ", " + String.valueOf((int) worldPoint.getYPos()) + ", " + String.valueOf((int) worldPoint.getZPos());
-        this.dimension = EnumDimension.getLocalizedNameFromId(worldPoint.getDimensionId());
+        this.dimension = OxygenHelperClient.getDimensionName(worldPoint.getDimensionId());
         this.processDescription(worldPoint.getDescription());
         this.setVisible(true);
     }

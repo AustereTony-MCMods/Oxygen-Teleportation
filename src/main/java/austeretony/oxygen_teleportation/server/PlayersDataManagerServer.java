@@ -1,15 +1,12 @@
 package austeretony.oxygen_teleportation.server;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.main.EnumOxygenStatusMessage;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
-import austeretony.oxygen_core.server.api.PrivilegeProviderServer;
+import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_teleportation.common.TeleportationPlayerData;
 import austeretony.oxygen_teleportation.common.TeleportationPlayerData.EnumJumpProfile;
 import austeretony.oxygen_teleportation.common.WorldPoint;
@@ -33,52 +30,40 @@ public class PlayersDataManagerServer {
 
     private final TeleportationManagerServer manager;
 
-    private final Map<UUID, AbstractTeleportation> teleportations = new ConcurrentHashMap<>();
-
     protected PlayersDataManagerServer(TeleportationManagerServer manager) {
         this.manager = manager;
     }
 
     public boolean isPlayerTeleporting(UUID playerUUID) {
-        return this.teleportations.containsKey(playerUUID);
-    }
-
-    public void runTeleportations() {
-        OxygenHelperServer.addRoutineTask(()->{
-            Iterator<AbstractTeleportation> iterator = this.teleportations.values().iterator();
-            while (iterator.hasNext()) {
-                if (iterator.next().process())
-                    iterator.remove();
-            }
-        });
+        return OxygenHelperServer.getOxygenPlayerData(playerUUID).getTemporaryProcess(AbstractTeleportation.TELEPORTATION_PROCESS_ID) != null;
     }
 
     public void addTeleportation(AbstractTeleportation teleportation) {
-        this.teleportations.put(CommonReference.getPersistentUUID(teleportation.playerMP), teleportation);
+        OxygenHelperServer.getOxygenPlayerData(CommonReference.getPersistentUUID(teleportation.playerMP)).addTemporaryProcess(teleportation);
     }
 
     public void onPlayerLoaded(EntityPlayerMP playerMP) {
-        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);        
-        if (!this.manager.getPlayersDataContainer().isPlayerDataExist(playerUUID)) {
-            if (TeleportationConfig.FEE_MODE.getIntValue() == 1)
-                OxygenMain.network().sendTo(new CPSyncFeeItemStack(), playerMP);
-            TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().createPlayerData(playerUUID);
-            OxygenHelperServer.addIOTask(()->{
-                OxygenHelperServer.loadPersistentData(playerData);  
-                OxygenHelperServer.getPlayerSharedData(playerUUID).setByte(TeleportationMain.JUMP_PROFILE_SHARED_DATA_ID, playerData.getJumpProfile().ordinal());
-            });
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP); 
+        TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
+        if (playerData == null) {
+            playerData = this.manager.getPlayersDataContainer().createPlayerData(playerUUID);
+            OxygenHelperServer.loadPersistentData(playerData);  
         }
+        if (TeleportationConfig.FEE_MODE.asInt() == 1)
+            OxygenMain.network().sendTo(new CPSyncFeeItemStack(), playerMP);
+        OxygenHelperServer.getPlayerSharedData(playerUUID).setByte(TeleportationMain.JUMP_PROFILE_SHARED_DATA_ID, playerData.getJumpProfile().ordinal());
     }
 
     public void onPlayerUnloaded(EntityPlayerMP playerMP) {
-        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);        
+        //TODO May cause reset of cooldowns and jump profile
+        /*UUID playerUUID = CommonReference.getPersistentUUID(playerMP);        
         if (this.manager.getPlayersDataContainer().isPlayerDataExist(playerUUID))
-            this.manager.getPlayersDataContainer().removePlayerData(playerUUID);//TODO May cause reset of cooldowns and jump profile
+            this.manager.getPlayersDataContainer().removePlayerData(playerUUID);*/
     }
 
     public void changeJumpProfile(EntityPlayerMP playerMP, EnumJumpProfile profile) {
-        if (TeleportationConfig.ENABLE_PLAYERS.getBooleanValue()) {
-            UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_PLAYER_TELEPORTATION_USAGE.id(), TeleportationConfig.ENABLE_PLAYER_TELEPORTATION.asBoolean())) {
             TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
             playerData.setJumpProfile(profile);
             playerData.setChanged(true);     
@@ -90,44 +75,43 @@ public class PlayersDataManagerServer {
     }
 
     public void moveToPlayer(EntityPlayerMP visitorPlayerMP, int targetIndex) {
-        if (TeleportationConfig.ENABLE_PLAYERS.getBooleanValue()) {
-            UUID 
-            visitorUUID = CommonReference.getPersistentUUID(visitorPlayerMP),
-            targetUUID;
-            if (!this.isPlayerTeleporting(visitorUUID) 
-                    && this.readyMoveToPlayer(visitorUUID)
-                    && OxygenHelperServer.isPlayerOnline(targetIndex)) { 
-                targetUUID = OxygenHelperServer.getPlayerSharedData(targetIndex).getPlayerUUID();
-                if (!visitorUUID.equals(targetUUID)) {
-                    EnumJumpProfile targetJumpProfile = this.manager.getPlayersDataContainer().getPlayerData(targetUUID).getJumpProfile();
-                    switch (targetJumpProfile) {
-                    case DISABLED:
-                        if (PrivilegeProviderServer.getValue(visitorUUID, EnumTeleportationPrivilege.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false))
-                            this.move(visitorPlayerMP, visitorUUID, targetUUID);
-                        break;
-                    case FREE:
+        UUID 
+        visitorUUID = CommonReference.getPersistentUUID(visitorPlayerMP),
+        targetUUID;
+        if (PrivilegesProviderServer.getAsBoolean(visitorUUID, EnumTeleportationPrivilege.ALLOW_PLAYER_TELEPORTATION_USAGE.id(), TeleportationConfig.ENABLE_PLAYER_TELEPORTATION.asBoolean())
+                && !this.isPlayerTeleporting(visitorUUID) 
+                && this.readyMoveToPlayer(visitorUUID)
+                && OxygenHelperServer.isPlayerOnline(targetIndex)) { 
+            targetUUID = OxygenHelperServer.getPlayerSharedData(targetIndex).getPlayerUUID();
+            if (!visitorUUID.equals(targetUUID)) {
+                EnumJumpProfile targetJumpProfile = this.manager.getPlayersDataContainer().getPlayerData(targetUUID).getJumpProfile();
+                switch (targetJumpProfile) {
+                case DISABLED:
+                    if (PrivilegesProviderServer.getAsBoolean(visitorUUID, EnumTeleportationPrivilege.ENABLE_TELEPORTATION_TO_ANY_PLAYER.id(), false))
                         this.move(visitorPlayerMP, visitorUUID, targetUUID);
-                        break;
-                    case REQUEST:
-                        if (PrivilegeProviderServer.getValue(visitorUUID, EnumTeleportationPrivilege.ENABLE_TELEPORTATION_TO_ANY_PLAYER.toString(), false))
-                            this.move(visitorPlayerMP, visitorUUID, targetUUID);
-                        else {
-                            EntityPlayerMP targetPlayerMP = CommonReference.playerByUUID(targetUUID);
-                            OxygenHelperServer.sendRequest(visitorPlayerMP, targetPlayerMP, 
-                                    new TeleportationRequest(TeleportationMain.TELEPORTATION_REQUEST_ID, visitorUUID, CommonReference.getName(visitorPlayerMP)));
-                        }
-                        break;
-                    }  
-                } else
-                    OxygenHelperServer.sendStatusMessage(visitorPlayerMP, OxygenMain.OXYGEN_CORE_MOD_INDEX, EnumOxygenStatusMessage.REQUEST_RESET.ordinal());
+                    break;
+                case FREE:
+                    this.move(visitorPlayerMP, visitorUUID, targetUUID);
+                    break;
+                case REQUEST:
+                    if (PrivilegesProviderServer.getAsBoolean(visitorUUID, EnumTeleportationPrivilege.ENABLE_TELEPORTATION_TO_ANY_PLAYER.id(), false))
+                        this.move(visitorPlayerMP, visitorUUID, targetUUID);
+                    else {
+                        EntityPlayerMP targetPlayerMP = CommonReference.playerByUUID(targetUUID);
+                        OxygenHelperServer.sendRequest(visitorPlayerMP, targetPlayerMP, 
+                                new TeleportationRequest(TeleportationMain.TELEPORTATION_REQUEST_ID, visitorUUID, CommonReference.getName(visitorPlayerMP)));
+                    }
+                    break;
+                }  
             } else
                 OxygenHelperServer.sendStatusMessage(visitorPlayerMP, OxygenMain.OXYGEN_CORE_MOD_INDEX, EnumOxygenStatusMessage.REQUEST_RESET.ordinal());
-        }
+        } else
+            OxygenHelperServer.sendStatusMessage(visitorPlayerMP, OxygenMain.OXYGEN_CORE_MOD_INDEX, EnumOxygenStatusMessage.REQUEST_RESET.ordinal());
     }
 
     public void move(EntityPlayerMP visitorPlayerMP, UUID visitorUUID, UUID targetUUID) {
         EntityPlayerMP targetPlayerMP = CommonReference.playerByUUID(targetUUID);
-        if (!PrivilegeProviderServer.getValue(visitorUUID, EnumTeleportationPrivilege.ENABLE_CROSS_DIM_TELEPORTATION.toString(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.getBooleanValue())
+        if (!PrivilegesProviderServer.getAsBoolean(visitorUUID, EnumTeleportationPrivilege.ENABLE_CROSS_DIM_TELEPORTATION.id(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.asBoolean())
                 && visitorPlayerMP.dimension != targetPlayerMP.dimension) {
             OxygenHelperServer.sendStatusMessage(visitorPlayerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationStatusMessage.CROSS_DIM_TELEPORTSTION_DISABLED.ordinal());
             return;
@@ -140,8 +124,8 @@ public class PlayersDataManagerServer {
     }
 
     public void moveToCamp(EntityPlayerMP playerMP, long pointId) {
-        if (TeleportationConfig.ENABLE_CAMPS.getBooleanValue()) {
-            UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())) {
             if (this.campExist(playerUUID, pointId)) 
                 this.move(this.getCamp(playerUUID, pointId), playerUUID, playerMP);
             else if (this.haveInvitation(playerUUID, pointId))
@@ -151,8 +135,8 @@ public class PlayersDataManagerServer {
 
     public void moveToFavoriteCamp(EntityPlayerMP playerMP, long pointId) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (TeleportationConfig.ENABLE_CAMPS.getBooleanValue() 
-                && PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.ENABLE_FAVORITE_CAMP.toString(), TeleportationConfig.ENABLE_FAVORITE_CAMP.getBooleanValue())) {
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
+                && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ENABLE_FAVORITE_CAMP.id(), TeleportationConfig.ENABLE_FAVORITE_CAMP.asBoolean())) {
             if (this.campExist(playerUUID, pointId)) 
                 this.move(this.getCamp(playerUUID, pointId), playerUUID, playerMP);
             else if (this.haveInvitation(playerUUID, pointId))
@@ -164,7 +148,7 @@ public class PlayersDataManagerServer {
         if (this.campAvailable(worldPoint, playerUUID) 
                 && !this.isPlayerTeleporting(playerUUID) 
                 && this.readyMoveToCamp(playerUUID)) {
-            if (!PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.ENABLE_CROSS_DIM_TELEPORTATION.toString(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.getBooleanValue())
+            if (!PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ENABLE_CROSS_DIM_TELEPORTATION.id(), TeleportationConfig.ENABLE_CROSS_DIM_TELEPORTATION.asBoolean())
                     && playerMP.dimension != worldPoint.getDimensionId()) {
                 OxygenHelperServer.sendStatusMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationStatusMessage.CROSS_DIM_TELEPORTSTION_DISABLED.ordinal());
                 return;
@@ -174,11 +158,11 @@ public class PlayersDataManagerServer {
     }
 
     public void createCamp(EntityPlayerMP playerMP, String name, String description) {
-        if (TeleportationConfig.ENABLE_CAMPS.getBooleanValue()) {
-            UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
+        UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())) {
             TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
             if (playerData.getCampsAmount() 
-                    < PrivilegeProviderServer.getValue(playerUUID, EnumTeleportationPrivilege.CAMPS_MAX_AMOUNT.toString(), TeleportationConfig.CAMPS_MAX_AMOUNT.getIntValue())) {
+                    < PrivilegesProviderServer.getAsInt(playerUUID, EnumTeleportationPrivilege.CAMPS_MAX_AMOUNT.id(), TeleportationConfig.CAMPS_MAX_AMOUNT.asInt())) {
                 if (name.isEmpty())
                     name = String.format("Camp #%d", playerData.getCampsAmount() + 1);
                 name = name.trim();
@@ -211,7 +195,8 @@ public class PlayersDataManagerServer {
 
     public void removeCamp(EntityPlayerMP playerMP, long pointId) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (this.campExist(playerUUID, pointId)) { 
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
+                && this.campExist(playerUUID, pointId)) { 
             WorldPoint worldPoint = this.getCamp(playerUUID, pointId);
             if (this.isOwner(playerUUID, worldPoint)) {
                 TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
@@ -234,8 +219,9 @@ public class PlayersDataManagerServer {
     public void setFavoriteCamp(EntityPlayerMP playerMP, long pointId) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
         TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
-        if (TeleportationConfig.ENABLE_FAVORITE_CAMP.getBooleanValue() 
-                && (this.campExist(playerUUID, pointId) || this.manager.getSharedCampsContainer().haveInvitation(playerUUID, pointId))
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
+                && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ENABLE_FAVORITE_CAMP.id(), TeleportationConfig.ENABLE_FAVORITE_CAMP.asBoolean()) 
+                && (playerData.getCamp(pointId) != null || this.manager.getSharedCampsContainer().haveInvitation(playerUUID, pointId))
                 && pointId != playerData.getFavoriteCampId()) {
             playerData.setFavoriteCampId(pointId);
             playerData.setChanged(true);
@@ -248,7 +234,8 @@ public class PlayersDataManagerServer {
 
     public void changeCampLockState(EntityPlayerMP playerMP, long pointId, boolean flag) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (this.campExist(playerUUID, pointId)) { 
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
+                && this.campExist(playerUUID, pointId)) { 
             WorldPoint worldPoint = this.getCamp(playerUUID, pointId);
             if (this.isOwner(playerUUID, worldPoint)) {
                 TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
@@ -278,7 +265,8 @@ public class PlayersDataManagerServer {
 
     public void editCamp(EntityPlayerMP playerMP, long pointId, String name, String description, boolean updatePosition, boolean updateImage) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (this.campExist(playerUUID, pointId)) { 
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
+                && this.campExist(playerUUID, pointId)) { 
             WorldPoint worldPoint = this.getCamp(playerUUID, pointId);
             if (this.isOwner(playerUUID, worldPoint)) {
                 TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
@@ -319,14 +307,15 @@ public class PlayersDataManagerServer {
 
     public void invitePlayer(EntityPlayerMP playerMP, long pointId, UUID playerUUID) {
         UUID ownerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (TeleportationConfig.ENABLE_CAMP_INVITATIONS.getBooleanValue() 
+        if (TeleportationConfig.ENABLE_CAMP_INVITATIONS.asBoolean()
+                && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
                 && this.campExist(ownerUUID, pointId)) { 
             WorldPoint worldPoint = this.getCamp(ownerUUID, pointId);
             if (this.isOwner(ownerUUID, worldPoint) 
                     && OxygenHelperServer.isPlayerOnline(playerUUID)
                     && !this.manager.getSharedCampsContainer().haveInvitation(playerUUID, pointId)
                     && !playerUUID.equals(ownerUUID)) {
-                if (this.manager.getSharedCampsContainer().getInvitedPlayersAmountForCamp(playerUUID, pointId) < TeleportationConfig.MAX_INVITED_PLAYERS_PER_CAMP.getIntValue()) {
+                if (this.manager.getSharedCampsContainer().getInvitedPlayersAmountForCamp(playerUUID, pointId) < TeleportationConfig.MAX_INVITED_PLAYERS_PER_CAMP.asInt()) {
                     EntityPlayerMP invitedPlayerMP = CommonReference.playerByUUID(playerUUID);
                     OxygenHelperServer.sendRequest(playerMP, invitedPlayerMP, 
                             new CampInvitationRequest(
@@ -343,7 +332,8 @@ public class PlayersDataManagerServer {
 
     public void uninvitePlayer(EntityPlayerMP playerMP, long pointId, UUID playerUUID) {
         UUID ownerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (TeleportationConfig.ENABLE_CAMP_INVITATIONS.getBooleanValue() 
+        if (TeleportationConfig.ENABLE_CAMP_INVITATIONS.asBoolean() 
+                && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
                 && this.campExist(ownerUUID, pointId)) {
             WorldPoint worldPoint = this.getCamp(ownerUUID, pointId);
             if (this.isOwner(ownerUUID, worldPoint)

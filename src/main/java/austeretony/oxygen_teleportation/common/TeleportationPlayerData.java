@@ -29,7 +29,7 @@ public class TeleportationPlayerData extends AbstractPersistentData {
     private String dataPath;
 
     public TeleportationPlayerData() {
-        this.jumpProfile = EnumJumpProfile.values()[TeleportationConfig.DEFAULT_JUMP_PROFILE.getIntValue()];
+        this.jumpProfile = EnumJumpProfile.values()[TeleportationConfig.DEFAULT_PLAYER_TELEPORTATION_PROFILE.asInt()];
     }
 
     public UUID getPlayerUUID() {
@@ -96,13 +96,15 @@ public class TeleportationPlayerData extends AbstractPersistentData {
     }
 
     public int getOwnedCampsAmount() {
-        return (int) this.camps.values()
-                .stream()
-                .filter(camp->camp.isOwner(this.playerUUID))
-                .count();
+        int amount = 0;
+        for (WorldPoint camp : this.camps.values())
+            if (camp.isOwner(this.playerUUID))
+                amount++;
+        return amount;
     }
 
     public long createId(long seed) {
+        seed++;
         while (this.camps.containsKey(seed))
             seed++;
         return seed;
@@ -128,11 +130,6 @@ public class TeleportationPlayerData extends AbstractPersistentData {
     @Override
     public String getPath() {
         return this.dataPath;
-    }
-
-    @Override
-    public long getSaveDelayMinutes() {
-        return TeleportationConfig.CAMPS_SAVE_DELAY_MINUTES.getIntValue();
     }
 
     @Override

@@ -19,26 +19,22 @@ public class PlayersDataContainerServer {
     }
 
     public TeleportationPlayerData createPlayerData(UUID playerUUID) {     
-        TeleportationPlayerData playerData = new TeleportationPlayerData();
-        playerData.setPlayerUUID(playerUUID);
-        playerData.setPath(OxygenHelperServer.getDataFolder() + "/server/players/" + playerUUID + "/teleportation/player_data.dat");
-        this.players.put(playerUUID, playerData);
-        return playerData;
+        TeleportationPlayerData data = new TeleportationPlayerData();
+        data.setPlayerUUID(playerUUID);
+        data.setPath(OxygenHelperServer.getDataFolder() + "/server/players/" + playerUUID + "/teleportation/player_data.dat");
+        this.players.put(playerUUID, data);
+        return data;
     }
 
     public void removePlayerData(UUID playerUUID) {
         this.players.remove(playerUUID);
     }
 
-    public boolean isPlayerDataExist(UUID playerUUID) {
-        return this.players.containsKey(playerUUID);
-    }
-
     public TeleportationPlayerData getPlayerData(UUID playerUUID) {
         return this.players.get(playerUUID);
     }
 
-    public void saveData() {
+    public void save() {
         OxygenHelperServer.addRoutineTask(()->{
             for (TeleportationPlayerData playerData : this.players.values()) {
                 if (playerData.isChanged()) {

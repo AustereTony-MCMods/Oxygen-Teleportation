@@ -1,7 +1,6 @@
 package austeretony.oxygen_teleportation.client.gui.teleportation.camps;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,7 @@ import austeretony.alternateui.screen.core.GUIAdvancedElement;
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.client.api.TimeHelperClient;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.common.WorldPoint;
 import net.minecraft.client.renderer.GlStateManager;
@@ -103,7 +103,7 @@ public class WorldPointPreview extends GUIAdvancedElement<WorldPointPreview> {
             this.setTexture(image, 241, 135);
         this.name = worldPoint.getName();
         this.owner = ClientReference.localize("oxygen_teleportation.gui.menu.info.owner") + " " + worldPoint.getOwnerName();
-        this.creationDate = OxygenHelperClient.getDateFormat().format(new Date(worldPoint.getId()));
+        this.creationDate = TimeHelperClient.getDateTimeFormatter().format(TimeHelperClient.getZonedDateTime(worldPoint.getId()));
         this.position = String.valueOf((int) worldPoint.getXPos()) + ", " + String.valueOf((int) worldPoint.getYPos()) + ", " + String.valueOf((int) worldPoint.getZPos());
         this.dimension = OxygenHelperClient.getDimensionName(worldPoint.getDimensionId());
         this.processDescription(worldPoint.getDescription());

@@ -161,9 +161,9 @@ public class CampsSection extends AbstractGUISection {
         List<WorldPoint> points = new ArrayList<>(TeleportationManagerClient.instance().getPlayerData().getCamps());
 
         if (mode == 0)
-            Collections.sort(points, (p1, p2)-> (int) ((p1.getId() - p2.getId()) / 5000L));
+            Collections.sort(points, (p1, p2)->p1.getId() < p2.getId() ? - 1 : p1.getId() > p2.getId() ? 1 : 0);
         else if (mode == 1)
-            Collections.sort(points, (p1, p2)-> (int) ((p2.getId() - p1.getId()) / 5000L));
+            Collections.sort(points, (p1, p2)->p2.getId() < p1.getId() ? - 1 : p2.getId() > p1.getId() ? 1 : 0);
         else if (mode == 2)
             Collections.sort(points, (p1, p2)->p1.getName().compareTo(p2.getName()));
         else if (mode == 3)
@@ -227,7 +227,7 @@ public class CampsSection extends AbstractGUISection {
         this.resetPointInfo();
         this.timeSorter.setSorting(EnumSorting.DOWN);
         this.nameSorter.reset();
-        
+
         this.sortPoints(0);
         WorldPointPanelEntry pointButton;
         for (GUIButton button : this.pointsPanel.buttonsBuffer) {
@@ -238,7 +238,7 @@ public class CampsSection extends AbstractGUISection {
                 this.currentPoint = TeleportationManagerClient.instance().getPlayerData().getCamp(pointButton.index);
             }
         }
-        
+
         this.showPointInfo(worldPoint.getId(), false);
     }
 

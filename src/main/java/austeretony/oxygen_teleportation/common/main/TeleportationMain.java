@@ -66,7 +66,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = TeleportationMain.MODID, 
         name = TeleportationMain.NAME, 
         version = TeleportationMain.VERSION,
-        dependencies = "required-after:oxygen_core@[0.10.0,);",
+        dependencies = "required-after:oxygen_core@[0.10.1,);",
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = TeleportationMain.VERSIONS_FORGE_URL)
 public class TeleportationMain {
@@ -74,7 +74,7 @@ public class TeleportationMain {
     public static final String 
     MODID = "oxygen_teleportation",    
     NAME = "Oxygen: Teleportation",
-    VERSION = "0.10.0",
+    VERSION = "0.10.1",
     VERSION_CUSTOM = VERSION + ":beta:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Teleportation/info/mod_versions_forge.json";

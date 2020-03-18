@@ -40,9 +40,12 @@ oxygen_teleportation.gui.menu.callback.editLocation=Edit Location
 oxygen_teleportation.gui.menu.updateImage=Update Image
 oxygen_teleportation.gui.menu.updatePosition=Update Position
 
-oxygen_teleportation.gui.menu.createButton=Create
-oxygen_teleportation.gui.menu.moveButton=Move
-oxygen_teleportation.gui.menu.requestButton=Request
+oxygen_teleportation.gui.menu.button.createCamp=Create Camp
+oxygen_teleportation.gui.menu.button.moveToCamp=Move to Camp
+oxygen_teleportation.gui.menu.button.createLocation=Create Location
+oxygen_teleportation.gui.menu.button.moveToLocation=Move to Location
+oxygen_teleportation.gui.menu.button.moveToPlayer=Move to Player
+oxygen_teleportation.gui.menu.button.requestTeleportation=Request Teleportation
 
 oxygen_teleportation.gui.menu.campGenericName=Camp
 oxygen_teleportation.gui.menu.locationGenericName=Location

@@ -3,15 +3,15 @@ package austeretony.oxygen_teleportation.client.gui.teleportation.camps;
 import austeretony.alternateui.util.EnumGUIAlignment;
 import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.client.gui.OxygenGUITextures;
 import austeretony.oxygen_core.client.gui.OxygenGUIUtils;
-import austeretony.oxygen_core.client.gui.elements.OxygenIndexedPanelEntry;
+import austeretony.oxygen_core.client.gui.elements.OxygenWrapperPanelEntry;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
-import austeretony.oxygen_teleportation.client.gui.teleportation.TeleportationGUITextures;
 import austeretony.oxygen_teleportation.common.WorldPoint;
 import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class WorldPointPanelEntry extends OxygenIndexedPanelEntry<Long> {
+public class WorldPointPanelEntry extends OxygenWrapperPanelEntry<Long> {
 
     private boolean favorite, locked, shared, downloaded;
 
@@ -63,22 +63,22 @@ public class WorldPointPanelEntry extends OxygenIndexedPanelEntry<Long> {
         int iconX = this.getWidth() - 2;
         if (this.shared) {
             iconX -= 8;
-            this.mc.getTextureManager().bindTexture(TeleportationGUITextures.SHARED_ICON);                        
-            drawCustomSizedTexturedRect(iconX, 1, 0, 0, 8, 8, 8, 8);      
+            this.mc.getTextureManager().bindTexture(OxygenGUITextures.SHARE_ICONS);                        
+            drawCustomSizedTexturedRect(iconX, 1, 0, 0, 8, 8, 24, 8);      
         } else if (this.downloaded) {
             iconX -= 8;
-            this.mc.getTextureManager().bindTexture(TeleportationGUITextures.DOWNLOADED_ICON);                        
-            drawCustomSizedTexturedRect(iconX, 1, 0, 0, 8, 8, 8, 8);
+            this.mc.getTextureManager().bindTexture(OxygenGUITextures.DOWNLOAD_ICONS);                        
+            drawCustomSizedTexturedRect(iconX, 1, 0, 0, 8, 8, 24, 8);
         }
         if (this.locked) {
             iconX -= 8;
-            this.mc.getTextureManager().bindTexture(TeleportationGUITextures.LOCKED_ICON);                        
-            drawCustomSizedTexturedRect(iconX, 1, 0, 0, 8, 8, 8, 8);      
+            this.mc.getTextureManager().bindTexture(OxygenGUITextures.LOCK_ICONS);                        
+            drawCustomSizedTexturedRect(iconX, 1, 0, 0, 8, 8, 24, 8);      
         }
         if (this.favorite) {
             iconX -= 8;
-            this.mc.getTextureManager().bindTexture(TeleportationGUITextures.FAVORITE_ICON);                        
-            drawCustomSizedTexturedRect(iconX, 1, 0, 0, 8, 8, 8, 8);      
+            this.mc.getTextureManager().bindTexture(OxygenGUITextures.STAR_ICONS);                        
+            drawCustomSizedTexturedRect(iconX, 1, 0, 0, 8, 8, 24, 8);      
         }
         GlStateManager.disableBlend(); 
 

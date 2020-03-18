@@ -59,12 +59,12 @@ public class SharedCampsManagerContainer extends AbstractPersistentData {
 
     @Override
     public String getDisplayName() {
-        return "shared_camps";
+        return "teleportation:shared_camps_client";
     }
 
     @Override
     public String getPath() {
-        return OxygenHelperClient.getDataFolder() + "/server/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/invitations.dat";
+        return OxygenHelperClient.getDataFolder() + "/client/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/invitations.dat";
     }
 
     @Override

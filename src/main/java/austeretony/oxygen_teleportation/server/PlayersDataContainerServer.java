@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.TeleportationPlayerData;
 
@@ -19,22 +21,19 @@ public class PlayersDataContainerServer {
     }
 
     public TeleportationPlayerData createPlayerData(UUID playerUUID) {     
-        TeleportationPlayerData data = new TeleportationPlayerData();
-        data.setPlayerUUID(playerUUID);
-        data.setPath(OxygenHelperServer.getDataFolder() + "/server/players/" + playerUUID + "/teleportation/player_data.dat");
-        this.players.put(playerUUID, data);
-        return data;
+        TeleportationPlayerData playerData = new TeleportationPlayerData();
+        playerData.setPlayerUUID(playerUUID);
+        playerData.setPath(OxygenHelperServer.getDataFolder() + "/server/players/" + playerUUID + "/teleportation/player_data.dat");
+        this.players.put(playerUUID, playerData);
+        return playerData;
     }
 
-    public void removePlayerData(UUID playerUUID) {
-        this.players.remove(playerUUID);
-    }
-
+    @Nullable
     public TeleportationPlayerData getPlayerData(UUID playerUUID) {
         return this.players.get(playerUUID);
     }
 
-    public void save() {
+    void save() {
         OxygenHelperServer.addRoutineTask(()->{
             for (TeleportationPlayerData playerData : this.players.values()) {
                 if (playerData.isChanged()) {

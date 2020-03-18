@@ -10,8 +10,8 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
-import austeretony.oxygen_core.client.gui.elements.OxygenButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenCallbackBackgroundFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenKeyButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenScrollablePanel;
 import austeretony.oxygen_core.client.gui.elements.OxygenTextLabel;
 import austeretony.oxygen_core.common.util.MathUtils;
@@ -29,7 +29,7 @@ public class InvitationsCallback extends AbstractGUICallback {
 
     private OxygenScrollablePanel invitedPanel;
 
-    private OxygenButton closeButton;
+    private OxygenKeyButton closeButton;
 
     public InvitationsCallback(TeleportationMenuScreen screen, CampsSection section, int width, int height) {
         super(screen, section, width, height);
@@ -45,8 +45,7 @@ public class InvitationsCallback extends AbstractGUICallback {
 
         this.addElement(this.invitedPanel = new OxygenScrollablePanel(this.screen, 6, 15, this.getWidth() - 12, 10, 1, TeleportationConfig.MAX_INVITED_PLAYERS_PER_CAMP.asInt(), 5, EnumBaseGUISetting.TEXT_PANEL_SCALE.get().asFloat(), true));   
 
-        this.addElement(this.closeButton = new OxygenButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen_core.gui.close")));
-        this.closeButton.setKeyPressListener(Keyboard.KEY_X, ()->this.close());
+        this.addElement(this.closeButton = new OxygenKeyButton(this.getWidth() - 55, this.getHeight() - 10, ClientReference.localize("oxygen_core.gui.close"), Keyboard.KEY_X, this::close));
     }
 
     private void updateInvited() {

@@ -53,7 +53,7 @@ public class LocationsContainerClient extends AbstractPersistentData {
 
     @Override
     public String getDisplayName() {
-        return "locations";
+        return "teleportation:locations_client";
     }
 
     @Override

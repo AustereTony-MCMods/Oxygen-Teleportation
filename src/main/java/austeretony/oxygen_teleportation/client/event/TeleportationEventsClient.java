@@ -8,6 +8,6 @@ public class TeleportationEventsClient {
 
     @SubscribeEvent
     public void onClientInit(OxygenClientInitEvent event) {
-        TeleportationManagerClient.instance().init();
+        TeleportationManagerClient.instance().worldLoaded();
     }
 }

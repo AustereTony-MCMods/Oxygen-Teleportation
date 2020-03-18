@@ -33,6 +33,7 @@ public class WorldPointPreview extends GUIAdvancedElement<WorldPointPreview> {
         this.setStaticBackgroundColor(EnumBaseGUISetting.BACKGROUND_BASE_COLOR.get().asInt());
         this.setTextScale(EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat());
         this.setTooltipScaleFactor(EnumBaseGUISetting.TEXT_TITLE_SCALE.get().asFloat());
+        this.setDebugColor(EnumBaseGUISetting.TEXT_DARK_ENABLED_COLOR.get().asInt());
         this.disableFull();
     }
 
@@ -49,8 +50,8 @@ public class WorldPointPreview extends GUIAdvancedElement<WorldPointPreview> {
                 this.mc.getTextureManager().bindTexture(this.getTexture());                         
                 drawCustomSizedTexturedRect(0, 0, this.getTextureU(), this.getTextureV(), this.getTextureWidth(), this.getTextureHeight(), this.getImageWidth(), this.getImageHeight());  
             } else
-                drawRect(0, 0, 241, 135, 0xFF333333);
-            drawGradientRect(0, 0, 241, 70, 0x00000000, 0xC8000000);
+                drawRect(0, 0, 241, 135, 0xff333333);
+            drawGradientRect(0, 0, 241, 70, 0x00000000, 0xc8000000);
             GlStateManager.disableBlend(); 
 
             drawRect(0, 120, 241, 135, this.getStaticBackgroundColor());
@@ -88,7 +89,7 @@ public class WorldPointPreview extends GUIAdvancedElement<WorldPointPreview> {
             GlStateManager.scale(textScale, textScale, 0.0F);  
             int index = 0;
             for (String line : this.description) {
-                this.mc.fontRenderer.drawString(line, 0.0F, (this.mc.fontRenderer.FONT_HEIGHT + 2.0F) * index, this.getEnabledTextColor(), true);
+                this.mc.fontRenderer.drawString(line, 0.0F, (this.mc.fontRenderer.FONT_HEIGHT + 2.0F) * index, this.getDebugColor(), true);
                 index++;
             }
             GlStateManager.popMatrix();

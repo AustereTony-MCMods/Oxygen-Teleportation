@@ -6,13 +6,13 @@ import austeretony.alternateui.util.EnumGUIAlignment;
 import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
 import austeretony.oxygen_core.client.gui.OxygenGUITextures;
 import austeretony.oxygen_core.client.gui.OxygenGUIUtils;
-import austeretony.oxygen_core.client.gui.elements.OxygenIndexedPanelEntry;
 import austeretony.oxygen_core.client.gui.elements.OxygenTexturedButton;
+import austeretony.oxygen_core.client.gui.elements.OxygenWrapperPanelEntry;
 import austeretony.oxygen_core.common.PlayerSharedData;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import net.minecraft.client.renderer.GlStateManager;
 
-public class InvitedPlayerPanelEntry extends OxygenIndexedPanelEntry<UUID> {
+public class InvitedPlayerPanelEntry extends OxygenWrapperPanelEntry<UUID> {
 
     private OxygenTexturedButton uninviteButton;
 
@@ -74,7 +74,7 @@ public class InvitedPlayerPanelEntry extends OxygenIndexedPanelEntry<UUID> {
     @Override
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {       
         if (this.uninviteButton.mouseClicked(mouseX, mouseY, mouseButton)) {
-            TeleportationManagerClient.instance().getPlayerDataManager().uninvitePlayerSynced(this.pointId, this.index);
+            TeleportationManagerClient.instance().getPlayerDataManager().uninvitePlayerSynced(this.pointId, this.getWrapped());
             return true;
         }
         return false;

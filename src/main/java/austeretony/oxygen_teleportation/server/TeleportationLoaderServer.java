@@ -7,9 +7,9 @@ import java.nio.file.Paths;
 
 import austeretony.oxygen_core.common.api.OxygenHelperCommon;
 import austeretony.oxygen_core.common.item.ItemStackWrapper;
+import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.common.util.JsonUtils;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
-import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
@@ -24,11 +24,11 @@ public class TeleportationLoaderServer {
                     TeleportationManagerServer.instance().setFeeStack(
                             ItemStackWrapper.fromJson(JsonUtils.getExternalJsonData(folder).getAsJsonObject()));
                 } catch (IOException exception) {
-                    TeleportationMain.LOGGER.error("Fee stack data loading failed! Path: {}", folder);
+                    OxygenMain.LOGGER.error("[Teleportation] Fee stack data loading failed! Path: {}", folder);
                     exception.printStackTrace();
                 }
             } else
-                TeleportationManagerServer.instance().setFeeStack(ItemStackWrapper.getFromStack(new ItemStack(Items.EMERALD)));
+                TeleportationManagerServer.instance().setFeeStack(ItemStackWrapper.of(new ItemStack(Items.EMERALD)));
         });
     }
 
@@ -46,7 +46,7 @@ public class TeleportationLoaderServer {
             try {   
                 JsonUtils.createExternalJsonFile(folder, TeleportationManagerServer.instance().getFeeStackWrapper().toJson());
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Fee stack data saving failed! Path: {}", folder);
+                OxygenMain.LOGGER.error("[Teleportation] Fee stack data saving failed! Path: {}", folder);
                 exception.printStackTrace();
             }
         });

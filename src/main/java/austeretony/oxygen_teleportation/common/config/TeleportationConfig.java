@@ -13,6 +13,8 @@ public class TeleportationConfig extends AbstractConfig {
     public static final ConfigValue
     ENABLE_TELEPORTATION_MENU_KEY = ConfigValueUtils.getValue("client", "enable_teleportation_menu_key", true),
     ENABLE_FAVORITE_CAMP_KEY = ConfigValueUtils.getValue("client", "enable_favorite_camp_key", true),
+    TELEPORTATION_MENU_KEY = ConfigValueUtils.getValue("client", "teleportation_menu_key", 21),
+    FAVORITE_CAMP_KEY = ConfigValueUtils.getValue("client", "favorite_camp_key", 46),
 
     IMAGE_WIDTH = ConfigValueUtils.getValue("server", "image_width", 800, true),
     IMAGE_HEIGHT = ConfigValueUtils.getValue("server", "image_height", 450, true),
@@ -43,11 +45,17 @@ public class TeleportationConfig extends AbstractConfig {
     FEE_MODE = ConfigValueUtils.getValue("server", "fee_mode", 0, true),
     CAMP_TELEPORTATION_FEE = ConfigValueUtils.getValue("server", "camp_teleportation_fee", 0L, true),
     LOCATION_TELEPORTATION_FEE = ConfigValueUtils.getValue("server", "location_teleportation_fee", 0L, true),
-    TELEPORTATION_TO_PLAYER_FEE = ConfigValueUtils.getValue("server", "teleportation_to_player_fee", 0L, true);
+    TELEPORTATION_TO_PLAYER_FEE = ConfigValueUtils.getValue("server", "teleportation_to_player_fee", 0L, true),
+    ADVANCED_LOGGING = ConfigValueUtils.getValue("server", "advanced_logging", false);
 
     @Override
     public String getDomain() {
         return TeleportationMain.MODID;
+    }
+
+    @Override
+    public String getVersion() {
+        return TeleportationMain.VERSION_CUSTOM;
     }
 
     @Override
@@ -59,6 +67,8 @@ public class TeleportationConfig extends AbstractConfig {
     public void getValues(List<ConfigValue> values) {
         values.add(ENABLE_TELEPORTATION_MENU_KEY);
         values.add(ENABLE_FAVORITE_CAMP_KEY);
+        values.add(TELEPORTATION_MENU_KEY);
+        values.add(FAVORITE_CAMP_KEY);
 
         values.add(IMAGE_WIDTH);
         values.add(IMAGE_HEIGHT);
@@ -90,5 +100,6 @@ public class TeleportationConfig extends AbstractConfig {
         values.add(CAMP_TELEPORTATION_FEE);
         values.add(LOCATION_TELEPORTATION_FEE);
         values.add(TELEPORTATION_TO_PLAYER_FEE);
+        values.add(ADVANCED_LOGGING);
     }
 }

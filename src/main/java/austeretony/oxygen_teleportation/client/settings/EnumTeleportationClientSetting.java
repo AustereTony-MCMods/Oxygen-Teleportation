@@ -30,7 +30,7 @@ public enum EnumTeleportationClientSetting {
     }
 
     public static void register() {
-        for (EnumTeleportationClientSetting setting : EnumTeleportationClientSetting.values())
+        for (EnumTeleportationClientSetting setting : values())
             OxygenManagerClient.instance().getClientSettingManager().register(SettingValueUtils.getValue(setting.type, setting.key, setting.baseValue));
     }
 }

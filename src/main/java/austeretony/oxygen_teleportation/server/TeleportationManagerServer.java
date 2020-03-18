@@ -38,7 +38,7 @@ public class TeleportationManagerServer {
     }
 
     private void registerPersistentData() {
-        OxygenHelperServer.registerPersistentData(()->this.playersDataContainer.save());
+        OxygenHelperServer.registerPersistentData(this.playersDataContainer::save);
         OxygenHelperServer.registerPersistentData(this.sharedCampsContainer);
         OxygenHelperServer.registerPersistentData(this.locationsContainer);
     }
@@ -90,12 +90,8 @@ public class TeleportationManagerServer {
         this.imagesLoader.loadLocationPreviewImagesAsync();
     }
 
-    public void onPlayerLoaded(EntityPlayerMP playerMP) {
-        this.playersDataManager.onPlayerLoaded(playerMP);  
-    }
-
-    public void onPlayerUnloaded(EntityPlayerMP playerMP) {
-        this.playersDataManager.onPlayerUnloaded(playerMP);
+    public void playerLoaded(EntityPlayerMP playerMP) {
+        this.playersDataManager.playerLoaded(playerMP);  
     }
 
     public void setFeeStack(ItemStackWrapper stackWrapper) {

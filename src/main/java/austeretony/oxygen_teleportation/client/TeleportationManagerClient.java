@@ -99,9 +99,9 @@ public class TeleportationManagerClient {
         return this.keyHandler;
     }
 
-    public void init() {
+    public void worldLoaded() {
         this.playerData.setPlayerUUID(OxygenHelperClient.getPlayerUUID());
-        this.playerData.setPath(OxygenHelperClient.getDataFolder() + "/client/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/camps.dat");
+        this.playerData.setPath(OxygenHelperClient.getDataFolder() + "/client/players/" + OxygenHelperClient.getPlayerUUID() + "/teleportation/player_data.dat");
         OxygenHelperClient.loadPersistentDataAsync(this.playerData);
 
         OxygenHelperClient.loadPersistentDataAsync(this.sharedCampsContainer);

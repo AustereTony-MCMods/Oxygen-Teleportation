@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 import austeretony.oxygen_core.common.persistent.AbstractPersistentData;
 import austeretony.oxygen_core.common.util.ConcurrentSetWrapper;
 import austeretony.oxygen_core.common.util.StreamUtils;
@@ -26,14 +28,16 @@ public class SharedCampsContainerServer extends AbstractPersistentData {
 
     protected SharedCampsContainerServer() {}
 
+    @Nullable
     public UUID getCampOwner(long pointId) {
         return this.access.get(pointId);
     }
 
-    public boolean campExist(long pointId) {
+    public boolean isCampExist(long pointId) {
         return this.cache.containsKey(pointId);
     }
 
+    @Nullable
     public WorldPoint getCamp(long pointId) {
         return this.cache.get(pointId);
     }
@@ -116,12 +120,13 @@ public class SharedCampsContainerServer extends AbstractPersistentData {
         return invitations.access.get(pointId).size();
     }
 
+    @Nullable
     public InvitationsContainerServer getInvitationsContainer(UUID playerUUID) {
         return this.owners.get(playerUUID);
     }
 
     public void invite(UUID ownerUUID, long pointId, UUID invitedUUID) {
-        if (!this.campExist(pointId))
+        if (!this.isCampExist(pointId))
             this.cache.put(pointId, TeleportationManagerServer.instance().getPlayersDataContainer().getPlayerData(ownerUUID).getCamp(pointId));
 
         if (!this.access.containsKey(pointId))
@@ -182,7 +187,7 @@ public class SharedCampsContainerServer extends AbstractPersistentData {
 
     @Override
     public String getDisplayName() {
-        return "shared_camps";
+        return "teleportation:shared_camps_server";
     }
 
     @Override

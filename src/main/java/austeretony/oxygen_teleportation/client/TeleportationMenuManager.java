@@ -16,14 +16,14 @@ public class TeleportationMenuManager {
         this.manager = manager;
     }
 
-    public void openMenu() {
+    public static void openTeleportationMenu() {
         ClientReference.getGameSettings().hideGUI = true;
-        OxygenManagerClient.instance().getExecutionManager().scheduleTask(()->this.openMenuDelegated(), 100L, TimeUnit.MILLISECONDS);
+        OxygenManagerClient.instance().getExecutionManager().scheduleTask(TeleportationMenuManager::openTeleportationMenuDelegated, 100L, TimeUnit.MILLISECONDS);
     }
 
-    private void openMenuDelegated() {
+    private static void openTeleportationMenuDelegated() {
         ClientReference.delegateToClientThread(()->{
-            this.manager.getImagesManager().preparePreviewImage();
+            TeleportationManagerClient.instance().getImagesManager().preparePreviewImage();
             ClientReference.getGameSettings().hideGUI = false;
             ClientReference.displayGuiScreen(new TeleportationMenuScreen());
         });

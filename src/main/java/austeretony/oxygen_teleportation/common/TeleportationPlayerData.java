@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.common.persistent.AbstractPersistentData;
 import austeretony.oxygen_core.common.util.StreamUtils;
@@ -61,10 +63,11 @@ public class TeleportationPlayerData extends AbstractPersistentData {
         return this.camps.keySet();
     }
 
-    public boolean campExist(long pointId) {
+    public boolean isCampExist(long pointId) {
         return this.camps.containsKey(pointId);
     }
 
+    @Nullable
     public WorldPoint getCamp(long pointId) {
         return this.camps.get(pointId);
     }
@@ -79,14 +82,11 @@ public class TeleportationPlayerData extends AbstractPersistentData {
             this.favoriteCamp = 0L;
     }
 
-    public boolean isFavoriteCampExist() {
-        return this.favoriteCamp != 0L;
-    }
-
     public long getFavoriteCampId() {
         return this.favoriteCamp;
     }
 
+    @Nullable
     public WorldPoint getFavoriteCamp() {
         return this.camps.get(this.favoriteCamp);
     }
@@ -104,10 +104,10 @@ public class TeleportationPlayerData extends AbstractPersistentData {
     }
 
     public long createId(long seed) {
-        seed++;
-        while (this.camps.containsKey(seed))
-            seed++;
-        return seed;
+        long id = ++seed;
+        while (this.camps.containsKey(id))
+            id++;
+        return id;
     }
 
     public EnumJumpProfile getJumpProfile() {
@@ -124,7 +124,7 @@ public class TeleportationPlayerData extends AbstractPersistentData {
 
     @Override
     public String getDisplayName() {
-        return "player_data";
+        return "teleportation:player_data";
     }
 
     @Override

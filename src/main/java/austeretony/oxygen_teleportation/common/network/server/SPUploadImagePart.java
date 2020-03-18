@@ -14,11 +14,11 @@ public class SPUploadImagePart extends Packet {
 
     private long pointId;
 
-    private int[] fragment;
+    private byte[] fragment;
 
     public SPUploadImagePart() {}
 
-    public SPUploadImagePart(ImageTransferingServerBuffer.EnumImageTransfer operation, long pointId, int index, int[] fragment, int fragmentsAmount) {
+    public SPUploadImagePart(ImageTransferingServerBuffer.EnumImageTransfer operation, long pointId, int index, byte[] fragment, int fragmentsAmount) {
         this.ordinal = operation.ordinal();
         this.pointId = pointId;
         this.index = index;
@@ -33,15 +33,12 @@ public class SPUploadImagePart extends Packet {
         buffer.writeShort(this.index);
         buffer.writeShort(this.fragmentsAmount);
         buffer.writeShort(this.fragment.length);
-        for (int i : this.fragment)
-            buffer.writeInt(i);
+        buffer.writeBytes(this.fragment);
     }
 
     @Override
     public void read(ByteBuf buffer, INetHandler netHandler) {
         final EntityPlayerMP playerMP = getEntityPlayerMP(netHandler);
-        //TODO This packet will be send to frequently
-        //if (OxygenHelperServer.isNetworkRequestAvailable(CommonReference.getPersistentUUID(playerMP), TeleportationMain.IMAGE_UPLOAD_REQUEST_ID)) {
         final int ordinal = buffer.readByte();
         if (ordinal >= 0 && ordinal < ImageTransferingServerBuffer.EnumImageTransfer.values().length) {
             final ImageTransferingServerBuffer.EnumImageTransfer operation = ImageTransferingServerBuffer.EnumImageTransfer.values()[ordinal];
@@ -49,11 +46,9 @@ public class SPUploadImagePart extends Packet {
             final int 
             index = buffer.readShort(),
             fragmentsAmount = buffer.readShort();
-            final int[] fragment = new int[buffer.readShort()];
-            for (int i = 0; i < fragment.length; i++) 
-                fragment[i] = buffer.readInt();
+            final byte[] fragment = new byte[buffer.readShort()];
+            buffer.readBytes(fragment);
             OxygenHelperServer.addRoutineTask(()->ImageTransferingServerBuffer.processFragment(operation, CommonReference.getPersistentUUID(playerMP), pointId, fragmentsAmount, index, fragment));
         }
-        //}
     }
 }

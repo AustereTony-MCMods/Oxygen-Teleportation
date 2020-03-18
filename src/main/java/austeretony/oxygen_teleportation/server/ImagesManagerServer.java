@@ -1,14 +1,11 @@
 package austeretony.oxygen_teleportation.server;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
-import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import austeretony.oxygen_teleportation.common.network.client.CPDownloadPreviewImage;
 import austeretony.oxygen_teleportation.common.util.ImageTransferingServerBuffer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -40,12 +37,11 @@ public class ImagesManagerServer {
         }
     }
 
-    public void downloadCampPreviewToClientAsync(EntityPlayerMP playerMP, long pointId, BufferedImage bufferedImage) {
-        OxygenHelperServer.addRoutineTask(()->this.downloadCampPreviewToClient(playerMP, pointId, bufferedImage));
+    public void downloadCampPreviewToClientAsync(EntityPlayerMP playerMP, long pointId, byte[] imageRaw) {
+        OxygenHelperServer.addRoutineTask(()->this.downloadCampPreviewToClient(playerMP, pointId, imageRaw));
     }
 
-    public void downloadCampPreviewToClient(EntityPlayerMP playerMP, long pointId, BufferedImage bufferedImage) {
-        final byte[] imageRaw = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+    public void downloadCampPreviewToClient(EntityPlayerMP playerMP, long pointId, byte[] imageRaw) {
         OxygenMain.network().sendTo(new CPDownloadPreviewImage(EnumWorldPoint.CAMP, pointId, imageRaw), playerMP);  
     }
 
@@ -65,6 +61,6 @@ public class ImagesManagerServer {
         if (imageRaw != null)
             OxygenMain.network().sendTo(new CPDownloadPreviewImage(EnumWorldPoint.LOCATION, pointId, imageRaw), playerMP);  
         else 
-            TeleportationMain.LOGGER.error("Location preview image {}.png bytes are absent, can't download image.", pointId);
+            OxygenMain.LOGGER.error("[Teleportation] Location preview image {}.png bytes are absent, can't download image.", pointId);
     }
 }

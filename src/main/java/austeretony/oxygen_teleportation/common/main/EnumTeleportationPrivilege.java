@@ -51,7 +51,7 @@ public enum EnumTeleportationPrivilege {
     }
 
     public static void register() {
-        for (EnumTeleportationPrivilege privilege : EnumTeleportationPrivilege.values())
+        for (EnumTeleportationPrivilege privilege : values())
             PrivilegeRegistry.registerPrivilege(privilege.name, privilege.id, privilege.type);
     }
 }

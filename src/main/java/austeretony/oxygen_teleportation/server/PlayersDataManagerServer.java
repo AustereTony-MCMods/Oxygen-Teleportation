@@ -2,11 +2,14 @@ package austeretony.oxygen_teleportation.server;
 
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.main.EnumOxygenStatusMessage;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
+import austeretony.oxygen_core.server.api.TimeHelperServer;
 import austeretony.oxygen_teleportation.common.TeleportationPlayerData;
 import austeretony.oxygen_teleportation.common.TeleportationPlayerData.EnumJumpProfile;
 import austeretony.oxygen_teleportation.common.WorldPoint;
@@ -42,7 +45,7 @@ public class PlayersDataManagerServer {
         OxygenHelperServer.getOxygenPlayerData(CommonReference.getPersistentUUID(teleportation.playerMP)).addTemporaryProcess(teleportation);
     }
 
-    public void onPlayerLoaded(EntityPlayerMP playerMP) {
+    public void playerLoaded(EntityPlayerMP playerMP) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP); 
         TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
         if (playerData == null) {
@@ -52,13 +55,6 @@ public class PlayersDataManagerServer {
         if (TeleportationConfig.FEE_MODE.asInt() == 1)
             OxygenMain.network().sendTo(new CPSyncFeeItemStack(), playerMP);
         OxygenHelperServer.getPlayerSharedData(playerUUID).setByte(TeleportationMain.JUMP_PROFILE_SHARED_DATA_ID, playerData.getJumpProfile().ordinal());
-    }
-
-    public void onPlayerUnloaded(EntityPlayerMP playerMP) {
-        //TODO May cause reset of cooldowns and jump profile
-        /*UUID playerUUID = CommonReference.getPersistentUUID(playerMP);        
-        if (this.manager.getPlayersDataContainer().isPlayerDataExist(playerUUID))
-            this.manager.getPlayersDataContainer().removePlayerData(playerUUID);*/
     }
 
     public void changeJumpProfile(EntityPlayerMP playerMP, EnumJumpProfile profile) {
@@ -126,8 +122,9 @@ public class PlayersDataManagerServer {
     public void moveToCamp(EntityPlayerMP playerMP, long pointId) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
         if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())) {
-            if (this.campExist(playerUUID, pointId)) 
-                this.move(this.getCamp(playerUUID, pointId), playerUUID, playerMP);
+            WorldPoint camp = this.getCamp(playerUUID, pointId);
+            if (camp != null)
+                this.move(camp, playerUUID, playerMP);
             else if (this.haveInvitation(playerUUID, pointId))
                 this.move(this.manager.getSharedCampsContainer().getCamp(pointId), playerUUID, playerMP);
         }
@@ -137,8 +134,9 @@ public class PlayersDataManagerServer {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
         if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
                 && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ENABLE_FAVORITE_CAMP.id(), TeleportationConfig.ENABLE_FAVORITE_CAMP.asBoolean())) {
-            if (this.campExist(playerUUID, pointId)) 
-                this.move(this.getCamp(playerUUID, pointId), playerUUID, playerMP);
+            WorldPoint camp = this.getCamp(playerUUID, pointId);
+            if (camp != null)
+                this.move(camp, playerUUID, playerMP);
             else if (this.haveInvitation(playerUUID, pointId))
                 this.move(this.manager.getSharedCampsContainer().getCamp(pointId), playerUUID, playerMP);
         }
@@ -166,13 +164,17 @@ public class PlayersDataManagerServer {
                 if (name.isEmpty())
                     name = String.format("Camp #%d", playerData.getCampsAmount() + 1);
                 name = name.trim();
-                description = description.trim();
                 if (name.length() > WorldPoint.MAX_NAME_LENGTH)
                     name = name.substring(0, WorldPoint.MAX_NAME_LENGTH);
+                if (name.isEmpty())
+                    name = String.format("Camp #%d", playerData.getCampsAmount() + 1);
+
+                description = description.trim();
                 if (description.length() > WorldPoint.MAX_DESCRIPTION_LENGTH)
                     description = description.substring(0, WorldPoint.MAX_NAME_LENGTH);
-                WorldPoint worldPoint = new WorldPoint(
-                        playerData.createId(System.currentTimeMillis()),
+
+                WorldPoint camp = new WorldPoint(
+                        playerData.createId(TimeHelperServer.getCurrentMillis()),
                         playerUUID,
                         CommonReference.getName(playerMP), 
                         name, 
@@ -183,10 +185,10 @@ public class PlayersDataManagerServer {
                         (float) playerMP.posZ,
                         playerMP.rotationYawHead, 
                         playerMP.rotationPitch);
-                playerData.addCamp(worldPoint);
+                playerData.addCamp(camp);
                 playerData.setChanged(true);
 
-                OxygenMain.network().sendTo(new CPWorldPointCreated(EnumWorldPoint.CAMP, worldPoint), playerMP);
+                OxygenMain.network().sendTo(new CPWorldPointCreated(EnumWorldPoint.CAMP, camp), playerMP);
 
                 OxygenHelperServer.sendStatusMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationStatusMessage.CAMP_CREATED.ordinal());
             }
@@ -195,21 +197,22 @@ public class PlayersDataManagerServer {
 
     public void removeCamp(EntityPlayerMP playerMP, long pointId) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
-                && this.campExist(playerUUID, pointId)) { 
-            WorldPoint worldPoint = this.getCamp(playerUUID, pointId);
-            if (this.isOwner(playerUUID, worldPoint)) {
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())) { 
+            WorldPoint camp = this.getCamp(playerUUID, pointId);
+            if (camp != null
+                    && camp.isOwner(playerUUID)) {
                 TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
                 playerData.removeCamp(pointId);
+                playerData.setChanged(true);
+
                 this.manager.getImagesLoader().removeCampPreviewImageAsync(playerUUID, pointId);   
 
                 if (this.manager.getSharedCampsContainer().haveInvitedPlayers(playerUUID, pointId)) {
                     this.manager.getSharedCampsContainer().removeCamp(playerUUID, pointId);
                     this.manager.getSharedCampsContainer().setChanged(true);
                 }
-                playerData.setChanged(true);
 
-                OxygenMain.network().sendTo(new CPWorldPointRemoved(EnumWorldPoint.CAMP, worldPoint.getId()), playerMP);
+                OxygenMain.network().sendTo(new CPWorldPointRemoved(EnumWorldPoint.CAMP, camp.getId()), playerMP);
 
                 OxygenHelperServer.sendStatusMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationStatusMessage.CAMP_REMOVED.ordinal());
             }
@@ -234,26 +237,27 @@ public class PlayersDataManagerServer {
 
     public void changeCampLockState(EntityPlayerMP playerMP, long pointId, boolean flag) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
-                && this.campExist(playerUUID, pointId)) { 
-            WorldPoint worldPoint = this.getCamp(playerUUID, pointId);
-            if (this.isOwner(playerUUID, worldPoint)) {
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())) { 
+            WorldPoint camp = this.getCamp(playerUUID, pointId);
+            if (camp != null
+                    && camp.isOwner(playerUUID)) {
                 TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
-                worldPoint.setLocked(flag);
-                worldPoint.setId(playerData.createId(pointId));
-                playerData.addCamp(worldPoint);
+                camp.setLocked(flag);
+                camp.setId(playerData.createId(pointId));
+                playerData.addCamp(camp);
                 if (playerData.getFavoriteCampId() == pointId)
-                    playerData.setFavoriteCampId(worldPoint.getId());
+                    playerData.setFavoriteCampId(camp.getId());
                 playerData.removeCamp(pointId);
-                this.manager.getImagesLoader().renameCampPreviewImageAsync(playerUUID, pointId, worldPoint.getId());
-
-                if (this.manager.getSharedCampsContainer().haveInvitedPlayers(playerUUID, pointId)) {
-                    this.manager.getSharedCampsContainer().replaceCamp(playerUUID, pointId, worldPoint);
-                    this.manager.getSharedCampsContainer().setChanged(true);
-                }
                 playerData.setChanged(true);
 
-                OxygenMain.network().sendTo(new CPWorldPointEdited(EnumWorldPoint.CAMP, pointId, worldPoint, false), playerMP);
+                this.manager.getImagesLoader().renameCampPreviewImageAsync(playerUUID, pointId, camp.getId());
+
+                if (this.manager.getSharedCampsContainer().haveInvitedPlayers(playerUUID, pointId)) {
+                    this.manager.getSharedCampsContainer().replaceCamp(playerUUID, pointId, camp);
+                    this.manager.getSharedCampsContainer().setChanged(true);
+                }
+
+                OxygenMain.network().sendTo(new CPWorldPointEdited(EnumWorldPoint.CAMP, pointId, camp, false), playerMP);
 
                 if (flag)
                     OxygenHelperServer.sendStatusMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationStatusMessage.CAMP_LOCKED.ordinal());
@@ -265,40 +269,43 @@ public class PlayersDataManagerServer {
 
     public void editCamp(EntityPlayerMP playerMP, long pointId, String name, String description, boolean updatePosition, boolean updateImage) {
         UUID playerUUID = CommonReference.getPersistentUUID(playerMP);
-        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
-                && this.campExist(playerUUID, pointId)) { 
-            WorldPoint worldPoint = this.getCamp(playerUUID, pointId);
-            if (this.isOwner(playerUUID, worldPoint)) {
+        if (PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())) { 
+            WorldPoint camp = this.getCamp(playerUUID, pointId);
+            if (camp != null
+                    && camp.isOwner(playerUUID)) {
                 TeleportationPlayerData playerData = this.manager.getPlayersDataContainer().getPlayerData(playerUUID);
                 long newPointId = playerData.createId(pointId);
-                if (name.isEmpty())
-                    name = "Camp";
                 name = name.trim();
-                description = description.trim();
                 if (name.length() > WorldPoint.MAX_NAME_LENGTH)
                     name = name.substring(0, WorldPoint.MAX_NAME_LENGTH);
+                if (name.isEmpty())
+                    name = "Camp";
+
+                description = description.trim();
                 if (description.length() > WorldPoint.MAX_DESCRIPTION_LENGTH)
                     description = description.substring(0, WorldPoint.MAX_NAME_LENGTH);
-                worldPoint.setName(name);
-                worldPoint.setDescription(description);
+
+                camp.setName(name);
+                camp.setDescription(description);
                 if (updatePosition)
-                    worldPoint.setPosition((float) playerMP.posX, (float) playerMP.posY, (float) playerMP.posZ, playerMP.dimension, playerMP.rotationYawHead, playerMP.rotationPitch);
+                    camp.setPosition((float) playerMP.posX, (float) playerMP.posY, (float) playerMP.posZ, playerMP.dimension, playerMP.rotationYawHead, playerMP.rotationPitch);
                 if (updateImage)
                     this.manager.getImagesLoader().removeCampPreviewImage(playerUUID, pointId);
                 else
                     this.manager.getImagesLoader().renameCampPreviewImageAsync(playerUUID, pointId, newPointId);
-                worldPoint.setId(newPointId);
-                playerData.addCamp(worldPoint);
+                camp.setId(newPointId);
+                playerData.addCamp(camp);
                 if (playerData.getFavoriteCampId() == pointId)
                     playerData.setFavoriteCampId(newPointId);
                 playerData.removeCamp(pointId);
-                if (this.manager.getSharedCampsContainer().haveInvitedPlayers(playerUUID, pointId)) {
-                    this.manager.getSharedCampsContainer().replaceCamp(playerUUID, pointId, worldPoint);
-                    this.manager.getSharedCampsContainer().setChanged(true);
-                }
                 playerData.setChanged(true);
 
-                OxygenMain.network().sendTo(new CPWorldPointEdited(EnumWorldPoint.CAMP, pointId, worldPoint, updateImage), playerMP);
+                if (this.manager.getSharedCampsContainer().haveInvitedPlayers(playerUUID, pointId)) {
+                    this.manager.getSharedCampsContainer().replaceCamp(playerUUID, pointId, camp);
+                    this.manager.getSharedCampsContainer().setChanged(true);
+                }
+
+                OxygenMain.network().sendTo(new CPWorldPointEdited(EnumWorldPoint.CAMP, pointId, camp, updateImage), playerMP);
 
                 OxygenHelperServer.sendStatusMessage(playerMP, TeleportationMain.TELEPORTATION_MOD_INDEX, EnumTeleportationStatusMessage.CAMP_EDITED.ordinal());
             }
@@ -308,10 +315,10 @@ public class PlayersDataManagerServer {
     public void invitePlayer(EntityPlayerMP playerMP, long pointId, UUID playerUUID) {
         UUID ownerUUID = CommonReference.getPersistentUUID(playerMP);
         if (TeleportationConfig.ENABLE_CAMP_INVITATIONS.asBoolean()
-                && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
-                && this.campExist(ownerUUID, pointId)) { 
-            WorldPoint worldPoint = this.getCamp(ownerUUID, pointId);
-            if (this.isOwner(ownerUUID, worldPoint) 
+                && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())) { 
+            WorldPoint camp = this.getCamp(ownerUUID, pointId);
+            if (camp != null
+                    && camp.isOwner(ownerUUID) 
                     && OxygenHelperServer.isPlayerOnline(playerUUID)
                     && !this.manager.getSharedCampsContainer().haveInvitation(playerUUID, pointId)
                     && !playerUUID.equals(ownerUUID)) {
@@ -323,7 +330,7 @@ public class PlayersDataManagerServer {
                                     ownerUUID, 
                                     CommonReference.getName(playerMP), 
                                     pointId, 
-                                    worldPoint.getName()));
+                                    camp.getName()));
                 } else
                     OxygenHelperServer.sendStatusMessage(playerMP, OxygenMain.OXYGEN_CORE_MOD_INDEX, EnumOxygenStatusMessage.REQUEST_RESET.ordinal());
             }
@@ -333,10 +340,10 @@ public class PlayersDataManagerServer {
     public void uninvitePlayer(EntityPlayerMP playerMP, long pointId, UUID playerUUID) {
         UUID ownerUUID = CommonReference.getPersistentUUID(playerMP);
         if (TeleportationConfig.ENABLE_CAMP_INVITATIONS.asBoolean() 
-                && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())
-                && this.campExist(ownerUUID, pointId)) {
-            WorldPoint worldPoint = this.getCamp(ownerUUID, pointId);
-            if (this.isOwner(ownerUUID, worldPoint)
+                && PrivilegesProviderServer.getAsBoolean(playerUUID, EnumTeleportationPrivilege.ALLOW_CAMPS_USAGE.id(), TeleportationConfig.ENABLE_CAMPS.asBoolean())) {
+            WorldPoint camp = this.getCamp(ownerUUID, pointId);
+            if (camp != null
+                    && camp.isOwner(ownerUUID)
                     && this.manager.getSharedCampsContainer().haveInvitation(playerUUID, pointId)) {
                 this.manager.getSharedCampsContainer().uninvite(ownerUUID, pointId, playerUUID);
                 this.manager.getSharedCampsContainer().setChanged(true);
@@ -389,15 +396,12 @@ public class PlayersDataManagerServer {
         }
     }
 
-    private boolean campExist(UUID playerUUID, long pointId) {
-        return this.manager.getPlayersDataContainer().getPlayerData(playerUUID).campExist(pointId);
-    }
-
     private boolean haveInvitation(UUID playerUUID, long pointId) {
         return this.manager.getSharedCampsContainer().haveInvitation(playerUUID, pointId) 
-                && this.manager.getSharedCampsContainer().campExist(pointId);
+                && this.manager.getSharedCampsContainer().isCampExist(pointId);
     }
 
+    @Nullable
     private WorldPoint getCamp(UUID playerUUID, long pointId) {
         return this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCamp(pointId);
     }
@@ -406,11 +410,7 @@ public class PlayersDataManagerServer {
         return !worldPoint.isLocked() || worldPoint.isOwner(playerUUID);
     }
 
-    private boolean isOwner(UUID playerUUID, WorldPoint worldPoint) {
-        return worldPoint.isOwner(playerUUID);
-    }
-
     private boolean readyMoveToCamp(UUID playerUUID) {
-        return System.currentTimeMillis() >= this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCooldownData().getNextCampTime();
+        return TimeHelperServer.getCurrentMillis() >= this.manager.getPlayersDataContainer().getPlayerData(playerUUID).getCooldownData().getNextCampTime();
     }
 }

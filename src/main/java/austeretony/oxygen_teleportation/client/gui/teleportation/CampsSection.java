@@ -16,9 +16,10 @@ import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
 import austeretony.oxygen_core.client.api.OxygenGUIHelper;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.api.PrivilegesProviderClient;
-import austeretony.oxygen_core.client.gui.elements.OxygenButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenContextMenu;
 import austeretony.oxygen_core.client.gui.elements.OxygenCurrencyValue;
+import austeretony.oxygen_core.client.gui.elements.OxygenDefaultBackgroundWithButtonsFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenKeyButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenScrollablePanel;
 import austeretony.oxygen_core.client.gui.elements.OxygenSectionSwitcher;
 import austeretony.oxygen_core.client.gui.elements.OxygenSorter;
@@ -28,7 +29,6 @@ import austeretony.oxygen_core.client.gui.elements.OxygenTextLabel;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.common.util.MathUtils;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
-import austeretony.oxygen_teleportation.client.gui.teleportation.camps.PointsBackgroundFiller;
 import austeretony.oxygen_teleportation.client.gui.teleportation.camps.WorldPointPanelEntry;
 import austeretony.oxygen_teleportation.client.gui.teleportation.camps.WorldPointPreview;
 import austeretony.oxygen_teleportation.client.gui.teleportation.camps.callback.CampCreationCallback;
@@ -47,6 +47,7 @@ import austeretony.oxygen_teleportation.common.WorldPoint;
 import austeretony.oxygen_teleportation.common.WorldPoint.EnumWorldPoint;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
+import net.minecraft.client.gui.ScaledResolution;
 
 public class CampsSection extends AbstractGUISection {
 
@@ -54,7 +55,7 @@ public class CampsSection extends AbstractGUISection {
 
     private OxygenTextLabel pointsAmountTextLabel, cooldownTextLabel;
 
-    private OxygenButton createButton, moveButton;
+    private OxygenKeyButton createButton, moveButton;
 
     private OxygenSorter timeSorter, nameSorter;
 
@@ -88,35 +89,43 @@ public class CampsSection extends AbstractGUISection {
 
     @Override
     public void init() {	
-        this.addElement(new PointsBackgroundFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.creationCallback = new CampCreationCallback(this.screen, this, 140, 108).enableDefaultBackground();
+        this.pointEditingCallback = new EditCampCallback(this.screen, this, 140, 128).enableDefaultBackground();
+        this.removePointCallback = new CampRemoveCallback(this.screen, this, 140, 36).enableDefaultBackground();
+        this.leavePointCallback = new LeaveCampCallback(this.screen, this, 140, 36).enableDefaultBackground();
+
+        this.inviteCallback = new InviteCallback(this.screen, this, 140, 46).enableDefaultBackground();
+        this.invitationsCallback = new InvitationsCallback(this.screen, this, 140, 78).enableDefaultBackground();
+
+        this.addElement(new OxygenDefaultBackgroundWithButtonsFiller(0, 0, this.getWidth(), this.getHeight()));
         this.addElement(new OxygenTextLabel(4, 12, ClientReference.localize("oxygen_teleportation.gui.menu.title"), EnumBaseGUISetting.TEXT_TITLE_SCALE.get().asFloat(), EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()));
 
         this.addElement(this.pointsAmountTextLabel = new OxygenTextLabel(0, 22, "", EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()));
 
         this.addElement(this.timeSorter = new OxygenSorter(6, 29, EnumSorting.DOWN, ClientReference.localize("oxygen_core.gui.time")));   
-        this.timeSorter.setClickListener((sorting)->{
+        this.timeSorter.setSortingListener((sorting)->{
             this.nameSorter.reset();
             this.sortPoints(sorting == EnumSorting.DOWN ? 0 : 1);
         });
 
         this.addElement(this.nameSorter = new OxygenSorter(12, 29, EnumSorting.INACTIVE, ClientReference.localize("oxygen_core.gui.name")));  
-        this.nameSorter.setClickListener((sorting)->{
+        this.nameSorter.setSortingListener((sorting)->{
             this.timeSorter.reset();
             this.sortPoints(sorting == EnumSorting.DOWN ? 2 : 3);
         });
 
-        this.addElement(this.pointsPanel = new OxygenScrollablePanel(this.screen, 6, 36, 80, 10, 1, 100, 9, EnumBaseGUISetting.TEXT_PANEL_SCALE.get().asFloat(), true));   
+        this.addElement(this.pointsPanel = new OxygenScrollablePanel(this.screen, 6, 36, 80, 10, 1, 100, 10, EnumBaseGUISetting.TEXT_PANEL_SCALE.get().asFloat(), true));   
         this.addElement(this.searchField = new OxygenTextField(6, 16, 60, WorldPoint.MAX_NAME_LENGTH, ""));
         this.pointsPanel.initSearchField(this.searchField);
 
-        this.pointsPanel.<WorldPointPanelEntry>setClickListener((previous, clicked, mouseX, mouseY, mouseButton)->{
+        this.pointsPanel.<WorldPointPanelEntry>setElementClickListener((previous, clicked, mouseX, mouseY, mouseButton)->{
             if (this.currentEntry != clicked) {
                 if (this.currentEntry != null)
                     this.currentEntry.setToggled(false);
                 this.currentEntry = clicked;
-                this.currentPoint = TeleportationManagerClient.instance().getPlayerData().getCamp(clicked.index);
+                this.currentPoint = TeleportationManagerClient.instance().getPlayerData().getCamp(clicked.getWrapped());
                 clicked.toggle();                    
-                this.showPointInfo(clicked.index, false);
+                this.showPointInfo(clicked.getWrapped(), false);
             }
         });
 
@@ -128,18 +137,16 @@ public class CampsSection extends AbstractGUISection {
                 new EditContextAction(this),
                 new RemoveContextAction(this)));
 
-        this.addElement(this.createButton = new OxygenButton(6, this.getHeight() - 11, 40, 10, ClientReference.localize("oxygen_core.gui.create")));     
-        this.createButton.setKeyPressListener(Keyboard.KEY_R, ()->this.openCreationCallback());
+        this.addElement(this.createButton = new OxygenKeyButton(0, this.getY() + this.getHeight() + this.screen.guiTop - 8, ClientReference.localize("oxygen_teleportation.gui.menu.button.createCamp"), Keyboard.KEY_R, this::openCreationCallback));     
 
         this.addElement(this.worldPointPreview = new WorldPointPreview(91, 15));
-        this.addElement(this.cooldownTextLabel = new OxygenTextLabel(166, this.getHeight() - 4, "", EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()).setVisible(false));
-        this.addElement(this.moveButton = new OxygenButton(94, 138, 40, 10, ClientReference.localize("oxygen_teleportation.gui.menu.moveButton")).disableFull());     
-        this.moveButton.setKeyPressListener(Keyboard.KEY_F, ()->this.move());
+        this.addElement(this.cooldownTextLabel = new OxygenTextLabel(130, this.getHeight() - 5, "", EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()).setVisible(false));
+        this.addElement(this.moveButton = new OxygenKeyButton(0, this.getY() + this.getHeight() + this.screen.guiTop - 8, ClientReference.localize("oxygen_teleportation.gui.menu.button.moveToCamp"), Keyboard.KEY_F, this::move).disableFull());     
 
         this.addElement(new OxygenSectionSwitcher(this.getWidth() - 4, 5, this, this.screen.getLocationsSection(), this.screen.getPlayersSection()));
 
-        this.addElement(this.feeValue = new OxygenCurrencyValue(152, this.getHeight() - 10).disableFull());  
-        this.addElement(this.balanceValue = new OxygenCurrencyValue(this.getWidth() - 14, this.getHeight() - 10).disableFull());  
+        this.addElement(this.feeValue = new OxygenCurrencyValue(116, this.getHeight() - 11).disableFull());  
+        this.addElement(this.balanceValue = new OxygenCurrencyValue(this.getWidth() - 14, this.getHeight() - 11).disableFull());  
         if (TeleportationConfig.FEE_MODE.asInt() == 1) {
             this.feeValue.setValue(TeleportationManagerClient.instance().getFeeStackWrapper().getCachedItemStack(), 0);
             this.balanceValue.setValue(TeleportationManagerClient.instance().getFeeStackWrapper().getCachedItemStack(), (int) this.screen.balance);
@@ -147,14 +154,12 @@ public class CampsSection extends AbstractGUISection {
             this.feeValue.setValue(OxygenMain.COMMON_CURRENCY_INDEX, 0L);
             this.balanceValue.setValue(OxygenMain.COMMON_CURRENCY_INDEX, this.screen.balance);
         }
+    }
 
-        this.creationCallback = new CampCreationCallback(this.screen, this, 140, 110).enableDefaultBackground();
-        this.pointEditingCallback = new EditCampCallback(this.screen, this, 140, 130).enableDefaultBackground();
-        this.removePointCallback = new CampRemoveCallback(this.screen, this, 140, 38).enableDefaultBackground();
-        this.leavePointCallback = new LeaveCampCallback(this.screen, this, 140, 38).enableDefaultBackground();
-
-        this.inviteCallback = new InviteCallback(this.screen, this, 140, 48).enableDefaultBackground();
-        this.invitationsCallback = new InvitationsCallback(this.screen, this, 140, 81).enableDefaultBackground();
+    private void calculateButtonsHorizontalPosition() {
+        ScaledResolution sr = new ScaledResolution(this.mc);
+        this.createButton.setX((sr.getScaledWidth() - (12 + this.textWidth(this.createButton.getDisplayText(), this.createButton.getTextScale()))) / 2 - this.screen.guiLeft);
+        this.moveButton.setX(sr.getScaledWidth() / 2 + 50 - this.screen.guiLeft);
     }
 
     private void sortPoints(int mode) {
@@ -174,13 +179,13 @@ public class CampsSection extends AbstractGUISection {
             this.pointsPanel.addEntry(new WorldPointPanelEntry(EnumWorldPoint.CAMP, worldPoint));
 
         int maxAmount = PrivilegesProviderClient.getAsInt(EnumTeleportationPrivilege.CAMPS_MAX_AMOUNT.id(), TeleportationConfig.CAMPS_MAX_AMOUNT.asInt());
-        this.pointsAmountTextLabel.setDisplayText(String.valueOf(points.size()) + "/" + String.valueOf(maxAmount));     
+        this.pointsAmountTextLabel.setDisplayText(String.format("%d/%d", points.size(), maxAmount));     
         this.pointsAmountTextLabel.setX(89 - this.textWidth(this.pointsAmountTextLabel.getDisplayText(), this.pointsAmountTextLabel.getTextScale()));
 
         this.searchField.reset();
 
         this.pointsPanel.getScroller().reset();
-        this.pointsPanel.getScroller().updateRowsAmount(MathUtils.clamp(points.size(), 9, MathUtils.greaterOfTwo(points.size(), maxAmount)));
+        this.pointsPanel.getScroller().updateRowsAmount(MathUtils.clamp(points.size(), 10, MathUtils.greaterOfTwo(points.size(), maxAmount)));
     }
 
     private void openCreationCallback() {
@@ -190,7 +195,7 @@ public class CampsSection extends AbstractGUISection {
 
     private void move() {
         if (!this.searchField.isDragged()) {
-            TeleportationManagerClient.instance().getPlayerDataManager().moveToCampSynced(this.currentEntry.index);
+            TeleportationManagerClient.instance().getPlayerDataManager().moveToCampSynced(this.currentEntry.getWrapped());
             this.screen.close();
         }
     }
@@ -207,7 +212,9 @@ public class CampsSection extends AbstractGUISection {
 
     public void campsSynchronized() {
         this.sortPoints(0);
-        this.updateCreateButtonState();     
+        this.updateCreateButtonState();  
+
+        this.calculateButtonsHorizontalPosition();
     }
 
     public void cooldownSynchronized() {
@@ -232,10 +239,10 @@ public class CampsSection extends AbstractGUISection {
         WorldPointPanelEntry pointButton;
         for (GUIButton button : this.pointsPanel.buttonsBuffer) {
             pointButton = (WorldPointPanelEntry) button;
-            if (pointButton.index == worldPoint.getId()) {
+            if (pointButton.getWrapped() == worldPoint.getId()) {
                 pointButton.toggle();
                 this.currentEntry = pointButton;
-                this.currentPoint = TeleportationManagerClient.instance().getPlayerData().getCamp(pointButton.index);
+                this.currentPoint = TeleportationManagerClient.instance().getPlayerData().getCamp(pointButton.getWrapped());
             }
         }
 
@@ -256,7 +263,7 @@ public class CampsSection extends AbstractGUISection {
         for (GUIButton button : this.pointsPanel.buttonsBuffer) {
             pointButton = (WorldPointPanelEntry) button;
             pointButton.setFavorite(false);
-            if (pointButton.index == pointId)
+            if (pointButton.getWrapped() == pointId)
                 pointButton.setFavorite(true);
         }
     }
@@ -270,7 +277,7 @@ public class CampsSection extends AbstractGUISection {
                 WorldPointPanelEntry pointButton;
                 for (GUIButton button : this.pointsPanel.buttonsBuffer) {
                     pointButton = (WorldPointPanelEntry) button;
-                    if (pointButton.index == pointId)
+                    if (pointButton.getWrapped() == pointId)
                         pointButton.setShared(false);
                 }
             }

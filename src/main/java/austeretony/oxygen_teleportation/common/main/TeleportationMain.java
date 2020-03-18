@@ -1,8 +1,5 @@
 package austeretony.oxygen_teleportation.common.main;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import austeretony.oxygen_core.client.api.OxygenGUIHelper;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.command.CommandOxygenClient;
@@ -11,6 +8,7 @@ import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.api.OxygenHelperCommon;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.common.privilege.PrivilegeUtils;
+import austeretony.oxygen_core.server.OxygenManagerServer;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_core.server.command.CommandOxygenOperator;
@@ -66,7 +64,7 @@ import net.minecraftforge.fml.relauncher.Side;
         modid = TeleportationMain.MODID, 
         name = TeleportationMain.NAME, 
         version = TeleportationMain.VERSION,
-        dependencies = "required-after:oxygen_core@[0.10.1,);",
+        dependencies = "required-after:oxygen_core@[0.11.0,);",
         certificateFingerprint = "@FINGERPRINT@",
         updateJSON = TeleportationMain.VERSIONS_FORGE_URL)
 public class TeleportationMain {
@@ -74,7 +72,7 @@ public class TeleportationMain {
     public static final String 
     MODID = "oxygen_teleportation",    
     NAME = "Oxygen: Teleportation",
-    VERSION = "0.10.1",
+    VERSION = "0.11.0",
     VERSION_CUSTOM = VERSION + ":beta:0",
     GAME_VERSION = "1.12.2",
     VERSIONS_FORGE_URL = "https://raw.githubusercontent.com/AustereTony-MCMods/Oxygen-Teleportation/info/mod_versions_forge.json";
@@ -95,8 +93,6 @@ public class TeleportationMain {
     MANAGE_POINT_REQUEST_ID = 15,
     IMAGE_UPLOAD_REQUEST_ID = 16,
     TELEPORT_REQUEST_ID = 17;
-
-    public static final Logger LOGGER = LogManager.getLogger(NAME);
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -122,13 +118,13 @@ public class TeleportationMain {
             TeleportationManagerClient.create();
             CommonReference.registerEvent(new TeleportationEventsClient());
             OxygenGUIHelper.registerScreenId(TELEPORTATION_MENU_SCREEN_ID);
+            OxygenGUIHelper.registerContextAction(20, new TeleportToPlayerContextAction());//20 - group menu id
             OxygenGUIHelper.registerContextAction(50, new TeleportToPlayerContextAction());
             OxygenGUIHelper.registerContextAction(60, new TeleportToPlayerContextAction());
-            OxygenGUIHelper.registerContextAction(20, new TeleportToPlayerContextAction());//20 - group menu id
+            OxygenGUIHelper.registerContextAction(110, new TeleportToPlayerContextAction());//110 - guild menu id
             OxygenGUIHelper.registerOxygenMenuEntry(TeleportationMenuScreen.TELEPORTATIOIN_MENU_ENTRY);
             OxygenHelperClient.registerStatusMessagesHandler(new TeleportationStatusMessagesHandler());
-            OxygenHelperClient.registerSharedDataSyncListener(TELEPORTATION_MENU_SCREEN_ID, 
-                    ()->TeleportationManagerClient.instance().getTeleportationMenuManager().sharedDataSynchronized());
+            OxygenHelperClient.registerSharedDataSyncListener(TELEPORTATION_MENU_SCREEN_ID, TeleportationManagerClient.instance().getTeleportationMenuManager()::sharedDataSynchronized);
             OxygenHelperClient.registerDataSyncHandler(new CampsSyncHandlerClient());
             OxygenHelperClient.registerDataSyncHandler(new LocationsSyncHandlerClient());
             EnumTeleportationClientSetting.register();
@@ -161,7 +157,8 @@ public class TeleportationMain {
                     PrivilegeUtils.getPrivilege(EnumTeleportationPrivilege.CAMP_TELEPORTATION_FEE.id(), 0L),
                     PrivilegeUtils.getPrivilege(EnumTeleportationPrivilege.LOCATION_TELEPORTATION_FEE.id(), 0L),
                     PrivilegeUtils.getPrivilege(EnumTeleportationPrivilege.PLAYER_TELEPORTATION_FEE.id(), 0L));
-            LOGGER.info("Default Operator role privileges added.");
+            OxygenManagerServer.instance().getPrivilegesContainer().markChanged();
+            OxygenMain.LOGGER.info("[Teleportation] Default Operator role privileges added.");
         }
     }
 

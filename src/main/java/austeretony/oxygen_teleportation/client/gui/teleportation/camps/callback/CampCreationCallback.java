@@ -7,8 +7,8 @@ import austeretony.alternateui.screen.core.AbstractGUISection;
 import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.oxygen_core.client.api.ClientReference;
 import austeretony.oxygen_core.client.api.EnumBaseGUISetting;
-import austeretony.oxygen_core.client.gui.elements.OxygenButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenCallbackBackgroundFiller;
+import austeretony.oxygen_core.client.gui.elements.OxygenKeyButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenTextBoxField;
 import austeretony.oxygen_core.client.gui.elements.OxygenTextField;
 import austeretony.oxygen_core.client.gui.elements.OxygenTextLabel;
@@ -27,7 +27,7 @@ public class CampCreationCallback extends AbstractGUICallback {
 
     private OxygenTextBoxField descriptionBoxField;
 
-    private OxygenButton confirmButton, cancelButton;
+    private OxygenKeyButton confirmButton, cancelButton;
 
     public CampCreationCallback(TeleportationMenuScreen screen, CampsSection section, int width, int height) {
         super(screen, section, width, height);
@@ -46,11 +46,8 @@ public class CampCreationCallback extends AbstractGUICallback {
         this.addElement(this.nameField = new OxygenTextField(6, 25, this.getWidth() - 12, WorldPoint.MAX_NAME_LENGTH, ""));
         this.addElement(this.descriptionBoxField = new OxygenTextBoxField(6, 45, this.getWidth() - 12, 50, WorldPoint.MAX_DESCRIPTION_LENGTH));
 
-        this.addElement(this.confirmButton = new OxygenButton(15, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen_core.gui.confirm")));
-        this.confirmButton.setKeyPressListener(Keyboard.KEY_R, ()->this.confirm(false));
-
-        this.addElement(this.cancelButton = new OxygenButton(this.getWidth() - 55, this.getHeight() - 12, 40, 10, ClientReference.localize("oxygen_core.gui.cancel")));
-        this.cancelButton.setKeyPressListener(Keyboard.KEY_X, ()->this.close(false));
+        this.addElement(this.confirmButton = new OxygenKeyButton(15, this.getHeight() - 10, ClientReference.localize("oxygen_core.gui.confirm"), Keyboard.KEY_R, ()->this.confirm(false)));
+        this.addElement(this.cancelButton = new OxygenKeyButton(this.getWidth() - 55, this.getHeight() - 10, ClientReference.localize("oxygen_core.gui.cancel"), Keyboard.KEY_X, ()->this.close(false)));
     }
 
     @Override
@@ -60,8 +57,8 @@ public class CampCreationCallback extends AbstractGUICallback {
     }
 
     private void confirm(boolean mouseClick) {
-        if (mouseClick || !this.nameField.isDragged()
-                && !this.descriptionBoxField.isDragged()) {
+        if (mouseClick || (!this.nameField.isDragged()
+                && !this.descriptionBoxField.isDragged())) {
             TeleportationManagerClient.instance().getPlayerDataManager().createCampPointSynced(this.nameField.getTypedText(), this.descriptionBoxField.getTypedText());
             this.close();
         }

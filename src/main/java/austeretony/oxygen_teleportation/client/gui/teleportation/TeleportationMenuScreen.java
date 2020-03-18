@@ -8,11 +8,11 @@ import austeretony.alternateui.screen.core.GUIBaseElement;
 import austeretony.alternateui.screen.core.GUIWorkspace;
 import austeretony.alternateui.util.EnumGUIAlignment;
 import austeretony.oxygen_core.client.api.ClientReference;
+import austeretony.oxygen_core.client.api.InventoryProviderClient;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.api.PrivilegesProviderClient;
 import austeretony.oxygen_core.client.api.WatcherHelperClient;
 import austeretony.oxygen_core.client.gui.menu.OxygenMenuEntry;
-import austeretony.oxygen_core.common.inventory.InventoryHelper;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.client.gui.menu.TeleportationMenuEntry;
@@ -43,7 +43,7 @@ public class TeleportationMenuScreen extends AbstractGUIScreen {
         OxygenHelperClient.syncData(TeleportationMain.LOCATIONS_DATA_ID);
 
         if (TeleportationConfig.FEE_MODE.asInt() == 1)
-            this.balance = InventoryHelper.getEqualStackAmount(ClientReference.getClientPlayer(), TeleportationManagerClient.instance().getFeeStackWrapper());
+            this.balance = InventoryProviderClient.getPlayerInventory().getEqualItemAmount(ClientReference.getClientPlayer(), TeleportationManagerClient.instance().getFeeStackWrapper());
         else
             this.balance = WatcherHelperClient.getLong(OxygenMain.COMMON_CURRENCY_INDEX);
 
@@ -69,7 +69,7 @@ public class TeleportationMenuScreen extends AbstractGUIScreen {
             alignment = EnumGUIAlignment.CENTER;
             break;
         }
-        return new GUIWorkspace(this, 333, 149).setAlignment(alignment, 0, 0);
+        return new GUIWorkspace(this, 333, 150).setAlignment(alignment, 0, 0);
     }
 
     @Override

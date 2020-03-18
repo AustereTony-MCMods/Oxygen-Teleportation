@@ -14,10 +14,11 @@ import austeretony.oxygen_core.client.api.OxygenGUIHelper;
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
 import austeretony.oxygen_core.client.api.PrivilegesProviderClient;
 import austeretony.oxygen_core.client.gui.elements.OxygenActivityStatusSwitcher;
-import austeretony.oxygen_core.client.gui.elements.OxygenButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenCurrencyValue;
+import austeretony.oxygen_core.client.gui.elements.OxygenDefaultBackgroundWithButtonsUnderlinedFiller;
 import austeretony.oxygen_core.client.gui.elements.OxygenDropDownList;
-import austeretony.oxygen_core.client.gui.elements.OxygenDropDownList.OxygenDropDownListEntry;
+import austeretony.oxygen_core.client.gui.elements.OxygenDropDownList.OxygenDropDownListWrapperEntry;
+import austeretony.oxygen_core.client.gui.elements.OxygenKeyButton;
 import austeretony.oxygen_core.client.gui.elements.OxygenScrollablePanel;
 import austeretony.oxygen_core.client.gui.elements.OxygenSectionSwitcher;
 import austeretony.oxygen_core.client.gui.elements.OxygenSorter;
@@ -31,12 +32,12 @@ import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.common.util.MathUtils;
 import austeretony.oxygen_teleportation.client.TeleportationManagerClient;
 import austeretony.oxygen_teleportation.client.gui.teleportation.players.PlayerPanelEntry;
-import austeretony.oxygen_teleportation.client.gui.teleportation.players.PlayersBackgroundFiller;
 import austeretony.oxygen_teleportation.common.TeleportationPlayerData.EnumJumpProfile;
 import austeretony.oxygen_teleportation.common.WorldPoint;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
 import austeretony.oxygen_teleportation.common.main.EnumTeleportationPrivilege;
 import austeretony.oxygen_teleportation.common.main.TeleportationMain;
+import net.minecraft.client.gui.ScaledResolution;
 
 public class PlayersSection extends AbstractGUISection {
 
@@ -44,7 +45,7 @@ public class PlayersSection extends AbstractGUISection {
 
     private OxygenTextLabel playersAmountTextLabel, cooldownTextLabel;
 
-    private OxygenButton moveButton;
+    private OxygenKeyButton moveButton;
 
     private OxygenSorter statusSorter, usernameSorter;
 
@@ -75,19 +76,19 @@ public class PlayersSection extends AbstractGUISection {
 
     @Override
     public void init() {              
-        this.addElement(new PlayersBackgroundFiller(0, 0, this.getWidth(), this.getHeight()));
+        this.addElement(new OxygenDefaultBackgroundWithButtonsUnderlinedFiller(0, 0, this.getWidth(), this.getHeight()));
         this.addElement(new OxygenTextLabel(4, 12, ClientReference.localize("oxygen_teleportation.gui.menu.title"), EnumBaseGUISetting.TEXT_TITLE_SCALE.get().asFloat(), EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()));
 
         this.addElement(this.playersAmountTextLabel = new OxygenTextLabel(0, 22, "", EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()));
 
         this.addElement(this.statusSorter = new OxygenSorter(13, 28, EnumSorting.DOWN, ClientReference.localize("oxygen_core.gui.status")));   
-        this.statusSorter.setClickListener((sorting)->{
+        this.statusSorter.setSortingListener((sorting)->{
             this.usernameSorter.reset();
             this.sortPlayers(sorting == EnumSorting.DOWN ? 0 : 1);
         });
 
         this.addElement(this.usernameSorter = new OxygenSorter(19, 28, EnumSorting.INACTIVE, ClientReference.localize("oxygen_core.gui.username")));  
-        this.usernameSorter.setClickListener((sorting)->{
+        this.usernameSorter.setSortingListener((sorting)->{
             this.statusSorter.reset();
             this.sortPlayers(sorting == EnumSorting.DOWN ? 2 : 3);
         });
@@ -96,13 +97,13 @@ public class PlayersSection extends AbstractGUISection {
         this.addElement(this.searchField = new OxygenTextField(180, 16, 60, WorldPoint.MAX_NAME_LENGTH, ""));
         this.playersPanel.initSearchField(this.searchField);
 
-        this.playersPanel.<PlayerPanelEntry>setClickListener((previous, clicked, mouseX, mouseY, mouseButton)->{
+        this.playersPanel.<PlayerPanelEntry>setElementClickListener((previous, clicked, mouseX, mouseY, mouseButton)->{
             if (this.currentEntry != clicked) {
                 if (this.currentEntry != null)
                     this.currentEntry.setToggled(false);
                 this.currentEntry = clicked;
                 clicked.toggle();                    
-                this.showPlayerInfo();
+                this.showPlayerInfo(clicked.getWrapped());
             }
         });
 
@@ -110,17 +111,16 @@ public class PlayersSection extends AbstractGUISection {
 
         this.addElement(this.jumpProfileSwitcher = new OxygenDropDownList(80, 16, 75, ""));
         for (EnumJumpProfile jumpProfile : EnumJumpProfile.values())
-            this.jumpProfileSwitcher.addElement(new OxygenDropDownListEntry<EnumJumpProfile>(jumpProfile, jumpProfile.localizedName()));
+            this.jumpProfileSwitcher.addElement(new OxygenDropDownListWrapperEntry<EnumJumpProfile>(jumpProfile, jumpProfile.localizedName()));
 
-        this.jumpProfileSwitcher.<OxygenDropDownListEntry<EnumJumpProfile>>setClickListener(
-                (element)->TeleportationManagerClient.instance().getPlayerDataManager().changeJumpProfileSynced(element.index));
+        this.jumpProfileSwitcher.<OxygenDropDownListWrapperEntry<EnumJumpProfile>>setElementClickListener(
+                (element)->TeleportationManagerClient.instance().getPlayerDataManager().changeJumpProfileSynced(element.getWrapped()));
 
-        this.addElement(this.cooldownTextLabel = new OxygenTextLabel(78, this.getHeight() - 4, "",  EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()).setVisible(false));  
-        this.addElement(this.moveButton = new OxygenButton(6, this.getHeight() - 11,  40, 10, ClientReference.localize("oxygen_teleportation.gui.menu.moveButton")).disable());  
-        this.moveButton.setKeyPressListener(Keyboard.KEY_F, ()->this.move());
+        this.addElement(this.cooldownTextLabel = new OxygenTextLabel(60, this.getHeight() - 5, "",  EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()).setVisible(false));  
+        this.addElement(this.moveButton = new OxygenKeyButton(0, this.getY() + this.getHeight() + this.screen.guiTop - 8, ClientReference.localize("oxygen_teleportation.gui.menu.button.moveToPlayer"), Keyboard.KEY_F, this::move).disable());  
 
-        this.addElement(this.feeValue = new OxygenCurrencyValue(66, this.getHeight() - 10).disableFull());  
-        this.addElement(this.balanceValue = new OxygenCurrencyValue(this.getWidth() - 14, this.getHeight() - 10).disableFull());  
+        this.addElement(this.feeValue = new OxygenCurrencyValue(46, this.getHeight() - 11).disableFull());  
+        this.addElement(this.balanceValue = new OxygenCurrencyValue(this.getWidth() - 14, this.getHeight() - 11).disableFull());  
         if (TeleportationConfig.FEE_MODE.asInt() == 1) {
             this.feeValue.setValue(TeleportationManagerClient.instance().getFeeStackWrapper().getCachedItemStack(), 0);
             this.balanceValue.setValue(TeleportationManagerClient.instance().getFeeStackWrapper().getCachedItemStack(), (int) this.screen.balance);
@@ -130,6 +130,11 @@ public class PlayersSection extends AbstractGUISection {
         }
 
         this.addElement(new OxygenSectionSwitcher(this.getWidth() - 4, 5, this, this.screen.getCampsSection(), this.screen.getLocationsSection()));
+    }
+
+    private void calculateButtonsHorizontalPosition() {
+        ScaledResolution sr = new ScaledResolution(this.mc);
+        this.moveButton.setX((sr.getScaledWidth() - (12 + this.textWidth(this.moveButton.getDisplayText(), this.moveButton.getTextScale()))) / 2 - this.screen.guiLeft);
     }
 
     public void sortPlayers(int mode) {    
@@ -154,7 +159,7 @@ public class PlayersSection extends AbstractGUISection {
         for (PlayerSharedData sharedData : players)
             this.playersPanel.addEntry(new PlayerPanelEntry(sharedData));
 
-        this.playersAmountTextLabel.setDisplayText(String.valueOf(players.size()) + "/" + String.valueOf(OxygenHelperClient.getMaxPlayers()));   
+        this.playersAmountTextLabel.setDisplayText(String.format("%d/%d", players.size(), OxygenHelperClient.getMaxPlayers()));   
         this.playersAmountTextLabel.setX(327 - this.textWidth(this.playersAmountTextLabel.getDisplayText(), this.playersAmountTextLabel.getTextScale()));
 
         this.searchField.reset();
@@ -169,7 +174,7 @@ public class PlayersSection extends AbstractGUISection {
 
     private void move() {
         if (!this.searchField.isDragged()) {
-            TeleportationManagerClient.instance().getPlayerDataManager().moveToPlayerSynced(this.currentEntry.index);
+            TeleportationManagerClient.instance().getPlayerDataManager().moveToPlayerSynced(this.currentEntry.getWrapped());
             this.screen.close();
         }
     }
@@ -186,15 +191,22 @@ public class PlayersSection extends AbstractGUISection {
         this.activityStatusSwitcher.updateActivityStatus();
         this.jumpProfileSwitcher.setDisplayText(getJumpProfile(OxygenHelperClient.getPlayerSharedData()).localizedName());
         this.sortPlayers(0);
+
+        this.calculateButtonsHorizontalPosition();
     }
 
     public void cooldownSynchronized() {
         this.cooldownActive = this.getCooldownElapsedTimeSeconds() > 0;
     }
 
-    private void showPlayerInfo() {
+    private void showPlayerInfo(int playerIndex) {
         this.moveButton.setEnabled(this.screen.jumpsEnabled);
         this.cooldownTextLabel.setVisible(this.cooldownActive);
+
+        PlayerSharedData sharedData = OxygenHelperClient.getPlayerSharedData(playerIndex);
+        this.moveButton.setDisplayText(getJumpProfile(sharedData) == EnumJumpProfile.FREE 
+                ? ClientReference.localize("oxygen_teleportation.gui.menu.button.moveToPlayer") 
+                        : ClientReference.localize("oxygen_teleportation.gui.menu.button.requestTeleportation"));
 
         long fee = PrivilegesProviderClient.getAsLong(EnumTeleportationPrivilege.PLAYER_TELEPORTATION_FEE.id(), TeleportationConfig.TELEPORTATION_TO_PLAYER_FEE.asLong());
         if (fee > 0L) {

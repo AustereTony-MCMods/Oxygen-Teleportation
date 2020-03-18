@@ -1,7 +1,8 @@
 package austeretony.oxygen_teleportation.server;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,15 +10,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import austeretony.oxygen_core.common.api.CommonReference;
+import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
-import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ImagesLoaderServer {
@@ -34,13 +36,12 @@ public class ImagesLoaderServer {
 
     public void loadAndSendCampPreviewImages(EntityPlayerMP playerMP, long[] campIds) {
         UUID ownerUUID = CommonReference.getPersistentUUID(playerMP);
-        BufferedImage bufferedImage;
         for (long id : campIds) {
             if (this.manager.getSharedCampsContainer().haveInvitation(ownerUUID, id))
                 ownerUUID = this.manager.getSharedCampsContainer().getCampOwner(id);
-            bufferedImage = this.loadCampPreviewImage(ownerUUID, id);
-            if (bufferedImage != null)
-                this.manager.getImagesManager().downloadCampPreviewToClientAsync(playerMP, id, bufferedImage);
+            final byte[] imageRaw = this.loadCampPreviewImageBytes(ownerUUID, id);
+            if (imageRaw != null)
+                this.manager.getImagesManager().downloadCampPreviewToClientAsync(playerMP, id, imageRaw);
         }
     }
 
@@ -52,12 +53,13 @@ public class ImagesLoaderServer {
         UUID ownerUUID = CommonReference.getPersistentUUID(playerMP);
         if (this.manager.getSharedCampsContainer().haveInvitation(ownerUUID, campId))
             ownerUUID = this.manager.getSharedCampsContainer().getCampOwner(campId);
-        BufferedImage bufferedImage = this.loadCampPreviewImage(ownerUUID, campId);
-        if (bufferedImage != null)
-            this.manager.getImagesManager().downloadCampPreviewToClientAsync(playerMP, campId, bufferedImage);
+        final byte[] imageRaw = this.loadCampPreviewImageBytes(ownerUUID, campId);
+        if (imageRaw != null)
+            this.manager.getImagesManager().downloadCampPreviewToClientAsync(playerMP, campId, imageRaw);
     }
 
-    public BufferedImage loadCampPreviewImage(UUID playerUUID, long pointId) {
+    @Nullable
+    public byte[] loadCampPreviewImageBytes(UUID playerUUID, long pointId) {
         String folder = OxygenHelperServer.getDataFolder() + "/server/players/" + playerUUID + "/teleportation/images/camps/" + pointId + ".png";
         Path path = Paths.get(folder);
         if (Files.exists(path)) {
@@ -65,33 +67,42 @@ public class ImagesLoaderServer {
             BufferedImage bufferedImage;
             try {
                 bufferedImage = ImageIO.read(file);
-                return bufferedImage;
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "png", baos);
+                return baos.toByteArray();
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to load camp preview image {}.png for player {}.", pointId, playerUUID);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to obtain camp preview image {}.png bytes for player {}.", pointId, playerUUID);
                 exception.printStackTrace();
             }
         }
         return null;
     }
 
-    public void saveCampPreviewImageAsync(UUID playerUUID, long pointId, BufferedImage image) {
-        OxygenHelperServer.addIOTask(()->this.saveCampPreviewImage(playerUUID, pointId, image));
+    public void saveCampPreviewImageAsync(UUID playerUUID, long pointId, byte[] imageRaw) {
+        OxygenHelperServer.addIOTask(()->this.saveCampPreviewImage(playerUUID, pointId, imageRaw));
     }
 
-    public void saveCampPreviewImage(UUID playerUUID, long pointId, BufferedImage image) {
+    public void saveCampPreviewImage(UUID playerUUID, long pointId, byte[] imageRaw) {
         String folder = OxygenHelperServer.getDataFolder() + "/server/players/" + playerUUID + "/teleportation/images/camps/" + pointId + ".png";
         Path path = Paths.get(folder);
-        if (!Files.exists(path)) {
-            try {                   
+        try {
+            if (!Files.exists(path))
                 Files.createDirectories(path.getParent());              
-            } catch (IOException exception) {               
+
+            ByteArrayInputStream baos = new ByteArrayInputStream(imageRaw);
+            BufferedImage bufferedImage = null;
+            try {
+                bufferedImage = ImageIO.read(baos);
+            } catch (IOException exception) {
+                OxygenMain.LOGGER.error("[Teleportation] Failed to create camp buffered image {}.png of raw bytes for player {}.", pointId, playerUUID);
                 exception.printStackTrace();
             }
-        }
-        try {
-            ImageIO.write(image, "png", path.toFile());
+
+            if (bufferedImage != null)
+                ImageIO.write(bufferedImage, "png", path.toFile());
         } catch (IOException exception) {          
-            TeleportationMain.LOGGER.error("Failed to save camp preview image {}.png for player {}.", pointId, playerUUID);
+            OxygenMain.LOGGER.error("[Teleportation] Failed to save camp preview image {}.png for player {}.", pointId, playerUUID);
             exception.printStackTrace();
         }
     }
@@ -107,7 +118,7 @@ public class ImagesLoaderServer {
             try {
                 Files.delete(path);
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to remove camp preview image {}.png for player: {}.", pointId, playerUUID);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to remove camp preview image {}.png for player: {}.", pointId, playerUUID);
                 exception.printStackTrace();
             }
         }
@@ -124,14 +135,14 @@ public class ImagesLoaderServer {
             try {
                 Files.move(path, path.resolveSibling(newPointId + ".png"));
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to rename camp preview image {}.png.", oldPointId);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to rename camp preview image {}.png.", oldPointId);
                 exception.printStackTrace();
             }
         }
     }
 
     public void loadLocationPreviewImagesAsync() {
-        OxygenHelperServer.addIOTask(()->this.loadLocationPreviewImages());
+        OxygenHelperServer.addIOTask(this::loadLocationPreviewImages);
     }
 
     public void loadLocationPreviewImages() {
@@ -148,74 +159,53 @@ public class ImagesLoaderServer {
                         Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.asInt());
                         Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.asInt());
                     } catch (IllegalStateException exception) {
-                        TeleportationMain.LOGGER.error("Invalid location preview image {}.", fileName);
+                        OxygenMain.LOGGER.error("[Teleportation] Invalid location preview image {}.", fileName);
                         return;
                     }
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(bufferedImage, "png", baos);
+
                     this.manager.getImagesManager().getLocationPreviews().put(
                             Long.parseLong(StringUtils.remove(fileName, ".png")), 
-                            ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData());              
+                            baos.toByteArray());              
                 } catch (IOException exception) {
-                    TeleportationMain.LOGGER.error("Filed to load location preview image {}.", fileName);
+                    OxygenMain.LOGGER.error("[Teleportation] Filed to load location preview image {}.", fileName);
                     exception.printStackTrace();
                 }
             }
-            TeleportationMain.LOGGER.info("Loaded locations preview images.");
+            OxygenMain.LOGGER.info("[Teleportation] Loaded locations preview images.");
         }
     }
 
-    public void saveAndLoadBytesLocationPreviewAsync(long pointId, BufferedImage image) {        
-        OxygenHelperServer.addIOTask(()->{
-            this.saveLocationPreview(pointId, image);
-            this.loadLocationPreviewBytes(pointId);   
-        });
+    public void saveAndLoadBytesLocationPreviewAsync(long pointId, byte[] imageRaw) {    
+        this.manager.getImagesManager().getLocationPreviews().put(pointId, imageRaw);
+
+        OxygenHelperServer.addIOTask(()->this.saveLocationPreview(pointId, imageRaw));
     }
 
-    public void saveLocationPreview(long pointId, BufferedImage image) {
+    public void saveLocationPreview(long pointId, byte[] imageRaw) {
         String folder = OxygenHelperServer.getDataFolder() + "/server/world/teleportation/locations/images/" + pointId + ".png";
         Path path = Paths.get(folder);
-        if (!Files.exists(path)) {
-            try {                   
+        try {
+            if (!Files.exists(path))
                 Files.createDirectories(path.getParent());              
-            } catch (IOException exception) {               
+
+            ByteArrayInputStream baos = new ByteArrayInputStream(imageRaw);
+            BufferedImage bufferedImage = null;
+            try {
+                bufferedImage = ImageIO.read(baos);
+            } catch (IOException exception) {
+                OxygenMain.LOGGER.error("[Teleportation] Failed to create location buffered image {}.png of raw bytes.", pointId);
                 exception.printStackTrace();
             }
-        }
-        try {
-            ImageIO.write(image, "png", path.toFile());
+
+            if (bufferedImage != null)
+                ImageIO.write(bufferedImage, "png", path.toFile());
         } catch (IOException exception) {        
-            TeleportationMain.LOGGER.error("Failed to save location preview image {}.png", pointId);
+            OxygenMain.LOGGER.error("[Teleportation] Failed to save location preview image {}.png", pointId);
             exception.printStackTrace();
         }
-    }
-
-    public void loadLocationPreviewBytes(long pointId) {
-        String folder = OxygenHelperServer.getDataFolder() + "/server/world/teleportation/locations/images/" + pointId + ".png";
-        Path path = Paths.get(folder);
-        BufferedImage bufferedImage;
-        if (Files.exists(path)) {
-            bufferedImage = loadLocationPreviewImageServer(pointId);
-            if (bufferedImage != null)
-                this.manager.getImagesManager().getLocationPreviews().put(
-                        pointId, 
-                        ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData());              
-        }
-    }
-
-    public BufferedImage loadLocationPreviewImageServer(long pointId) {
-        String folder = OxygenHelperServer.getDataFolder() + "/server/world/teleportation/locations/images/" + pointId + ".png";
-        Path path = Paths.get(folder);
-        if (Files.exists(path)) {
-            File file = new File(folder);
-            BufferedImage bufferedImage;
-            try {
-                bufferedImage = ImageIO.read(file);
-                return bufferedImage;
-            } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to load location preview image {}.png", pointId);
-                exception.printStackTrace();
-            }
-        }
-        return null;
     }
 
     public void removeLocationPreviewImageAsync(long pointId) {
@@ -229,7 +219,7 @@ public class ImagesLoaderServer {
             try {
                 Files.delete(path);
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to remove location preview image {}.png.", pointId);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to remove location preview image {}.png.", pointId);
                 exception.printStackTrace();
             }
         }
@@ -246,7 +236,7 @@ public class ImagesLoaderServer {
             try {
                 Files.move(path, path.resolveSibling(newPointId + ".png"));
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to rename location preview image {}.png.", oldPointId);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to rename location preview image {}.png.", oldPointId);
                 exception.printStackTrace();
             }
         }

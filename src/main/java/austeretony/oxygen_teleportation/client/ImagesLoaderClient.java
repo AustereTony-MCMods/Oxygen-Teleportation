@@ -13,8 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import austeretony.oxygen_core.client.api.OxygenHelperClient;
+import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_teleportation.common.config.TeleportationConfig;
-import austeretony.oxygen_teleportation.common.main.TeleportationMain;
 
 public class ImagesLoaderClient {
 
@@ -25,7 +25,7 @@ public class ImagesLoaderClient {
     }
 
     public void loadCampPreviewImagesAsync() {
-        OxygenHelperClient.addIOTask(()->this.loadCampPreviewImages());
+        OxygenHelperClient.addIOTask(this::loadCampPreviewImages);
     }
 
     public void loadCampPreviewImages() {
@@ -42,16 +42,16 @@ public class ImagesLoaderClient {
                         Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.asInt());
                         Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.asInt());
                     } catch (IllegalStateException exception) {
-                        TeleportationMain.LOGGER.error("Invalid camp preview image {}.", fileName);
+                        OxygenMain.LOGGER.error("[Teleportation] Invalid camp preview image {}.", fileName);
                         return;
                     }
                     this.manager.getImagesManager().getPreviewImages().put(Long.parseLong(StringUtils.remove(fileName, ".png")), bufferedImage);
                 } catch (IOException exception) {
-                    TeleportationMain.LOGGER.error("Failed to load camp preview image {}.", fileName);
+                    OxygenMain.LOGGER.error("[Teleportation] Failed to load camp preview image {}.", fileName);
                     exception.printStackTrace();
                 }
             }
-            TeleportationMain.LOGGER.info("Loaded camps preview images.");
+            OxygenMain.LOGGER.info("[Teleportation] Loaded camps preview images.");
         }
     }
 
@@ -76,13 +76,13 @@ public class ImagesLoaderClient {
         try {
             ImageIO.write(image, "png", path.toFile());
         } catch (IOException exception) {      
-            TeleportationMain.LOGGER.error("Failed to save camp preview image {}.png.", pointId);
+            OxygenMain.LOGGER.error("[Teleportation] Failed to save camp preview image {}.png.", pointId);
             exception.printStackTrace();
         }
     }
 
     public void removeUnusedCampPreviewImagesAsync() {
-        OxygenHelperClient.addIOTask(()->this.removeUnusedCampPreviewImages());
+        OxygenHelperClient.addIOTask(this::removeUnusedCampPreviewImages);
     }
 
     public void removeUnusedCampPreviewImages() {
@@ -92,16 +92,16 @@ public class ImagesLoaderClient {
             Path path;
             for (String fileName : files) {
                 path = Paths.get(folder + "/" + fileName);
-                if (!this.manager.getPlayerData().campExist(Long.parseLong(StringUtils.remove(fileName, ".png")))) {
+                if (!this.manager.getPlayerData().isCampExist(Long.parseLong(StringUtils.remove(fileName, ".png")))) {
                     try {
                         Files.delete(path);
                     } catch (IOException exception) {
-                        TeleportationMain.LOGGER.error("Failed to remove camp preview image {}.", fileName);
+                        OxygenMain.LOGGER.error("[Teleportation] Failed to remove camp preview image {}.", fileName);
                         exception.printStackTrace();
                     }
                 }
             }
-            TeleportationMain.LOGGER.info("Removed unused camps preview images.");
+            OxygenMain.LOGGER.info("[Teleportation] Removed unused camps preview images.");
         }
     }
 
@@ -112,7 +112,7 @@ public class ImagesLoaderClient {
             try {
                 Files.delete(path);
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to remove camp preview image {}.png.", pointId);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to remove camp preview image {}.png.", pointId);
                 exception.printStackTrace();
             }
         }
@@ -128,16 +128,16 @@ public class ImagesLoaderClient {
         if (Files.exists(path)) {
             try {
                 Files.move(path, path.resolveSibling(newPointId + ".png"));
-                TeleportationMain.LOGGER.info("Renamed camp preview image {}.png to {}.png", oldPointId, newPointId);
+                OxygenMain.LOGGER.info("[Teleportation] Renamed camp preview image {}.png to {}.png", oldPointId, newPointId);
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to rename camp preview image {}.png.", oldPointId);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to rename camp preview image {}.png.", oldPointId);
                 exception.printStackTrace();
             }
         }
     }
 
     public void loadLocationPreviewImagesAsync() {
-        OxygenHelperClient.addIOTask(()->this.loadLocationPreviewImages());
+        OxygenHelperClient.addIOTask(this::loadLocationPreviewImages);
     }
 
     public void loadLocationPreviewImages() {
@@ -154,16 +154,16 @@ public class ImagesLoaderClient {
                         Validate.validState(bufferedImage.getWidth() == TeleportationConfig.IMAGE_WIDTH.asInt());
                         Validate.validState(bufferedImage.getHeight() == TeleportationConfig.IMAGE_HEIGHT.asInt());
                     } catch (IllegalStateException exception) {
-                        TeleportationMain.LOGGER.error("Invalid location preview image: {}.", fileName);
+                        OxygenMain.LOGGER.error("[Teleportation] Invalid location preview image: {}.", fileName);
                         return;
                     }
                     this.manager.getImagesManager().getPreviewImages().put(Long.parseLong(StringUtils.remove(fileName, ".png")), bufferedImage);
                 } catch (IOException exception) {
-                    TeleportationMain.LOGGER.error("Failed to load location preview image: {}.", fileName);
+                    OxygenMain.LOGGER.error("[Teleportation] Failed to load location preview image: {}.", fileName);
                     exception.printStackTrace();
                 }
             }
-            TeleportationMain.LOGGER.info("Loaded locations preview images.");
+            OxygenMain.LOGGER.info("[Teleportation] Loaded locations preview images.");
         }
     }
 
@@ -188,7 +188,7 @@ public class ImagesLoaderClient {
         try {
             ImageIO.write(image, "png", path.toFile());
         } catch (IOException exception) {        
-            TeleportationMain.LOGGER.error("Failed to save location preview image: {}.png", pointId);
+            OxygenMain.LOGGER.error("[Teleportation] Failed to save location preview image: {}.png", pointId);
             exception.printStackTrace();
         }
     }
@@ -208,12 +208,12 @@ public class ImagesLoaderClient {
                     try {
                         Files.delete(path);
                     } catch (IOException exception) {
-                        TeleportationMain.LOGGER.error("Failed to remove location preview image {}.", fileName);
+                        OxygenMain.LOGGER.error("[Teleportation] Failed to remove location preview image {}.", fileName);
                         exception.printStackTrace();
                     }
                 }
             }
-            TeleportationMain.LOGGER.info("Removed unused locations preview images.");
+            OxygenMain.LOGGER.info("[Teleportation] Removed unused locations preview images.");
         }
     }
 
@@ -228,7 +228,7 @@ public class ImagesLoaderClient {
             try {
                 Files.delete(path);
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to remove location preview image {}.png.", pointId);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to remove location preview image {}.png.", pointId);
                 exception.printStackTrace();
             }
         }
@@ -244,9 +244,9 @@ public class ImagesLoaderClient {
         if (Files.exists(path)) {
             try {
                 Files.move(path, path.resolveSibling(newPointId + ".png"));
-                TeleportationMain.LOGGER.info("Renamed location preview image {}.png to {}.png", oldPointId, newPointId);
+                OxygenMain.LOGGER.info("[Teleportation] Renamed location preview image {}.png to {}.png", oldPointId, newPointId);
             } catch (IOException exception) {
-                TeleportationMain.LOGGER.error("Failed to rename location preview image {}.png.", oldPointId);
+                OxygenMain.LOGGER.error("[Teleportation] Failed to rename location preview image {}.png.", oldPointId);
                 exception.printStackTrace();
             }
         }

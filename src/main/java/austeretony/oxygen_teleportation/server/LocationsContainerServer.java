@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 import austeretony.oxygen_core.common.persistent.AbstractPersistentData;
 import austeretony.oxygen_core.common.util.StreamUtils;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
@@ -27,10 +29,6 @@ public class LocationsContainerServer extends AbstractPersistentData {
         return this.locations.size();
     }
 
-    public boolean isLocationsExist() {
-        return !this.locations.isEmpty();
-    }
-
     public Set<Long> getLocationIds() {
         return this.locations.keySet();
     }
@@ -39,6 +37,7 @@ public class LocationsContainerServer extends AbstractPersistentData {
         return this.locations.containsKey(pointId);
     }
 
+    @Nullable
     public WorldPoint getLocation(long pointId) {
         return this.locations.get(pointId);
     }
@@ -52,15 +51,15 @@ public class LocationsContainerServer extends AbstractPersistentData {
     }
 
     public long createId(long seed) {
-        seed++;
-        while (this.locations.containsKey(seed))
-            seed++;
-        return seed;
+        long id = ++seed;
+        while (this.locations.containsKey(id))
+            id++;
+        return id;
     }
 
     @Override
     public String getDisplayName() {
-        return "locations";
+        return "teleportation:locations_server";
     }
 
     @Override

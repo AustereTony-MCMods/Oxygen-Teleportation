@@ -4,10 +4,10 @@ import java.util.UUID;
 
 import austeretony.oxygen_core.common.api.CommonReference;
 import austeretony.oxygen_core.common.api.process.AbstractTemporaryProcess;
-import austeretony.oxygen_core.common.inventory.InventoryHelper;
 import austeretony.oxygen_core.common.main.OxygenMain;
 import austeretony.oxygen_core.common.sound.OxygenSoundEffects;
 import austeretony.oxygen_core.server.api.CurrencyHelperServer;
+import austeretony.oxygen_core.server.api.InventoryProviderServer;
 import austeretony.oxygen_core.server.api.OxygenHelperServer;
 import austeretony.oxygen_core.server.api.PrivilegesProviderServer;
 import austeretony.oxygen_core.server.api.SoundEventHelperServer;
@@ -82,17 +82,19 @@ public abstract class AbstractTeleportation extends AbstractTemporaryProcess {
     public void expired() {
         if (this.fee > 0L) {
             if (TeleportationConfig.FEE_MODE.asInt() == 1) {
-                if (InventoryHelper.getEqualStackAmount(this.playerMP, TeleportationManagerServer.instance().getFeeStackWrapper()) < this.fee)
+                if (InventoryProviderServer.getPlayerInventory().getEqualItemAmount(this.playerMP, TeleportationManagerServer.instance().getFeeStackWrapper()) < this.fee)
                     return;
-                CommonReference.delegateToServerThread(()->InventoryHelper.removeEqualStack(this.playerMP, TeleportationManagerServer.instance().getFeeStackWrapper(), (int) this.fee));
-                SoundEventHelperServer.playSoundClient(this.playerMP, OxygenSoundEffects.INVENTORY.id);
+
+                InventoryProviderServer.getPlayerInventory().removeItem(this.playerMP, TeleportationManagerServer.instance().getFeeStackWrapper(), (int) this.fee);
+                SoundEventHelperServer.playSoundClient(this.playerMP, OxygenSoundEffects.INVENTORY_OPERATION.getId());
             } else {
                 UUID playerUUID = CommonReference.getPersistentUUID(this.playerMP);
                 if (!CurrencyHelperServer.enoughCurrency(playerUUID, this.fee, OxygenMain.COMMON_CURRENCY_INDEX))
                     return;
+
                 CurrencyHelperServer.removeCurrency(playerUUID, this.fee, OxygenMain.COMMON_CURRENCY_INDEX);
 
-                SoundEventHelperServer.playSoundClient(this.playerMP, OxygenSoundEffects.SELL.id);
+                SoundEventHelperServer.playSoundClient(this.playerMP, OxygenSoundEffects.RINGING_COINS.getId());
             }
         }
         this.move();

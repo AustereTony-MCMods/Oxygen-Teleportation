@@ -39,9 +39,12 @@ oxygen_teleportation.gui.menu.callback.editLocation=Редактирование
 oxygen_teleportation.gui.menu.updateImage=Обновить Изображение
 oxygen_teleportation.gui.menu.updatePosition=Обновить Позицию
 
-oxygen_teleportation.gui.menu.createButton=Создать
-oxygen_teleportation.gui.menu.moveButton=Посетить
-oxygen_teleportation.gui.menu.requestButton=Запрос
+oxygen_teleportation.gui.menu.button.createCamp=Создать Лагерь
+oxygen_teleportation.gui.menu.button.moveToCamp=Посетить Лагерь
+oxygen_teleportation.gui.menu.button.createLocation=Создать Локацию
+oxygen_teleportation.gui.menu.button.moveToLocation=Посетить Локацию
+oxygen_teleportation.gui.menu.button.moveToPlayer=Переместиться к Игроку
+oxygen_teleportation.gui.menu.button.requestTeleportation=Запросить Перемещение
 
 oxygen_teleportation.gui.menu.campGenericName=Лагерь
 oxygen_teleportation.gui.menu.locationGenericName=Локация

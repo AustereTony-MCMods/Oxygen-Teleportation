@@ -1,0 +1,100 @@
+key.teleportation.teleportationMenu=Otwórz Menu Teleportacji
+key.teleportation.moveToFavCamp=Przenieś TP do ulubionych
+
+oxygen_teleportation.gui.settings.module.teleportation=Teleportacja / Obozy
+oxygen_teleportation.gui.settings.option.addTeleportationMenu=Wyświetlaj menu z teleportacją i obozami
+oxygen_teleportation.gui.settings.option.alignmentTeleportationMenu=Pokazuj menu teleportacji
+
+oxygen_teleportation.gui.menu.title=Teleportacja
+oxygen_teleportation.gui.menu.camps=Obozowiska
+oxygen_teleportation.gui.menu.locations=Lokacje
+oxygen_teleportation.gui.menu.players=Gracze
+
+oxygen_teleportation.gui.menu.makeFvorite=Dodaj do ulubionych
+oxygen_teleportation.gui.menu.lock=Zablokuj
+oxygen_teleportation.gui.menu.unlock=Odblokuj
+oxygen_teleportation.gui.menu.invite=Zaproś
+oxygen_teleportation.gui.menu.invitations=Zaproszenia
+oxygen_teleportation.gui.menu.edit=Edytuj
+oxygen_teleportation.gui.menu.remove=Skasuj
+oxygen_teleportation.gui.menu.leave=Opuść
+oxygen_teleportation.gui.menu.uninvite=Zaproszenie
+oxygen_teleportation.gui.menu.moveTo=Teleportuj
+
+oxygen_teleportation.gui.menu.players.profile=Profil
+
+oxygen_teleportation.gui.menu.callback.campCreation=Tworzenie nowego Obozu
+oxygen_teleportation.gui.menu.callback.invitePlayer=Zaproś
+oxygen_teleportation.gui.menu.callback.invitePlayer.request=Podaj nazwę gracza:
+oxygen_teleportation.gui.menu.callback.invitations=Zaproszenia
+oxygen_teleportation.gui.menu.callback.removeCamp=Skasować Obóz?
+oxygen_teleportation.gui.menu.callback.removeCamp.request=Punkt obozowy zostanie usunięty.
+oxygen_teleportation.gui.menu.callback.leaveCamp=Opuścić Obóz
+oxygen_teleportation.gui.menu.callback.leaveCamp.request=Punkt obozowy zostanie usunięty.
+oxygen_teleportation.gui.menu.callback.editCamp=Edycja Obozu
+oxygen_teleportation.gui.menu.callback.locationCreation=Tworzenie Lokacji
+oxygen_teleportation.gui.menu.callback.removeLocation=Skasuj Lokację
+oxygen_teleportation.gui.menu.callback.removeLocation.request=Punkt lokalizacyjny zostanie usunięty.
+oxygen_teleportation.gui.menu.callback.editLocation=Edytuj Lokację
+
+oxygen_teleportation.gui.menu.updateImage=Zaktualizuj nowe zdjęcie
+oxygen_teleportation.gui.menu.updatePosition=Zaktualizuj nową pozycję
+
+oxygen_teleportation.gui.menu.button.createCamp=Utwórz Obóz
+oxygen_teleportation.gui.menu.button.moveToCamp=Przenieś się do Obozu
+oxygen_teleportation.gui.menu.button.createLocation=Utwórz Lokację
+oxygen_teleportation.gui.menu.button.moveToLocation=Przenieś się do Lokacji
+oxygen_teleportation.gui.menu.button.moveToPlayer=Przenieś się do Gracza
+oxygen_teleportation.gui.menu.button.requestTeleportation=Prośba o TP
+
+oxygen_teleportation.gui.menu.campGenericName=Obóz
+oxygen_teleportation.gui.menu.locationGenericName=Lokacja
+
+oxygen_teleportation.gui.menu.info.owner=Właściciel:
+
+oxygen_teleportation.gui.menu.tooltip.camps=Obozy
+oxygen_teleportation.gui.menu.tooltip.locations=Lokacje
+oxygen_teleportation.gui.menu.tooltip.players=Gracze
+
+oxygen_teleportation.jumpProfile.free=Darmowe
+oxygen_teleportation.jumpProfile.request=Na żądanie
+oxygen_teleportation.jumpProfile.disabled=Wyłączone
+
+oxygen_teleportation.status.campCreated=Utworzony punkt obozu
+oxygen_teleportation.status.campEdited=Punkt obozowy zedytowany
+oxygen_teleportation.status.campRemoved=Punkt obozu został usunięty
+oxygen_teleportation.status.favoriteCampSet=Obóz ustawiony jako ulubiony
+oxygen_teleportation.status.campLocked=Punkt obozowy jest zablokowany
+oxygen_teleportation.status.campUnlocked=Punkt obozowy jest odblokowany
+oxygen_teleportation.status.locationCreated=Utworzony punkt lokalizacyjny
+oxygen_teleportation.status.locationEdited=Punkt lokalizacyjny edytowany
+oxygen_teleportation.status.locationRemoved=Usunięty punkt lokalizacyjny
+oxygen_teleportation.status.locationLocked=Punkt lokalizacyjny zablokowany
+oxygen_teleportation.status.locationUnlocked=Punkt lokalizacyjny odblokowany
+oxygen_teleportation.status.prepareForTeleportation=Przygotowywanie do teleportacji..
+oxygen_teleportation.status.movedToCamp=Przeniesiono się do punktu obozowego
+oxygen_teleportation.status.movedToLocation=Przeniesiono się do lokalizacji
+oxygen_teleportation.status.movedToPlayer=Przeniesiono się do gracza
+oxygen_teleportation.status.jumpProfileChanged=Profil skoku teleportacyjnego zmieniony
+oxygen_teleportation.status.jumpRequestAccepted=Zaakceptowałeś prośbę o teleportację
+oxygen_teleportation.status.jumpRequestRejected=Prośba o teleportacje została odrzucona
+oxygen_teleportation.status.jumpRequestAcceptedVisitor=Twoja prośba o teleportację została przyjęta
+oxygen_teleportation.status.jumpRequestRejectedVisitor=Twoja prośba o teleportację została odrzucona
+oxygen_teleportation.status.jumpRequestTargetOffline=Gracz jest niedostępny
+oxygen_teleportation.status.jumpRequestVisitorOffline=Gracz jest niedostępny
+oxygen_teleportation.status.teleportationAborted=Teleportacja została przerwana
+oxygen_teleportation.status.crossDimTeleportationDisabled=Teleportowanie się pomiędzy wymiarami jest zabronione
+oxygen_teleportation.status.invitatioinRequestSent=Wysłano zaproszenie do tego obozu
+oxygen_teleportation.status.invitationRequestAccepted=Zaakceptowałeś prośbę o zaproszenie do obozu
+oxygen_teleportation.status.invitationRequestRejected=Prośba o zaproszenie do obozu została odrzucona
+oxygen_teleportation.status.invitationRequestAcceptedOwner=Twoje zaproszenie do obozu zostało przyjęte
+oxygen_teleportation.status.invitationRequestRejectedOwner=Twoje zaproszenie do obozu zostało odrzucone
+oxygen_teleportation.status.playerUninvited=Nieproszony gracz
+oxygen_teleportation.status.campLeft=Pozostałe punkty obozu
+oxygen_teleportation.status.feeStackSpecified=Ustalono opłatę
+
+oxygen_teleportation.jump.request=%s wysłał Ci prośbę o teleportację.
+oxygen_teleportation.invitation.request=%s zaprosił cię na obóz <%s>.
+
+oxygen_teleportation.command.dataReset=<oxygen: teleportation> zresetowane.
+oxygen_teleportation.command.exception.mainHandEmpty=Główna ręka jest pusta!

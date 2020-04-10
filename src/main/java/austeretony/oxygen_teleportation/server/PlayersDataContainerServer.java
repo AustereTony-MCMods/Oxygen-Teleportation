@@ -34,13 +34,11 @@ public class PlayersDataContainerServer {
     }
 
     void save() {
-        OxygenHelperServer.addRoutineTask(()->{
-            for (TeleportationPlayerData playerData : this.players.values()) {
-                if (playerData.isChanged()) {
-                    playerData.setChanged(false);
-                    OxygenHelperServer.savePersistentDataAsync(playerData);
-                }
-            }   
-        });
+        for (TeleportationPlayerData playerData : this.players.values()) {
+            if (playerData.isChanged()) {
+                playerData.setChanged(false);
+                OxygenHelperServer.savePersistentDataAsync(playerData);
+            }
+        }   
     }
 }

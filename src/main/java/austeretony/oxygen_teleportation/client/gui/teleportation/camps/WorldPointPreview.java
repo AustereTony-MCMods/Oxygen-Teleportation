@@ -54,7 +54,7 @@ public class WorldPointPreview extends GUIAdvancedElement<WorldPointPreview> {
             drawGradientRect(0, 0, 241, 70, 0x00000000, 0xc8000000);
             GlStateManager.disableBlend(); 
 
-            drawRect(0, 120, 241, 135, this.getStaticBackgroundColor());
+            //drawRect(0, 120, 241, 135, this.getStaticBackgroundColor());
 
             float textScale = this.getTooltipScaleFactor() + 0.2F;
 

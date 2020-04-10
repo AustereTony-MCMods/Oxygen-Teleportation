@@ -140,13 +140,13 @@ public class CampsSection extends AbstractGUISection {
         this.addElement(this.createButton = new OxygenKeyButton(0, this.getY() + this.getHeight() + this.screen.guiTop - 8, ClientReference.localize("oxygen_teleportation.gui.menu.button.createCamp"), Keyboard.KEY_R, this::openCreationCallback));     
 
         this.addElement(this.worldPointPreview = new WorldPointPreview(91, 15));
-        this.addElement(this.cooldownTextLabel = new OxygenTextLabel(130, this.getHeight() - 5, "", EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()).setVisible(false));
+        this.addElement(this.cooldownTextLabel = new OxygenTextLabel(0, this.getY() + this.getHeight() + this.screen.guiTop - 2, "", EnumBaseGUISetting.TEXT_SUB_SCALE.get().asFloat() - 0.05F, EnumBaseGUISetting.TEXT_ENABLED_COLOR.get().asInt()).setVisible(false));
         this.addElement(this.moveButton = new OxygenKeyButton(0, this.getY() + this.getHeight() + this.screen.guiTop - 8, ClientReference.localize("oxygen_teleportation.gui.menu.button.moveToCamp"), Keyboard.KEY_F, this::move).disableFull());     
 
         this.addElement(new OxygenSectionSwitcher(this.getWidth() - 4, 5, this, this.screen.getLocationsSection(), this.screen.getPlayersSection()));
 
-        this.addElement(this.feeValue = new OxygenCurrencyValue(116, this.getHeight() - 11).disableFull());  
-        this.addElement(this.balanceValue = new OxygenCurrencyValue(this.getWidth() - 14, this.getHeight() - 11).disableFull());  
+        this.addElement(this.feeValue = new OxygenCurrencyValue(0, this.getY() + this.getHeight() + this.screen.guiTop - 8).disableFull());  
+        this.addElement(this.balanceValue = new OxygenCurrencyValue(0, this.getY() + this.getHeight() + this.screen.guiTop - 8).disableFull());  
         if (TeleportationConfig.FEE_MODE.asInt() == 1) {
             this.feeValue.setValue(TeleportationManagerClient.instance().getFeeStackWrapper().getCachedItemStack(), 0);
             this.balanceValue.setValue(TeleportationManagerClient.instance().getFeeStackWrapper().getCachedItemStack(), (int) this.screen.balance);
@@ -160,6 +160,15 @@ public class CampsSection extends AbstractGUISection {
         ScaledResolution sr = new ScaledResolution(this.mc);
         this.createButton.setX((sr.getScaledWidth() - (12 + this.textWidth(this.createButton.getDisplayText(), this.createButton.getTextScale()))) / 2 - this.screen.guiLeft);
         this.moveButton.setX(sr.getScaledWidth() / 2 + 50 - this.screen.guiLeft);
+
+        long fee = PrivilegesProviderClient.getAsLong(EnumTeleportationPrivilege.CAMP_TELEPORTATION_FEE.id(), TeleportationConfig.CAMP_TELEPORTATION_FEE.asLong());
+        if (fee > 0L) {
+            this.moveButton.setX(this.moveButton.getX() + 44);
+
+            this.cooldownTextLabel.setX(sr.getScaledWidth() / 2 + 50 - this.screen.guiLeft);
+            this.feeValue.setX(sr.getScaledWidth() / 2 + 84 - this.screen.guiLeft);
+            this.balanceValue.setX(sr.getScaledWidth() - 10 - this.screen.guiLeft);
+        }
     }
 
     private void sortPoints(int mode) {
